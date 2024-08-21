@@ -1,0 +1,336 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ooo-yay.com API",
+    "version": "1.0.0",
+    "description": "Resource-based API for ooo-yay.com."
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "operationId": "core_urls_add",
+        "summary": "Add",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns a simple health check response."
+      }
+    },
+    "/api/token/pair": {
+      "post": {
+        "operationId": "token_obtain_pair",
+        "summary": "Obtain Token",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenObtainPairOutputSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "token"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenObtainPairInputSchema"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/token/refresh": {
+      "post": {
+        "operationId": "token_refresh",
+        "summary": "Refresh Token",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenRefreshOutputSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "token"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRefreshInputSchema"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/token/verify": {
+      "post": {
+        "operationId": "token_verify",
+        "summary": "Verify Token",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Schema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "token"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenVerifyInputSchema"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/accounts/whoami": {
+      "get": {
+        "operationId": "accounts_urls_whoami",
+        "summary": "Whoami",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSelf"
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns the calling users details",
+        "tags": [
+          "accounts"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/HealthStatus"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "HealthStatus": {
+        "enum": [
+          "ok",
+          "not_ok"
+        ],
+        "title": "HealthStatus",
+        "type": "string"
+      },
+      "TokenObtainPairOutputSchema": {
+        "properties": {
+          "username": {
+            "description": "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+            "maxLength": 150,
+            "title": "Username",
+            "type": "string"
+          },
+          "refresh": {
+            "title": "Refresh",
+            "type": "string"
+          },
+          "access": {
+            "title": "Access",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "refresh",
+          "access"
+        ],
+        "title": "TokenObtainPairOutputSchema",
+        "type": "object"
+      },
+      "TokenObtainPairInputSchema": {
+        "properties": {
+          "password": {
+            "maxLength": 128,
+            "title": "Password",
+            "type": "string"
+          },
+          "username": {
+            "description": "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+            "maxLength": 150,
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "password",
+          "username"
+        ],
+        "title": "TokenObtainPairInputSchema",
+        "type": "object"
+      },
+      "TokenRefreshOutputSchema": {
+        "properties": {
+          "refresh": {
+            "title": "Refresh",
+            "type": "string"
+          },
+          "access": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Access"
+          }
+        },
+        "required": [
+          "refresh",
+          "access"
+        ],
+        "title": "TokenRefreshOutputSchema",
+        "type": "object"
+      },
+      "TokenRefreshInputSchema": {
+        "properties": {
+          "refresh": {
+            "title": "Refresh",
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh"
+        ],
+        "title": "TokenRefreshInputSchema",
+        "type": "object"
+      },
+      "Schema": {
+        "properties": {},
+        "title": "Schema",
+        "type": "object"
+      },
+      "TokenVerifyInputSchema": {
+        "properties": {
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "TokenVerifyInputSchema",
+        "type": "object"
+      },
+      "UserSelf": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "first_name": {
+            "title": "First Name",
+            "type": "string"
+          },
+          "last_name": {
+            "title": "Last Name",
+            "type": "string"
+          },
+          "is_staff": {
+            "title": "Is Staff",
+            "type": "boolean"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "date_joined": {
+            "format": "date-time",
+            "title": "Date Joined",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "email",
+          "first_name",
+          "last_name",
+          "is_staff",
+          "is_active",
+          "date_joined"
+        ],
+        "title": "UserSelf",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "JWTAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "servers": []
+}

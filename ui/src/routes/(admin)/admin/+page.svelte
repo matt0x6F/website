@@ -1,0 +1,1 @@
+<p>Welcome to the admin interface.</p>

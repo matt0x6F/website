@@ -1,0 +1,86 @@
+[tool.poetry]
+name = "blog-api"
+package-mode = false
+version = "1.0.0"
+description = "My blog API"
+authors = ["Matt Ouille <matt.ouille@protonmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django-ninja = "^1.2.2"
+django-configurations = "^2.5.1"
+uvicorn = "^0.30.6"
+psycopg = {extras = ["binary"], version = "^3.2.1"}
+django-ninja-extra = "^0.21.3"
+django-ninja-jwt = "^5.3.2"
+django-cors-headers = "^4.4.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.5.7"
+
+[tool.ruff]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+line-length = 100
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["api"]
+
+[tool.pytest.ini_options]
+addopts = "--verbose --cov-report term --cov-report html --cov=."
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "*__init__*",
+    ".venv/*",
+]
+
+[tool.coverage.report]
+omit = [
+    "*__init__*",
+    ".venv/*",
+    "tests/*",
+    "app/core/db*", # This should be an external package
+    "notebooks/*",
+]
+exclude_lines = [
+    "if __name__ == .__main__.:"
+]

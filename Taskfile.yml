@@ -1,0 +1,64 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  default:
+    desc: "Display the task list"
+    cmds:
+      - task --list
+    silent: true
+
+  run-docker:
+    desc: "Run docker-compose up"
+    cmds:
+      - docker compose up --build -d
+    internal: true
+
+  up:
+    desc: "Start the development environment"
+    summary: "Start the development environment. Logs are shown in parallel with the restart of the containers."
+    deps:
+      - run-docker
+      - logs
+
+  down:
+    desc: "Stop the development environment"
+    cmds:
+      - docker compose down
+
+  logs:
+    desc: "Show logs"
+    cmds:
+      - docker compose logs django svelte -f
+    ignore_error: true
+
+  migrate:
+    desc: "Run migrations"
+    cmds:
+      - python api/manage.py makemigrations
+      - python api/manage.py migrate
+  
+  create-super-user:
+    desc: "Create super user"
+    cmds:
+      - python api/manage.py createsuperuser
+
+  export-schema:
+    desc: "Export OpenAPI v3.1 schema"
+    generates:
+      - api/schema.json
+    cmds:
+      - python api/manage.py export_openapi_schema --output api/schema.json --indent 2
+
+  generate-sdk:
+    desc: "Generate SDK"
+    cmds:
+      - openapi-generator-cli generate -g typescript-fetch -i api/schema.json -o ui/src/lib/api
+    generates:
+      - ui/src/lib/api
+    sources:
+      - api/schema.json
+    method: checksum
+    deps:
+      - export-schema
