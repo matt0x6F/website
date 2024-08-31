@@ -15,12 +15,19 @@
 
 import * as runtime from '../runtime';
 import type {
+  NewAccount,
   UserSelf,
 } from '../models/index';
 import {
+    NewAccountFromJSON,
+    NewAccountToJSON,
     UserSelfFromJSON,
     UserSelfToJSON,
 } from '../models/index';
+
+export interface AccountsApiSignUpRequest {
+    newAccount: NewAccount;
+}
 
 /**
  * 
@@ -28,10 +35,56 @@ import {
 export class AccountsApi extends runtime.BaseAPI {
 
     /**
+     * Creates a new user
+     * Sign Up
+     */
+    async accountsApiSignUpRaw(requestParameters: AccountsApiSignUpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSelf>> {
+        if (requestParameters['newAccount'] == null) {
+            throw new runtime.RequiredError(
+                'newAccount',
+                'Required parameter "newAccount" was null or undefined when calling accountsApiSignUp().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/accounts/sign_up`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+            body: NewAccountToJSON(requestParameters['newAccount']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserSelfFromJSON(jsonValue));
+    }
+
+    /**
+     * Creates a new user
+     * Sign Up
+     */
+    async accountsApiSignUp(requestParameters: AccountsApiSignUpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSelf> {
+        const response = await this.accountsApiSignUpRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Returns the calling users details
      * Whoami
      */
-    async accountsUrlsWhoamiRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSelf>> {
+    async accountsApiWhoamiRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSelf>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -58,8 +111,8 @@ export class AccountsApi extends runtime.BaseAPI {
      * Returns the calling users details
      * Whoami
      */
-    async accountsUrlsWhoami(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSelf> {
-        const response = await this.accountsUrlsWhoamiRaw(initOverrides);
+    async accountsApiWhoami(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSelf> {
+        const response = await this.accountsApiWhoamiRaw(initOverrides);
         return await response.value();
     }
 

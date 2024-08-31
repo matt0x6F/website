@@ -40,6 +40,20 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@cartamd/plugin-anchor": "^2.0.3",
+		"@cartamd/plugin-attachment": "^4.0.2",
+		"@cartamd/plugin-code": "^4.0.6",
+		"@cartamd/plugin-component": "^1.0.2",
+		"@cartamd/plugin-emoji": "^4.1.3",
+		"@cartamd/plugin-math": "^4.1.0",
+		"@cartamd/plugin-slash": "^4.0.2",
+		"@cartamd/plugin-tikz": "^4.1.8",
+		"carta-md": "^4.4.4",
+		"carta-plugin-imsize": "^2.0.2",
+		"carta-plugin-ins-del": "^2.0.1",
+		"carta-plugin-subscript": "^2.0.0",
+		"carta-plugin-video": "^2.0.1",
+		"isomorphic-dompurify": "^2.14.0",
 		"typescript-cookie": "^1.0.6"
 	}
 }

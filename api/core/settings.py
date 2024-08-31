@@ -13,13 +13,17 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 
+import structlog
 from configurations import Configuration, values
+
+# Makes use of django-configurations
+# docs: https://django-configurations.readthedocs.io
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class Base(Configuration):
-    # Build paths inside the project like this: BASE_DIR / 'subdir'.
-    BASE_DIR = Path(__file__).resolve().parent.parent
-
     AUTH_USER_MODEL = "accounts.User"
 
     # Quick-start development settings - unsuitable for production
@@ -48,6 +52,7 @@ class Base(Configuration):
         "ninja_jwt",
         "ninja_jwt.token_blacklist",
         "accounts",
+        "blog",
     ]
 
     MIDDLEWARE = [
@@ -59,9 +64,10 @@ class Base(Configuration):
         "django.contrib.auth.middleware.AuthenticationMiddleware",
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
+        "django_structlog.middlewares.RequestMiddleware",
     ]
 
-    ROOT_URLCONF = "core.urls"
+    ROOT_URLCONF = "core.api"
 
     NINJA_JWT = {"BLACKLIST_AFTER_ROTATION": True, "ROTATE_REFRESH_TOKENS": True}
 
@@ -132,6 +138,23 @@ class Base(Configuration):
 
     DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+    structlog.configure(
+        processors=[
+            structlog.contextvars.merge_contextvars,
+            structlog.stdlib.filter_by_level,
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.stdlib.add_logger_name,
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.processors.UnicodeDecoder(),
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ],
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        cache_logger_on_first_use=True,
+    )
+
 
 class Local(Base):
     DEBUG = True
@@ -165,8 +188,77 @@ class Dev(Base):
         }
     }
 
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "filters": {
+            "require_debug_false": {
+                "()": "django.utils.log.RequireDebugFalse",
+            },
+            "require_debug_true": {
+                "()": "django.utils.log.RequireDebugTrue",
+            },
+        },
+        "formatters": {
+            "django.server": {
+                "()": "django.utils.log.ServerFormatter",
+                "format": "[{server_time}] {message}",
+                "style": "{",
+            },
+            "json_formatter": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.processors.JSONRenderer(),
+            },
+            "plain_console": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.dev.ConsoleRenderer(),
+            },
+            "key_value": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.processors.KeyValueRenderer(
+                    key_order=["timestamp", "level", "event", "logger"]
+                ),
+            },
+        },
+        "handlers": {
+            "console": {
+                # "level": "INFO",
+                "filters": ["require_debug_true"],
+                "class": "logging.StreamHandler",
+                "formatter": "plain_console",
+            },
+            "django.server": {
+                "level": "INFO",
+                "class": "logging.StreamHandler",
+                "formatter": "django.server",
+            },
+            "mail_admins": {
+                "level": "ERROR",
+                "filters": ["require_debug_false"],
+                "class": "django.utils.log.AdminEmailHandler",
+            },
+        },
+        "loggers": {
+            "blog": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+            "": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+            "django": {
+                "handlers": ["console"],
+                "level": "INFO",
+                "propagate": False,
+            },
+            "django.server": {
+                "handlers": ["django.server"],
+                "level": "INFO",
+                "propagate": False,
+            },
+        },
+    }
+
 
 class Prod(Base):
+    # load .env files for production
+    DOT_ENV = os.path.join(BASE_DIR, ".env")
+
     DEBUG = False
     ALLOWED_HOSTS = ["*"]
 

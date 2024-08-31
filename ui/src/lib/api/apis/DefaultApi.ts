@@ -31,7 +31,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Returns a simple health check response.
      * Add
      */
-    async coreUrlsAddRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HealthResponse>> {
+    async coreApiAddRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HealthResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -50,8 +50,8 @@ export class DefaultApi extends runtime.BaseAPI {
      * Returns a simple health check response.
      * Add
      */
-    async coreUrlsAdd(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HealthResponse> {
-        const response = await this.coreUrlsAddRaw(initOverrides);
+    async coreApiAdd(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HealthResponse> {
+        const response = await this.coreApiAddRaw(initOverrides);
         return await response.value();
     }
 

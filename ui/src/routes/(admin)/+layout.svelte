@@ -16,9 +16,9 @@
 		Toast
 
 	} from 'flowbite-svelte';
-	import { authenticatedStore, getUserData, getUsername, isAuthenticated, removeAccessToken, removeRefreshToken, removeUserData, removeUsername, userDataStore, usernameStore } from '../../stores/auth';
+	import { authenticatedStore, getUserData, getUsername, isAuthenticated, removeAccessToken, removeRefreshToken, removeUserData, removeUsername, setUserData, userDataStore, usernameStore } from '../../stores/auth';
 	import { addToast, notifications } from '../../stores/notifications';
-	import { CheckCircleSolid } from 'flowbite-svelte-icons';
+	import { CheckCircleSolid, ChevronDownOutline } from 'flowbite-svelte-icons';
 	import { goto } from '$app/navigation';
 
     let authenticated: boolean = $authenticatedStore;
@@ -35,6 +35,8 @@
             goto("/login");
         }
 
+        await setUserData();
+
         let user = getUserData()
 
         if ((user) && !user.isStaff) {
@@ -42,13 +44,13 @@
         }
     });
 
+    let toasts: Record<number, boolean> = {}
+
     notifications.subscribe((notifs) => {
         for (var notification of notifs) {
             toasts[notification.id] = notification.toastStatus;
         }
     })
-
-    let toasts: Record<number, boolean> = {}
 
     const signOut = () => {
         console.log("Sign out")
@@ -85,14 +87,14 @@
             <NavHamburger class1="w-full md:flex md:w-auto md:order-1"></NavHamburger>
         </div>
         <Dropdown placement="bottom" triggeredby="#avatar-menu">
-            {#if authenticated === true}
+            {#if authenticated}
             <DropdownHeader>
-                <span class="block text-sm">{$usernameStore}</span>
-                <span class="block truncate text-sm font-medium">name@flowbite.com</span>
+                <span class="block text-sm">{$userDataStore.username}</span>
+                <span class="block truncate text-sm font-medium">{$userDataStore.email}</span>
             </DropdownHeader>
-            <DropdownItem>Dashboard</DropdownItem>
-            <DropdownItem>Settings</DropdownItem>
-            <DropdownItem>Earnings</DropdownItem>
+            {#if $userDataStore.isStaff == true}
+                <DropdownItem href="/admin">Admin</DropdownItem>
+            {/if}
             <DropdownDivider></DropdownDivider>
             <DropdownItem on:click={() => signOut()}>Sign out</DropdownItem>
             {:else}
@@ -103,6 +105,13 @@
             <NavLi href="/" active={true}>Home</NavLi>
             <NavLi href="/about">About</NavLi>
             <NavLi href="/blog">Blog</NavLi>
+            <NavLi class="cursor-pointer">
+                Admin<ChevronDownOutline class="w-6 h-6 ms-2 text-primary-800 dark:text-white inline" />
+            </NavLi>
+            <Dropdown class="w-44 z-20">
+                <DropdownItem href="/admin">Dashboard</DropdownItem>
+                <DropdownItem href="/admin/write">Write</DropdownItem>
+            </Dropdown>
         </NavUl>
     </Navbar>
 

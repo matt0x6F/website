@@ -1,10 +1,16 @@
 apis/AccountsApi.ts
 apis/DefaultApi.ts
+apis/PostsApi.ts
 apis/TokenApi.ts
 apis/index.ts
 index.ts
 models/HealthResponse.ts
 models/HealthStatus.ts
+models/Input.ts
+models/NewAccount.ts
+models/PagedPostDetails.ts
+models/PostDetails.ts
+models/PostMutate.ts
 models/TokenObtainPairInputSchema.ts
 models/TokenObtainPairOutputSchema.ts
 models/TokenRefreshInputSchema.ts

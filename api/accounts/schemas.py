@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from ninja import Schema
 
@@ -12,3 +13,11 @@ class UserSelf(Schema):
     is_staff: bool
     is_active: bool
     date_joined: datetime
+
+
+class NewAccount(Schema):
+    username: str
+    email: str
+    password: str
+    first_name: Optional[str] = ""
+    last_name: Optional[str] = ""

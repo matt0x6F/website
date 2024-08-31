@@ -1,18 +1,83 @@
 import { AccountsApi, Configuration, TokenApi, type UserSelf } from "$lib/api";
 import { getCookie, setCookie, removeCookie } from "typescript-cookie"
 import { PUBLIC_BASE_URL } from "$env/static/public";
-import { writable } from "svelte/store";
+import { writable, type Writable } from "svelte/store";
 
 // This function will check if the user is authenticated. It will return true if the user is authenticated, and false otherwise.
 // It will refresh the access token if it is expired and a valid refresh token is present.
 export const isAuthenticated = async (): Promise<boolean> => {
     let accessToken = await getAccessToken();
 
+    console.log("Checking if user is authenticated");
+
     if (!accessToken) {
+        console.log("User is not authenticated");
+
         return false;
     }
 
-    return true;
+    // validate the access token
+    const config = new Configuration({
+        basePath: PUBLIC_BASE_URL,
+        headers: {
+            "Authorization": "Bearer " + accessToken
+        }
+    })
+
+    let api = new TokenApi(config)
+
+    let passed = false
+    
+    try {
+        await api.tokenVerify({tokenVerifyInputSchema: { token: accessToken }})
+        console.log("Access token passed validation check")
+        passed = true
+    } catch (error) {
+        console.log("Access token failed validation check " + error)
+        passed = false
+    }
+
+    if (!passed) {
+        console.log("Access token failed validation check. Attempting to refresh token")
+
+        let refreshToken = await getRefreshToken();
+        if (!refreshToken) {
+            console.log("No refresh token found. User is not authenticated");
+
+            return false;
+        }
+
+        console.log("Making call to refresh token with URL: " + PUBLIC_BASE_URL);
+
+        let config = new Configuration({
+            basePath: PUBLIC_BASE_URL,
+        })
+
+        let api = new TokenApi(config);
+        api.tokenRefresh({tokenRefreshInputSchema: { refresh: refreshToken}}).then((response) => {
+            if (!response.access) {
+                refreshToken = undefined;
+                return
+            }
+
+            setAccessToken(response.access);
+            setRefreshToken(response.refresh);
+
+            accessToken = response.access;
+            refreshToken = response.refresh;
+
+            passed = true;
+        }).catch((error) => {
+            console.error(error);
+
+            refreshToken = undefined;
+            passed = false;
+        });
+    }
+
+    console.log("Token validation complete. User is authenticated: " + passed);
+
+    return passed;
 }
 
 export const setUsername = (username: string) => {
@@ -21,7 +86,7 @@ export const setUsername = (username: string) => {
     usernameStore.set(username);
     authenticatedStore.set(true);
 
-    setCookie("username", username, { expires: new Date(Date.now() + 24*60*60000)})
+    setCookie("username", username, { path: "/", expires: new Date(Date.now() + 24*60*60000)})
 }
 
 // This function will set the access token in the cookies. It will expire in 5 minutes.
@@ -31,7 +96,7 @@ export const setAccessToken = (token: string) => {
     authenticatedStore.set(true);
 
     // 5 * 60000 = 5 minutes
-    setCookie("access_token", token, { expires: new Date(Date.now() + 5*60000)});
+    setCookie("access_token", token, { path: "/", expires: new Date(Date.now() + 5*60000)});
 }
 
 // This function will set the refresh token in the cookies. It will expire in 24 hours.
@@ -41,7 +106,7 @@ export const setRefreshToken = (token: string) => {
     authenticatedStore.set(true);
 
     // 24 * 60 * 60000 = 24 hours
-    setCookie("refresh_token", token, { expires: new Date(Date.now() + 24*60*60000)});
+    setCookie("refresh_token", token, { path: "/", expires: new Date(Date.now() + 24*60*60000)});
 }
 
 export const setUserData = async () => {
@@ -55,9 +120,11 @@ export const setUserData = async () => {
     })
 
     let api = new AccountsApi(config)
-    await api.accountsUrlsWhoami().then((user) => {
+    await api.accountsApiWhoami().then((user) => {
         userDataStore.set(user)
-        setCookie("user_data", JSON.stringify(user), { expires: new Date(Date.now() + 24*60*60000)})
+        setCookie("user_data", JSON.stringify(user), { path: "/", expires: new Date(Date.now() + 24*60*60000)})
+
+        setUsername(user.username);
     }).catch((error) => {
         console.log("Error while fetching WhoAmI endpoint " + error)
     })
@@ -89,7 +156,16 @@ export const removeRefreshToken = () => {
 }
 
 export const removeUserData = () => {
-    userDataStore.set({})
+    userDataStore.set({
+        username: "",
+        email: "",
+        firstName: "",
+        lastName: "",
+        id: 0,
+        isActive: false,
+        isStaff: false,
+        dateJoined: new Date(),
+    })
     removeCookie("userData")
 }
 
@@ -161,7 +237,21 @@ export const getAccessToken = async (): Promise<string | undefined> => {
     return accessToken;
 }
 
-export const usernameStore = writable(getUsername());
+export const usernameStore = writable("");
 export const authenticatedStore = writable(false);
-export const userDataStore = writable({})
+export const userDataStore: Writable<UserSelf> = writable({
+    username: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    id: 0,
+    isActive: false,
+    isStaff: false,
+    isSuperuser: false,
+    dateJoined: new Date(),
+    lastLogin: new Date(),
+    groups: [],
+    userPermissions: [],
+    userGroups: []
+});
 

@@ -62,3 +62,11 @@ tasks:
     method: checksum
     deps:
       - export-schema
+
+  build:
+    desc: "Build the frontend and backend"
+    env:
+      PUBLIC_BASE_URL: "https://ooo-yay.com"
+    cmds:
+      - cd ui && npm run build
+      - cd backend && python manage.py collectstatic --noinput

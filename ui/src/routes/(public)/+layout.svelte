@@ -11,12 +11,13 @@
 		Dropdown,
 		DropdownItem,
 		DropdownHeader,
-		DropdownDivider,
+		Toast,
 
-		Toast
+		DropdownDivider
+
 
 	} from 'flowbite-svelte';
-	import { authenticatedStore, getUsername, isAuthenticated, removeAccessToken, removeRefreshToken, removeUserData, removeUsername, usernameStore } from '../../stores/auth';
+	import { authenticatedStore, getUserData, getUsername, isAuthenticated, removeAccessToken, removeRefreshToken, removeUserData, removeUsername, setUserData, userDataStore, usernameStore } from '../../stores/auth';
 	import { addToast, notifications } from '../../stores/notifications';
 	import { CheckCircleSolid } from 'flowbite-svelte-icons';
 	import { goto } from '$app/navigation';
@@ -27,8 +28,18 @@
         authenticated = value;
     });
 
+    let userData = {}
+
+    userDataStore.subscribe((value) => {
+        userData = value;
+    });
+
     onMount(async () => {
         authenticated = await isAuthenticated();
+
+        if (authenticated) {
+            let user = await setUserData();
+        }
     })
 
     notifications.subscribe((notifs) => {
@@ -76,12 +87,12 @@
         <Dropdown placement="bottom" triggeredby="#avatar-menu">
             {#if authenticated}
             <DropdownHeader>
-                <span class="block text-sm">{$usernameStore}</span>
-                <span class="block truncate text-sm font-medium">name@flowbite.com</span>
+                <span class="block text-sm">{$userDataStore.username}</span>
+                <span class="block truncate text-sm font-medium">{$userDataStore.email}</span>
             </DropdownHeader>
-            <DropdownItem>Dashboard</DropdownItem>
-            <DropdownItem>Settings</DropdownItem>
-            <DropdownItem>Earnings</DropdownItem>
+            {#if $userDataStore.isStaff == true}
+                <DropdownItem href="/admin">Admin</DropdownItem>
+            {/if}
             <DropdownDivider></DropdownDivider>
             <DropdownItem on:click={() => signOut()}>Sign out</DropdownItem>
             {:else}

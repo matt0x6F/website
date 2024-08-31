@@ -23,6 +23,8 @@ from ninja import Schema
 from ninja_extra import NinjaExtraAPI
 from ninja_jwt.controller import NinjaJWTDefaultController
 
+from auth.middleware import JWTAuth, StaffOnlyModify
+
 api = NinjaExtraAPI(
     title="ooo-yay.com API",
     version="1.0.0",
@@ -49,7 +51,8 @@ def add(request) -> HealthResponse:
     return {"status": "ok"}
 
 
-api.add_router("/accounts/", "accounts.urls.router")
+api.add_router("/accounts/", "accounts.api.router")
+api.add_router("/posts/", "blog.api.posts_router", auth=JWTAuth(permissions=StaffOnlyModify))
 
 
 urlpatterns = [
