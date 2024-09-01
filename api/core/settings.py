@@ -270,7 +270,7 @@ class Prod(Base):
 
     DATABASES = {
         "default": {
-            "ENGINE": "django_postgrespool2",
+            "ENGINE": "django.db.backends.postgresql",
             "NAME": "blog",
             "USER": "blog",
             "PASSWORD": DB_PASSWORD,
@@ -278,6 +278,7 @@ class Prod(Base):
             "PORT": "25061",
             "OPTIONS": {
                 "sslmode": "require",
+                "pool": {"min_size": 2, "max_size": 20, "timeout": 10},
             },
         }
     }
