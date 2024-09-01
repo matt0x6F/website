@@ -260,6 +260,88 @@ class Prod(Base):
     DOT_ENV = os.path.join(BASE_DIR, ".env")
 
     DEBUG = False
-    ALLOWED_HOSTS = ["*"]
+    ALLOWED_HOSTS = ["ooo-yay.com", "127.0.0.1"]
 
     SECRET_KEY = values.SecretValue()
+
+    DB_PASSWORD = values.SearchURLValue()
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django_postgrespool2",
+            "NAME": "blog",
+            "USER": "blog",
+            "PASSWORD": DB_PASSWORD,
+            "HOST": "private-dbaas-db-8109674-do-user-2679318-0.g.db.ondigitalocean.com",
+            "PORT": "25061",
+            "OPTIONS": {
+                "sslmode": "require",
+            },
+        }
+    }
+
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "filters": {
+            "require_debug_false": {
+                "()": "django.utils.log.RequireDebugFalse",
+            },
+            "require_debug_true": {
+                "()": "django.utils.log.RequireDebugTrue",
+            },
+        },
+        "formatters": {
+            "django.server": {
+                "()": "django.utils.log.ServerFormatter",
+                "format": "[{server_time}] {message}",
+                "style": "{",
+            },
+            "json_formatter": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.processors.JSONRenderer(),
+            },
+            "plain_console": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.dev.ConsoleRenderer(),
+            },
+            "key_value": {
+                "()": structlog.stdlib.ProcessorFormatter,
+                "processor": structlog.processors.KeyValueRenderer(
+                    key_order=["timestamp", "level", "event", "logger"]
+                ),
+            },
+        },
+        "handlers": {
+            "console": {
+                # "level": "INFO",
+                "filters": ["require_debug_true"],
+                "class": "logging.StreamHandler",
+                "formatter": "plain_console",
+            },
+            "django.server": {
+                "level": "INFO",
+                "class": "logging.StreamHandler",
+                "formatter": "django.server",
+            },
+            "mail_admins": {
+                "level": "ERROR",
+                "filters": ["require_debug_false"],
+                "class": "django.utils.log.AdminEmailHandler",
+            },
+        },
+        "loggers": {
+            "blog": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+            "": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+            "django": {
+                "handlers": ["console"],
+                "level": "INFO",
+                "propagate": False,
+            },
+            "django.server": {
+                "handlers": ["django.server"],
+                "level": "INFO",
+                "propagate": False,
+            },
+        },
+    }
