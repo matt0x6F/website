@@ -256,8 +256,10 @@ class Dev(Base):
 
 
 class Prod(Base):
+    SETTINGS_DIR = os.path.dirname(os.path.dirname(__file__))
+
     # load .env files for production
-    DOT_ENV = os.path.join(BASE_DIR, ".env")
+    DOT_ENV = os.path.join(SETTINGS_DIR, ".env")
 
     DEBUG = False
     ALLOWED_HOSTS = ["ooo-yay.com", "127.0.0.1"]
