@@ -2,6 +2,8 @@
 node_modules/
 .task/
 dbdata/
+config.ini
 
 # Python
 __pycache__/
+.env.prod

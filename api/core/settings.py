@@ -15,6 +15,10 @@ from pathlib import Path
 
 import structlog
 
+from core.config import get_config
+
+config = get_config()
+
 # Makes use of django-configurations
 # docs: https://django-configurations.readthedocs.io
 
@@ -29,9 +33,7 @@ AUTH_USER_MODEL = "accounts.User"
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-##=&q06x&%046sr@-(39lhirrbq!8)x-nm9e1#jm$-2tup^c(@"
-if ENVIRONMENT == "prod":
-    SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = config.secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -149,40 +151,29 @@ structlog.configure(
     cache_logger_on_first_use=True,
 )
 
-DEBUG = True
-if ENVIRONMENT == "prod":
-    DEBUG = False
+DEBUG = config.debug
 
-ALLOWED_HOSTS = ["*"]
-if ENVIRONMENT == "prod":
-    ALLOWED_HOSTS = ["127.0.0.1", "ooo-yay.com"]
+ALLOWED_HOSTS = config.allowed_hosts
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
-if ENVIRONMENT == "prod":
-    CORS_ALLOWED_ORIGINS = ["https://ooo-yay.com"]
+CORS_ALLOWED_ORIGINS = config.cors.allowed_origins
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "blog",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "postgres",
-        "PORT": "5432",
+        "NAME": config.database.name,
+        "USER": config.database.user,
+        "PASSWORD": config.database.password,
+        "HOST": config.database.host,
+        "PORT": config.database.port,
     }
 }
 if ENVIRONMENT == "prod":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "OPTIONS": {
-                "sslmode": "require",
-                "service": "blog_pooled",
-                "passfile": ".blog_pgpass",
-                "pool": True,
-            },
-        }
-    }
+    DATABASES["default"]["OPTIONS"] = (
+        {
+            "sslmode": "require",
+            "pool": True,
+        },
+    )
 
 LOGGING = {
     "version": 1,
@@ -235,6 +226,7 @@ LOGGING = {
         },
     },
     "loggers": {
+        "core": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
         "blog": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
         "": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
         "django": {

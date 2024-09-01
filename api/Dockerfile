@@ -36,7 +36,6 @@ COPY . .
 
 RUN poetry install
 
-ENV DJANGO_CONFIGURATION=Dev
 ENV DJANGO_SETTINGS_MODULE=core.settings
 
-CMD ["poetry", "run", "python", "manage.py", "runserver", "--configuration", "Dev", "0.0.0.0:8000"]
+CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
