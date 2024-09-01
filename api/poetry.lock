@@ -213,27 +213,6 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
-name = "django-configurations"
-version = "2.5.1"
-description = "A helper for organizing Django settings."
-optional = false
-python-versions = "<4.0,>=3.8"
-files = [
-    {file = "django-configurations-2.5.1.tar.gz", hash = "sha256:6e5083757e2bbdf9bb7850567536b96a93515f6b17503d74928ff628db2e0e94"},
-    {file = "django_configurations-2.5.1-py3-none-any.whl", hash = "sha256:ceb84858da2dac846b15e715c2fd936cfc4c7917c074aff8d31700564093955e"},
-]
-
-[package.dependencies]
-django = ">=3.2"
-
-[package.extras]
-cache = ["django-cache-url"]
-database = ["dj-database-url"]
-email = ["dj-email-url"]
-search = ["dj-search-url"]
-testing = ["dj-database-url", "dj-email-url", "dj-search-url", "django-cache-url (>=1.0.0)"]
-
-[[package]]
 name = "django-cors-headers"
 version = "4.4.0"
 description = "django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS)."
@@ -680,4 +659,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "30d457aa3de8b2dd392c0f7bddf040ca94cf84b2ecebfe67539ff64f690b98e1"
+content-hash = "686273890f4f09b0c31e22e48e0a0c08b84af897f7fd853eb0ff434ff02c34fe"

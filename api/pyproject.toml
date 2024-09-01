@@ -8,7 +8,6 @@ authors = ["Matt Ouille <matt.ouille@protonmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.10"
 django-ninja = "^1.2.2"
-django-configurations = "^2.5.1"
 uvicorn = "^0.30.6"
 psycopg = {extras = ["pool"], version = "^3.2.1"}
 django-ninja-extra = "^0.21.3"

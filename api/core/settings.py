@@ -14,7 +14,6 @@ import os
 from pathlib import Path
 
 import structlog
-from configurations import Configuration, values
 
 # Makes use of django-configurations
 # docs: https://django-configurations.readthedocs.io
@@ -22,329 +21,231 @@ from configurations import Configuration, values
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "dev")
 
-class Base(Configuration):
-    AUTH_USER_MODEL = "accounts.User"
+AUTH_USER_MODEL = "accounts.User"
 
-    # Quick-start development settings - unsuitable for production
-    # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-    # SECURITY WARNING: keep the secret key used in production secret!
-    SECRET_KEY = "django-insecure-##=&q06x&%046sr@-(39lhirrbq!8)x-nm9e1#jm$-2tup^c(@"
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = "django-insecure-##=&q06x&%046sr@-(39lhirrbq!8)x-nm9e1#jm$-2tup^c(@"
+if ENVIRONMENT == "prod":
+    SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
-    # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = True
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
-    ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
-    # Application definition
+# Application definition
 
-    INSTALLED_APPS = [
-        "django.contrib.admin",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
-        "django.contrib.sessions",
-        "django.contrib.messages",
-        "django.contrib.staticfiles",
-        "corsheaders",
-        "ninja",
-        "ninja_extra",
-        "ninja_jwt",
-        "ninja_jwt.token_blacklist",
-        "accounts",
-        "blog",
-    ]
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "corsheaders",
+    "ninja",
+    "ninja_extra",
+    "ninja_jwt",
+    "ninja_jwt.token_blacklist",
+    "accounts",
+    "blog",
+]
 
-    MIDDLEWARE = [
-        "django.middleware.security.SecurityMiddleware",
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "corsheaders.middleware.CorsMiddleware",
-        "django.middleware.common.CommonMiddleware",
-        "django.middleware.csrf.CsrfViewMiddleware",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.messages.middleware.MessageMiddleware",
-        "django.middleware.clickjacking.XFrameOptionsMiddleware",
-        "django_structlog.middlewares.RequestMiddleware",
-    ]
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_structlog.middlewares.RequestMiddleware",
+]
 
-    ROOT_URLCONF = "core.api"
+ROOT_URLCONF = "core.api"
 
-    NINJA_JWT = {"BLACKLIST_AFTER_ROTATION": True, "ROTATE_REFRESH_TOKENS": True}
+NINJA_JWT = {"BLACKLIST_AFTER_ROTATION": True, "ROTATE_REFRESH_TOKENS": True}
 
-    TEMPLATES = [
-        {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": [],
-            "APP_DIRS": True,
-            "OPTIONS": {
-                "context_processors": [
-                    "django.template.context_processors.debug",
-                    "django.template.context_processors.request",
-                    "django.contrib.auth.context_processors.auth",
-                    "django.contrib.messages.context_processors.messages",
-                ],
-            },
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
         },
-    ]
+    },
+]
 
-    WSGI_APPLICATION = "core.wsgi.application"
+WSGI_APPLICATION = "core.wsgi.application"
 
-    # Database
-    # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+# Password validation
+# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
-    # Password validation
-    # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
+]
 
-    AUTH_PASSWORD_VALIDATORS = [
-        {
-            "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-        },
-        {
-            "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        },
-        {
-            "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-        },
-        {
-            "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-        },
-    ]
+# Internationalization
+# https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-    # Internationalization
-    # https://docs.djangoproject.com/en/5.1/topics/i18n/
+LANGUAGE_CODE = "en-us"
 
-    LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
 
-    TIME_ZONE = "UTC"
+USE_I18N = True
 
-    USE_I18N = True
+USE_TZ = True
 
-    USE_TZ = True
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = "static/"
 
-    # Static files (CSS, JavaScript, Images)
-    # https://docs.djangoproject.com/en/5.1/howto/static-files/
-    STATIC_ROOT = os.path.join(BASE_DIR, "static")
-    STATIC_URL = "static/"
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-    # Default primary key field type
-    # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-    DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.filter_by_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=True,
+)
 
-    structlog.configure(
-        processors=[
-            structlog.contextvars.merge_contextvars,
-            structlog.stdlib.filter_by_level,
-            structlog.processors.TimeStamper(fmt="iso"),
-            structlog.stdlib.add_logger_name,
-            structlog.stdlib.add_log_level,
-            structlog.stdlib.PositionalArgumentsFormatter(),
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
-            structlog.processors.UnicodeDecoder(),
-            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-        ],
-        logger_factory=structlog.stdlib.LoggerFactory(),
-        cache_logger_on_first_use=True,
-    )
-
-
-class Local(Base):
-    DEBUG = True
-    ALLOWED_HOSTS = ["*"]
-
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "blog",
-            "USER": "postgres",
-            "PASSWORD": "postgres",
-            "HOST": "localhost",
-            "PORT": "5432",
-        }
-    }
-
-
-class Dev(Base):
-    DEBUG = True
-    ALLOWED_HOSTS = ["*"]
-    CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
-
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "blog",
-            "USER": "postgres",
-            "PASSWORD": "postgres",
-            "HOST": "postgres",
-            "PORT": "5432",
-        }
-    }
-
-    LOGGING = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "filters": {
-            "require_debug_false": {
-                "()": "django.utils.log.RequireDebugFalse",
-            },
-            "require_debug_true": {
-                "()": "django.utils.log.RequireDebugTrue",
-            },
-        },
-        "formatters": {
-            "django.server": {
-                "()": "django.utils.log.ServerFormatter",
-                "format": "[{server_time}] {message}",
-                "style": "{",
-            },
-            "json_formatter": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.processors.JSONRenderer(),
-            },
-            "plain_console": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(),
-            },
-            "key_value": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.processors.KeyValueRenderer(
-                    key_order=["timestamp", "level", "event", "logger"]
-                ),
-            },
-        },
-        "handlers": {
-            "console": {
-                # "level": "INFO",
-                "filters": ["require_debug_true"],
-                "class": "logging.StreamHandler",
-                "formatter": "plain_console",
-            },
-            "django.server": {
-                "level": "INFO",
-                "class": "logging.StreamHandler",
-                "formatter": "django.server",
-            },
-            "mail_admins": {
-                "level": "ERROR",
-                "filters": ["require_debug_false"],
-                "class": "django.utils.log.AdminEmailHandler",
-            },
-        },
-        "loggers": {
-            "blog": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
-            "": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
-            "django": {
-                "handlers": ["console"],
-                "level": "INFO",
-                "propagate": False,
-            },
-            "django.server": {
-                "handlers": ["django.server"],
-                "level": "INFO",
-                "propagate": False,
-            },
-        },
-    }
-
-
-class Prod(Base):
-    SETTINGS_DIR = os.path.dirname(os.path.dirname(__file__))
-
-    # load .env files for production
-    DOT_ENV = os.path.join(SETTINGS_DIR, ".env")
-
+DEBUG = True
+if ENVIRONMENT == "prod":
     DEBUG = False
-    ALLOWED_HOSTS = ["ooo-yay.com", "127.0.0.1"]
 
-    SECRET_KEY = values.SecretValue()
+ALLOWED_HOSTS = ["*"]
+if ENVIRONMENT == "prod":
+    ALLOWED_HOSTS = ["127.0.0.1", "ooo-yay.com"]
 
-    DB_PASSWORD = values.Value()
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+if ENVIRONMENT == "prod":
+    CORS_ALLOWED_ORIGINS = ["https://ooo-yay.com"]
 
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "blog",
+        "USER": "postgres",
+        "PASSWORD": "postgres",
+        "HOST": "postgres",
+        "PORT": "5432",
+    }
+}
+if ENVIRONMENT == "prod":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": "blog_pool",
-            "USER": "blog",
-            "PASSWORD": DB_PASSWORD,
-            "HOST": "private-dbaas-db-8109674-do-user-2679318-0.g.db.ondigitalocean.com",
-            "PORT": "25061",
             "OPTIONS": {
                 "sslmode": "require",
-                "pool": {"min_size": 2, "max_size": 20, "timeout": 10},
+                "service": "blog_pooled",
+                "passfile": ".blog_pgpass",
+                "pool": True,
             },
         }
     }
 
-    LOGGING = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "filters": {
-            "require_debug_false": {
-                "()": "django.utils.log.RequireDebugFalse",
-            },
-            "require_debug_true": {
-                "()": "django.utils.log.RequireDebugTrue",
-            },
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
         },
-        "formatters": {
-            "django.server": {
-                "()": "django.utils.log.ServerFormatter",
-                "format": "[{server_time}] {message}",
-                "style": "{",
-            },
-            "json_formatter": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.processors.JSONRenderer(),
-            },
-            "plain_console": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(),
-            },
-            "key_value": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.processors.KeyValueRenderer(
-                    key_order=["timestamp", "level", "event", "logger"]
-                ),
-            },
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
         },
-        "handlers": {
-            "console": {
-                # "level": "INFO",
-                "filters": ["require_debug_true"],
-                "class": "logging.StreamHandler",
-                "formatter": "plain_console",
-            },
-            "django.server": {
-                "level": "INFO",
-                "class": "logging.StreamHandler",
-                "formatter": "django.server",
-            },
-            "mail_admins": {
-                "level": "ERROR",
-                "filters": ["require_debug_false"],
-                "class": "django.utils.log.AdminEmailHandler",
-            },
+    },
+    "formatters": {
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[{server_time}] {message}",
+            "style": "{",
         },
-        "loggers": {
-            "blog": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
-            "": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
-            "django": {
-                "handlers": ["console"],
-                "level": "INFO",
-                "propagate": False,
-            },
-            "django.server": {
-                "handlers": ["django.server"],
-                "level": "INFO",
-                "propagate": False,
-            },
+        "json_formatter": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
         },
-    }
+        "plain_console": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(),
+        },
+        "key_value": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.KeyValueRenderer(
+                key_order=["timestamp", "level", "event", "logger"]
+            ),
+        },
+    },
+    "handlers": {
+        "console": {
+            # "level": "INFO",
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
+            "formatter": "plain_console",
+        },
+        "django.server": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "django.server",
+        },
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
+        },
+    },
+    "loggers": {
+        "blog": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+        "": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.server": {
+            "handlers": ["django.server"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
