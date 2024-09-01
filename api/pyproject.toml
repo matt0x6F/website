@@ -10,7 +10,7 @@ python = "^3.10"
 django-ninja = "^1.2.2"
 django-configurations = "^2.5.1"
 uvicorn = "^0.30.6"
-psycopg = {extras = ["binary"], version = "^3.2.1"}
+psycopg = {extras = ["pool"], version = "^3.2.1"}
 django-ninja-extra = "^0.21.3"
 django-ninja-jwt = "^5.3.2"
 django-cors-headers = "^4.4.0"
