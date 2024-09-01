@@ -271,7 +271,7 @@ class Prod(Base):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": "blog",
+            "NAME": "blog_pool",
             "USER": "blog",
             "PASSWORD": DB_PASSWORD,
             "HOST": "private-dbaas-db-8109674-do-user-2679318-0.g.db.ondigitalocean.com",
