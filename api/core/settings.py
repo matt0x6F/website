@@ -264,7 +264,7 @@ class Prod(Base):
 
     SECRET_KEY = values.SecretValue()
 
-    DB_PASSWORD = values.SearchURLValue()
+    DB_PASSWORD = values.Value()
 
     DATABASES = {
         "default": {
