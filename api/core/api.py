@@ -56,6 +56,6 @@ api.add_router("/posts/", "blog.api.posts_router", auth=JWTAuth(permissions=Staf
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("django-admin/", admin.site.urls),
     path("api/", api.urls),
 ]
