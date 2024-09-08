@@ -13,6 +13,7 @@ class UserSelf(Schema):
     is_staff: bool
     is_active: bool
     date_joined: datetime
+    avatar_link: Optional[str] = None
 
 
 class NewAccount(Schema):

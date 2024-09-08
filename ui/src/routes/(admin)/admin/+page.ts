@@ -13,18 +13,29 @@ export const load: PageLoad = async () => {
     });
     const api = new PostsApi(config);
 
-    let posts: PostDetails[] = [];
+    let publishedPosts: PostDetails[] = [];
+    let draftPosts: PostDetails[] = [];
 
     try {
-        posts = (await api.blogApiListPosts({all: true, limit: 100, offset: 0})).items;
+        publishedPosts = (await api.blogApiListPosts({all: false, limit: 100, offset: 0})).items;
 
-        console.log("Fetched posts: " + posts.length);
+        console.log("Fetched posts: " + publishedPosts.length);
     } catch (error)
     {
-        console.log("Error fetching posts: " + error);
+        console.log("Error fetching published posts: " + error);
+    }
+
+    try {
+        draftPosts = (await api.blogApiListPosts({all: false, drafts: true, limit: 100, offset: 0})).items;
+
+        console.log("Fetched posts: " + draftPosts.length);
+    } catch (error)
+    {
+        console.log("Error fetching draft posts: " + error);
     }
 
     return {
-        posts
+        publishedPosts: publishedPosts,
+        draftPosts: draftPosts
     }
 }

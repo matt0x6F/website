@@ -45,32 +45,34 @@
     }
 </script>
 
-<div class="max-w-sm mx-auto">
-    <div class="mb-6">
-        <Label for="username" class="block mb-2">Username</Label>
-        <ButtonGroup class="w-full">
-            <InputAddon>
-                <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
-            </InputAddon>
-            <Input id="username" bind:value={username} placeholder="your username" />
-        </ButtonGroup>
-    </div>
-    
-    <div class="mb-6">
-        <Label for="password" class="block mb-2">Password</Label>
-        <ButtonGroup class="w-full">
-            <InputAddon>
-                <LockSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
-            </InputAddon>
-            <Input id="password" bind:value={password} placeholder="password" type="password" />
-        </ButtonGroup>
-    </div>
+<form on:submit|preventDefault={() => signIn()}>
+    <div class="max-w-sm mx-auto">
+        <div class="mb-6">
+            <Label for="username" class="block mb-2">Username</Label>
+            <ButtonGroup class="w-full">
+                <InputAddon>
+                    <UserCircleSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                </InputAddon>
+                <Input id="username" bind:value={username} placeholder="your username" />
+            </ButtonGroup>
+        </div>
+        
+        <div class="mb-6">
+            <Label for="password" class="block mb-2">Password</Label>
+            <ButtonGroup class="w-full">
+                <InputAddon>
+                    <LockSolid class="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                </InputAddon>
+                <Input id="password" bind:value={password} placeholder="password" type="password" />
+            </ButtonGroup>
+        </div>
 
-    <div>
-        <p>Not a user? <a href="/sign_up">Sign up!</a></p>
-    </div>
+        <div>
+            <p>Not a user? <a href="/sign_up">Sign up!</a></p>
+        </div>
 
-    <div class="text-center">
-        <Button on:click={() => signIn()}>Login</Button>
+        <div class="text-center">
+            <Button type="submit">Login</Button>
+        </div>
     </div>
-</div>
+</form>

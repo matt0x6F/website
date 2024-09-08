@@ -67,6 +67,12 @@ export interface UserSelf {
      * @memberof UserSelf
      */
     dateJoined: Date;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSelf
+     */
+    avatarLink?: string | null;
 }
 
 /**
@@ -102,6 +108,7 @@ export function UserSelfFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'isStaff': json['is_staff'],
         'isActive': json['is_active'],
         'dateJoined': (new Date(json['date_joined'])),
+        'avatarLink': json['avatar_link'] == null ? undefined : json['avatar_link'],
     };
 }
 
@@ -119,6 +126,7 @@ export function UserSelfToJSON(value?: UserSelf | null): any {
         'is_staff': value['isStaff'],
         'is_active': value['isActive'],
         'date_joined': ((value['dateJoined']).toISOString()),
+        'avatar_link': value['avatarLink'],
     };
 }
 

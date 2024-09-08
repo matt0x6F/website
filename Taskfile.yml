@@ -38,6 +38,8 @@ tasks:
     cmds:
       - python api/manage.py makemigrations
       - python api/manage.py migrate
+    env:
+      DATABASE__HOST: "localhost"
   
   create-super-user:
     desc: "Create super user"

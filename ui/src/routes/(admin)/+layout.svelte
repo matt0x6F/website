@@ -13,7 +13,10 @@
 		DropdownHeader,
 		DropdownDivider,
 
-		Toast
+		Toast,
+
+		Button
+
 
 	} from 'flowbite-svelte';
 	import { authenticatedStore, getUserData, getUsername, isAuthenticated, removeAccessToken, removeRefreshToken, removeUserData, removeUsername, setUserData, userDataStore, usernameStore } from '../../stores/auth';
@@ -82,12 +85,12 @@
         <NavBrand href="/">
             <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">ooo-yay.com</span>
         </NavBrand>
+        {#if authenticated}
         <div class="flex items-center md:order-2">
-            <Avatar id="avatar-menu" src="/images/profile-picture-3.webp"></Avatar>
+            <Avatar id="avatar-menu" src="/img/neon_fellow_mushroom_forest.png" rounded />
             <NavHamburger class1="w-full md:flex md:w-auto md:order-1"></NavHamburger>
         </div>
         <Dropdown placement="bottom" triggeredby="#avatar-menu">
-            {#if authenticated}
             <DropdownHeader>
                 <span class="block text-sm">{$userDataStore.username}</span>
                 <span class="block truncate text-sm font-medium">{$userDataStore.email}</span>
@@ -97,10 +100,12 @@
             {/if}
             <DropdownDivider></DropdownDivider>
             <DropdownItem on:click={() => signOut()}>Sign out</DropdownItem>
-            {:else}
-            <DropdownItem href="/login">Sign in</DropdownItem>
-            {/if}
         </Dropdown>
+        {:else}
+        <div class="flex items-center md:order-2">
+            <Button href="/login">Sign in</Button>
+        </div>
+        {/if}
         <NavUl>
             <NavLi href="/" active={true}>Home</NavLi>
             <NavLi href="/about">About</NavLi>

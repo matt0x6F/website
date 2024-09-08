@@ -254,4 +254,3 @@ export const userDataStore: Writable<UserSelf> = writable({
     userPermissions: [],
     userGroups: []
 });
-

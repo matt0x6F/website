@@ -17,13 +17,20 @@ posts_router = Router()
 
 @posts_router.get("/", response={200: List[PostDetails]}, tags=["posts"])
 @paginate
-def list_posts(request: HttpRequest, all: bool = False):
+def list_posts(request: HttpRequest, all: bool = False, drafts: bool = False):
     if all and request.user.is_staff:
         logger.debug(
             "Returning all posts", user=request.user.username, is_staff=request.user.is_staff
         )
 
         return Post.objects.all()
+
+    if drafts and request.user.is_staff:
+        logger.debug(
+            "Returning draft posts", user=request.user.username, is_staff=request.user.is_staff
+        )
+
+        return Post.objects.filter(published__is_null=True)
 
     logger.debug(
         "Returning published posts", user=request.user.username, is_staff=request.user.is_staff
@@ -45,7 +52,7 @@ def get_post_by_id(request, id: int):
 
 
 @posts_router.post(
-    "",
+    "/",
     response={201: PostDetails},
     tags=["posts"],
     auth=JWTAuth(permissions=StaffOnlyModify),

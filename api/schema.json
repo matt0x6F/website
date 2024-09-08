@@ -205,6 +205,16 @@
           },
           {
             "in": "query",
+            "name": "drafts",
+            "schema": {
+              "default": false,
+              "title": "Drafts",
+              "type": "boolean"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
             "name": "limit",
             "schema": {
               "default": 100,
@@ -589,6 +599,17 @@
             "format": "date-time",
             "title": "Date Joined",
             "type": "string"
+          },
+          "avatar_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Link"
           }
         },
         "required": [

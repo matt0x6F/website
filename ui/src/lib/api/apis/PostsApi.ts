@@ -46,6 +46,7 @@ export interface BlogApiGetPostBySlugRequest {
 
 export interface BlogApiListPostsRequest {
     all?: boolean;
+    drafts?: boolean;
     limit?: number;
     offset?: number;
 }
@@ -234,6 +235,10 @@ export class PostsApi extends runtime.BaseAPI {
 
         if (requestParameters['all'] != null) {
             queryParameters['all'] = requestParameters['all'];
+        }
+
+        if (requestParameters['drafts'] != null) {
+            queryParameters['drafts'] = requestParameters['drafts'];
         }
 
         if (requestParameters['limit'] != null) {
