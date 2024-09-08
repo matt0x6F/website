@@ -306,6 +306,25 @@
               "type": "string"
             },
             "required": true
+          },
+          {
+            "in": "query",
+            "name": "year",
+            "schema": {
+              "title": "Year",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "draft",
+            "schema": {
+              "default": false,
+              "title": "Draft",
+              "type": "boolean"
+            },
+            "required": false
           }
         ],
         "responses": {

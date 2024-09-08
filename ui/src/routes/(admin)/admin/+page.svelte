@@ -2,6 +2,7 @@
 
 	import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
 	import type { PageData } from "./$types";
+	import { EyeSolid } from "flowbite-svelte-icons";
 
     export let data: PageData
 
@@ -35,6 +36,14 @@
 
         return `${dayOfWeek}, ${month} the ${dayWithSuffix}, ${year} @ ${hours}:${minutes}`;
     }
+
+    function formatPostYear(date: Date | null | undefined): string {
+        if (!date) {
+            return new Date().getFullYear().toString();
+        }
+
+        return date.getFullYear().toString();
+    }
 </script>
 
 <p class="py-4">Welcome to the admin interface.</p>
@@ -49,6 +58,7 @@
             <TableHeadCell>Title</TableHeadCell>
             <TableHeadCell>Author</TableHeadCell>
             <TableHeadCell>Published</TableHeadCell>
+            <TableHeadCell></TableHeadCell>
             </TableHead>
             <TableBody tableBodyClass="divide-y">
                 {#each data.publishedPosts as post }
@@ -56,10 +66,12 @@
                     <TableBodyCell><a href="/admin/write/{post.id}">{post.title}</a></TableBodyCell>
                     <TableBodyCell>{post.authorId}</TableBodyCell>
                     <TableBodyCell>{formatDate(post.published)}</TableBodyCell>
+                    <TableBodyCell><a href="/blog/posts/{formatPostYear(post.published)}/{post.slug}"><EyeSolid ariaLabel="View this post" /></a></TableBodyCell>
                 </TableBodyRow>
                 {:else}
                 <TableBodyRow>
                     <TableBodyCell>No published posts</TableBodyCell>
+                    <TableBodyCell></TableBodyCell>
                     <TableBodyCell></TableBodyCell>
                     <TableBodyCell></TableBodyCell>
                 </TableBodyRow>
@@ -73,16 +85,19 @@
             <TableHead>
             <TableHeadCell>Title</TableHeadCell>
             <TableHeadCell>Author</TableHeadCell>
+            <TableHeadCell></TableHeadCell>
             </TableHead>
             <TableBody tableBodyClass="divide-y">
                 {#each data.draftPosts as post }
                 <TableBodyRow>
                     <TableBodyCell><a href="/admin/write/{post.id}">{post.title}</a></TableBodyCell>
                     <TableBodyCell>{post.authorId}</TableBodyCell>
+                    <TableBodyCell><a href="/blog/drafts/{formatPostYear(post.published)}/{post.slug}"><EyeSolid ariaLabel="Preview this post" /></a></TableBodyCell>
                 </TableBodyRow>
                 {:else}
                 <TableBodyRow>
                     <TableBodyCell>No drafts</TableBodyCell>
+                    <TableBodyCell></TableBodyCell>
                     <TableBodyCell></TableBodyCell>
                 </TableBodyRow>
                 {/each}

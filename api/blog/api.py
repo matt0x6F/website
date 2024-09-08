@@ -56,13 +56,25 @@ def list_posts(request: HttpRequest, all: bool = False, drafts: bool = False):
 
 
 @posts_router.get("/slug/{slug}", response={200: PostDetails}, tags=["posts"])
-def get_post_by_slug(request, slug: str):
-    return Post.objects.get(slug=slug)
+def get_post_by_slug(request: HttpRequest, slug: str, year: int = None, draft=False):
+    if request.user.is_staff:
+        if draft:
+            return Post.objects.filter(published__isnull=True).get(slug=slug)
+
+        return Post.objects.filter(published__year=year).get(slug=slug)
+
+    return (
+        Post.objects.filter(published__lte=datetime.now())
+        .filter(published__year=year)
+        .get(slug=slug)
+    )
 
 
 @posts_router.get("/{id}", response={200: PostDetails}, tags=["posts"])
-def get_post_by_id(request, id: int):
-    return Post.objects.get(id=id)
+def get_post_by_id(request: HttpRequest, id: int):
+    if request.user.is_staff:
+        return Post.objects.get(id=id)
+    return Post.objects.filter(published__lte=datetime.now()).get(id=id)
 
 
 @posts_router.post(

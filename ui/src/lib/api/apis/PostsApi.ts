@@ -42,6 +42,8 @@ export interface BlogApiGetPostByIdRequest {
 
 export interface BlogApiGetPostBySlugRequest {
     slug: string;
+    year?: number;
+    draft?: boolean;
 }
 
 export interface BlogApiListPostsRequest {
@@ -198,6 +200,14 @@ export class PostsApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['year'] != null) {
+            queryParameters['year'] = requestParameters['year'];
+        }
+
+        if (requestParameters['draft'] != null) {
+            queryParameters['draft'] = requestParameters['draft'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

@@ -16,68 +16,7 @@ export const isAuthenticated = async (): Promise<boolean> => {
         return false;
     }
 
-    // validate the access token
-    const config = new Configuration({
-        basePath: PUBLIC_BASE_URL,
-        headers: {
-            "Authorization": "Bearer " + accessToken
-        }
-    })
-
-    let api = new TokenApi(config)
-
-    let passed = false
-    
-    try {
-        await api.tokenVerify({tokenVerifyInputSchema: { token: accessToken }})
-        console.log("Access token passed validation check")
-        passed = true
-    } catch (error) {
-        console.log("Access token failed validation check " + error)
-        passed = false
-    }
-
-    if (!passed) {
-        console.log("Access token failed validation check. Attempting to refresh token")
-
-        let refreshToken = await getRefreshToken();
-        if (!refreshToken) {
-            console.log("No refresh token found. User is not authenticated");
-
-            return false;
-        }
-
-        console.log("Making call to refresh token with URL: " + PUBLIC_BASE_URL);
-
-        let config = new Configuration({
-            basePath: PUBLIC_BASE_URL,
-        })
-
-        let api = new TokenApi(config);
-        api.tokenRefresh({tokenRefreshInputSchema: { refresh: refreshToken}}).then((response) => {
-            if (!response.access) {
-                refreshToken = undefined;
-                return
-            }
-
-            setAccessToken(response.access);
-            setRefreshToken(response.refresh);
-
-            accessToken = response.access;
-            refreshToken = response.refresh;
-
-            passed = true;
-        }).catch((error) => {
-            console.error(error);
-
-            refreshToken = undefined;
-            passed = false;
-        });
-    }
-
-    console.log("Token validation complete. User is authenticated: " + passed);
-
-    return passed;
+    return true;
 }
 
 export const setUsername = (username: string) => {
@@ -235,7 +174,7 @@ export const getAccessToken = async (): Promise<string | undefined> => {
             console.error(error);
 
             refreshToken = undefined;
-            return
+            return ""
         });
     }
 
@@ -268,7 +207,7 @@ export const getAccessToken = async (): Promise<string | undefined> => {
                 console.error(error);
     
                 refreshToken = undefined;
-                return
+                return ""
             });
         }
     }

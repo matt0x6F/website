@@ -11,11 +11,12 @@
     import { emoji } from '@cartamd/plugin-emoji';
     import { slash } from '@cartamd/plugin-slash';
     import { anchor } from '@cartamd/plugin-anchor';
+	import { Badge } from 'flowbite-svelte';
 	
 
     export let data
 
-    let posts = data.posts
+    let post = data.post
 
     const carta = new Carta({
         sanitizer: DOMPurify.sanitize,
@@ -61,13 +62,14 @@
 
 <h1 class="text-4xl font-semibold py-6">Blog</h1>
 
-{#each posts as post}
-    <article class="markdown-body">
-        <h1 class="text-4xl font-semibold py-2">{post.title}</h1>
-        <!-- Format published date as "Friday, July 10th @ 23:00 2024" -->
-        <p class="text-gray-500 text-sm">{formatDate(post.published)}</p>
-        <Markdown {carta} value={post.content} />
-    </article>
+<article class="markdown-body">
+    <h1 class="text-4xl font-semibold py-2">{post.title}</h1>
+    {#if post.published}
+    <p class="text-gray-500 text-sm">{formatDate(post.published)}</p>
+    {:else}
+    <Badge color="indigo">Draft</Badge>
+    {/if}
+    <Markdown {carta} value={post.content} />
+</article>
 
-    <hr class="my-8" />
-{/each}
+<hr class="my-8" />

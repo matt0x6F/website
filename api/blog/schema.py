@@ -1,5 +1,3 @@
-# write Pydantic schema for blog.Post
-
 from datetime import datetime
 from typing import Optional
 
