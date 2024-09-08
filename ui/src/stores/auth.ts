@@ -202,6 +202,14 @@ export const getUserData = (): UserSelf | undefined => {
 export const getAccessToken = async (): Promise<string | undefined> => {
     let accessToken = getCookie("access_token");
 
+    let config = new Configuration({
+        basePath: PUBLIC_BASE_URL,
+    })
+
+    let api = new TokenApi(config);
+
+
+    // access token is missing
     if (!accessToken) {
         let refreshToken = await getRefreshToken();
         if (!refreshToken) {
@@ -210,11 +218,6 @@ export const getAccessToken = async (): Promise<string | undefined> => {
 
         console.log("Making call to refresh token with URL: " + PUBLIC_BASE_URL);
 
-        let config = new Configuration({
-            basePath: PUBLIC_BASE_URL,
-        })
-
-        let api = new TokenApi(config);
         api.tokenRefresh({tokenRefreshInputSchema: { refresh: refreshToken}}).then((response) => {
             if (!response.access) {
                 refreshToken = undefined;
@@ -226,6 +229,8 @@ export const getAccessToken = async (): Promise<string | undefined> => {
 
             accessToken = response.access;
             refreshToken = response.refresh;
+
+            return accessToken
         }).catch((error) => {
             console.error(error);
 
@@ -233,6 +238,41 @@ export const getAccessToken = async (): Promise<string | undefined> => {
             return
         });
     }
+
+    // validate the access token
+    if (accessToken !== undefined) {
+        try {
+            api.tokenVerify({tokenVerifyInputSchema: {token: accessToken}})
+        } catch {
+            let refreshToken = await getRefreshToken();
+            if (!refreshToken) {
+                return undefined;
+            }
+    
+            console.log("Making call to refresh token with URL: " + PUBLIC_BASE_URL);
+    
+            api.tokenRefresh({tokenRefreshInputSchema: { refresh: refreshToken}}).then((response) => {
+                if (!response.access) {
+                    refreshToken = undefined;
+                    return
+                }
+    
+                setAccessToken(response.access);
+                setRefreshToken(response.refresh);
+    
+                accessToken = response.access;
+                refreshToken = response.refresh;
+
+                return accessToken
+            }).catch((error) => {
+                console.error(error);
+    
+                refreshToken = undefined;
+                return
+            });
+        }
+    }
+
 
     return accessToken;
 }
