@@ -60,9 +60,8 @@
     }
 </script>
 
-<h1 class="text-4xl font-semibold py-6">Blog</h1>
-
 <article class="markdown-body">
+    <p><a href="/admin">Back to admin dashboard</a></p>
     <h1 class="text-4xl font-semibold py-2">{post.title}</h1>
     {#if post.published}
     <p class="text-gray-500 text-sm">{formatDate(post.published)}</p>
