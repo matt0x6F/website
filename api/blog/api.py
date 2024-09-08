@@ -23,14 +23,14 @@ def list_posts(request: HttpRequest, all: bool = False, drafts: bool = False):
             "Returning all posts", user=request.user.username, is_staff=request.user.is_staff
         )
 
-        return Post.objects.all()
+        return Post.objects.all().order_by("-id")
 
     if drafts and request.user.is_staff:
         logger.debug(
             "Returning draft posts", user=request.user.username, is_staff=request.user.is_staff
         )
 
-        return Post.objects.filter(published__is_null=True)
+        return Post.objects.filter(published__is_null=True).order_by("-id")
 
     logger.debug(
         "Returning published posts", user=request.user.username, is_staff=request.user.is_staff
@@ -38,7 +38,7 @@ def list_posts(request: HttpRequest, all: bool = False, drafts: bool = False):
 
     print(f"USER: {request.user.username} {request.user.is_staff}")
 
-    return Post.objects.filter(published__lte=datetime.now())
+    return Post.objects.filter(published__lte=datetime.now()).order_by("-published")
 
 
 @posts_router.get("/slug/{slug}", response={200: PostDetails}, tags=["posts"])
@@ -57,7 +57,7 @@ def get_post_by_id(request, id: int):
     tags=["posts"],
     auth=JWTAuth(permissions=StaffOnlyModify),
 )
-def create_post(request, post: PostMutate):
+def create_post(request: HttpRequest, post: PostMutate):
     return Post.objects.create(**post.dict(), author=request.user)
 
 
