@@ -4,6 +4,7 @@ from typing import List
 import structlog
 from django.http import HttpRequest
 from ninja import Router
+from ninja.errors import HttpError
 from ninja.pagination import paginate
 
 from auth.middleware import JWTAuth, StaffOnlyModify
@@ -23,22 +24,35 @@ def list_posts(request: HttpRequest, all: bool = False, drafts: bool = False):
             "Returning all posts", user=request.user.username, is_staff=request.user.is_staff
         )
 
-        return Post.objects.all().order_by("-id")
+        try:
+            return Post.objects.all().order_by("-id")
+        except Exception as err:
+            logger.error("Error fetching all posts", error=err)
+
+            raise HttpError(500, "Fail to fetch all posts") from err
 
     if drafts and request.user.is_staff:
         logger.debug(
             "Returning draft posts", user=request.user.username, is_staff=request.user.is_staff
         )
 
-        return Post.objects.filter(published__is_null=True).order_by("-id")
+        try:
+            return Post.objects.filter(published__isnull=True).order_by("-id")
+        except Exception as err:
+            logger.error("Error fetching draft posts", error=err)
+
+            raise HttpError(500, "Fail to fetch draft posts") from err
 
     logger.debug(
         "Returning published posts", user=request.user.username, is_staff=request.user.is_staff
     )
 
-    print(f"USER: {request.user.username} {request.user.is_staff}")
+    try:
+        return Post.objects.filter(published__lte=datetime.now()).order_by("-published")
+    except Exception as err:
+        logger.error("Error fetching published posts", error=err)
 
-    return Post.objects.filter(published__lte=datetime.now()).order_by("-published")
+        raise HttpError(500, "Fail to fetch published posts") from err
 
 
 @posts_router.get("/slug/{slug}", response={200: PostDetails}, tags=["posts"])
