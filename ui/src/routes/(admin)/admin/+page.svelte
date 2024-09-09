@@ -1,10 +1,18 @@
 <script lang="ts">
 
-	import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
+	import { Button, ButtonGroup, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
 	import type { PageData } from "./$types";
-	import { EyeSolid } from "flowbite-svelte-icons";
+	import { EyeSolid, TrashBinSolid } from "flowbite-svelte-icons";
+	import { PUBLIC_BASE_URL } from "$env/static/public";
+	import { Configuration, PostsApi } from "$lib/api";
+	import { getAccessToken } from "../../../stores/auth";
+	import DeleteButton from "$lib/components/DeleteButton.svelte";
+	import { addToast } from "../../../stores/notifications";
 
     export let data: PageData
+
+    let draftPosts = data.draftPosts
+    let publishedPosts = data.publishedPosts
 
     function formatDate(date: Date | null | undefined): string {
         if (!date) {
@@ -44,6 +52,15 @@
 
         return date.getFullYear().toString();
     }
+
+    async function removeDraft(event: CustomEvent<{postID: number}>) {
+        // search through draftPosts and delete the post with the matching ID
+        draftPosts = draftPosts.filter(post => post.id !== event.detail.postID);
+
+        addToast({
+                message: "Deleted draft post"
+            })
+    }
 </script>
 
 <p class="py-4">Welcome to the admin interface.</p>
@@ -53,7 +70,7 @@
 <div class="flex flex-row space-x-4 w-full">
     <div class="flex-grow">
         <h2 class="text-lg font-bold">Posts</h2>
-        <Table>
+        <Table hoverable>
             <TableHead>
             <TableHeadCell>Title</TableHeadCell>
             <TableHeadCell>Author</TableHeadCell>
@@ -61,12 +78,19 @@
             <TableHeadCell></TableHeadCell>
             </TableHead>
             <TableBody tableBodyClass="divide-y">
-                {#each data.publishedPosts as post }
+                {#each publishedPosts as post }
                 <TableBodyRow>
                     <TableBodyCell><a href="/admin/write/{post.id}">{post.title}</a></TableBodyCell>
                     <TableBodyCell>{post.authorId}</TableBodyCell>
                     <TableBodyCell>{formatDate(post.published)}</TableBodyCell>
-                    <TableBodyCell><a href="/blog/posts/{formatPostYear(post.published)}/{post.slug}"><EyeSolid ariaLabel="View this post" /></a></TableBodyCell>
+                    <TableBodyCell class="text-right">
+                        <ButtonGroup class="*:!ring-primary-700">
+                            <Button size="xs" href="/blog/posts/{formatPostYear(post.published)}/{post.slug}">
+                                <EyeSolid class="inline-block" ariaLabel="Preview this post" />
+                                Preview
+                            </Button>
+                          </ButtonGroup>    
+                    </TableBodyCell>
                 </TableBodyRow>
                 {:else}
                 <TableBodyRow>
@@ -81,18 +105,26 @@
     </div>
     <div class="flex-grow">
         <h2 class="text-lg font-bold">Drafts</h2>
-        <Table>
+        <Table hoverable>
             <TableHead>
             <TableHeadCell>Title</TableHeadCell>
             <TableHeadCell>Author</TableHeadCell>
             <TableHeadCell></TableHeadCell>
             </TableHead>
             <TableBody tableBodyClass="divide-y">
-                {#each data.draftPosts as post }
+                {#each draftPosts as post }
                 <TableBodyRow>
                     <TableBodyCell><a href="/admin/write/{post.id}">{post.title}</a></TableBodyCell>
                     <TableBodyCell>{post.authorId}</TableBodyCell>
-                    <TableBodyCell><a href="/blog/drafts/{formatPostYear(post.published)}/{post.slug}"><EyeSolid ariaLabel="Preview this post" /></a></TableBodyCell>
+                    <TableBodyCell class="text-right">
+                        <ButtonGroup class="*:!ring-primary-700">
+                            <Button size="xs" href="/blog/drafts/{formatPostYear(post.published)}/{post.slug}">
+                                <EyeSolid class="inline-block" ariaLabel="Preview this post" />
+                                Preview
+                            </Button>
+                            <DeleteButton postID={post.id} on:postDeleted={removeDraft} />
+                          </ButtonGroup>
+                    </TableBodyCell>
                 </TableBodyRow>
                 {:else}
                 <TableBodyRow>
