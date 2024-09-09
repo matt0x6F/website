@@ -60,15 +60,17 @@
     }
 </script>
 
-<article class="markdown-body">
+<article class="markdown-body" itemscope itemtype="https://schema.org/BlogPosting">
     <p><a href="/blog">Back to posts</a></p>
-    <h1 class="text-4xl font-semibold py-2">{post.title}</h1>
+    <h1 itemprop="headline" class="text-4xl font-semibold py-2">{post.title}</h1>
     {#if post.published}
-    <p class="text-gray-500 text-sm">{formatDate(post.published)}</p>
+    <p itemprop="datePublished" class="text-gray-500 text-sm">{formatDate(post.published)}</p>
     {:else}
     <Badge color="indigo">Draft</Badge>
     {/if}
-    <Markdown {carta} value={post.content} />
+    <div itemprop="articleBody">
+        <Markdown {carta} value={post.content} />
+    </div>
 </article>
 
 <hr class="my-8" />
