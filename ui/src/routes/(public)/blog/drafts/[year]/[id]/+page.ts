@@ -14,17 +14,17 @@ export const load: PageLoad = async ({ params }) => {
     const api = new PostsApi(config);
 
     let post: PostDetails = {
-        id: 0,
+        id: +params.id,
         title: "",
         content: "",
-        slug: params.slug,
+        slug: "",
         createdAt: new Date(),
         updatedAt: new Date(),
         authorId: 0,
     }
 
     try {
-        post = await api.blogApiGetPostBySlug({slug: params.slug, draft: true});
+        post = await api.blogApiGetPostById({id: +params.id});
 
         console.log("Fetched post: " + post.id);
     } catch (error)

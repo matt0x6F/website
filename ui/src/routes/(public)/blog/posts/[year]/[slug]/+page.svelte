@@ -58,33 +58,68 @@
 
         return `${dayOfWeek}, ${month} the ${dayWithSuffix}, ${year} @ ${hours}:${minutes}`;
     }
+
+    function parseDateAsYear(date: Date | null | undefined): string {
+        if (!date) {
+            return "";
+        }
+        
+        return date.getFullYear().toString();
+    }
+
+    const metadata = {
+        "@context": "https://schema.org/",
+        "@type": "BlogPosting",
+        "@id": "https://ooo-yay.com/blog/posts/" + parseDateAsYear(post.published) + "/" + post.slug,
+        "mainEntityOfPage": "https://ooo-yay.com/blog/posts/" + parseDateAsYear(post.published) + "/" + post.slug,
+        "headline": post.title,
+        "name": post.title,
+        "description": "When Schema.org arrived on the scene I thought we might have arrived at the point where library metadata  could finally blossom; adding value outside of library systems to help library curated resources become first class citizens, and hence results, in the global web we all inhabit.  But as yet it has not happened.",
+        "datePublished": post.published,
+        "dateModified": post.updatedAt,
+        "author": {
+            "@type": "Person",
+            "@id": "https://ooo-yay.com/about",
+            "name": "Matt Ouille",
+            "url": "https://ooo-yay.com/about",
+        },
+        "publisher": {
+            "@type": "Organization",
+            "@id": "https://ooo-yay.com",
+            "name": "ooo-yay",
+        },
+        "url": "https://ooo-yay.com/blog/posts/" + parseDateAsYear(post.published) + "/" + post.slug,
+        "isPartOf": {
+            "@type" : "Blog",
+            "@id": "https://ooo-yay.com/blog/",
+            "name": "ooo-yay Blog",
+            "publisher": {
+                "@type": "Organization",
+                "@id": "https://ooo-yay.com",
+                "name": "ooo-yay"
+            }
+        },
+        "wordCount": post.content.split(" ").length,
+        "keywords": [],
+    }
 </script>
 
-<article class="markdown-body" itemscope itemtype="https://schema.org/BlogPosting">
+<article class="markdown-body">
     <p><a href="/blog">Back to posts</a></p>
+
+    {@html `<script type="application/ld+json">
+        ${JSON.stringify(metadata)}
+    </script>`}
 
     <h1 itemprop="headline" class="text-4xl font-semibold py-2">{post.title}</h1>
     
     {#if post.published}
     <p class="text-gray-500 text-sm">{formatDate(post.published)}</p>
-
-    <input type="hidden" itemprop="author" value="Matt Ouille" />
-    <input type="hidden" itemprop="datePublished" value={post.published.toISOString()} />
-    <input type="hidden" itemprop="accessMode" value="textual" />
-    <input type="hidden" itemprop="accessModeSufficient" value="textual" />
-    <input type="hidden" itemprop="accessibilityFeature" value="alternativeText" />
-    <input type="hidden" itemprop="copyrightYear" value={post.published.getFullYear()} />
-    <input type="hidden" itemprop="copyrightHolder" value="Matt Ouille" />
-    <input type="hidden" itemprop="copyrightNotice" value="Copyright 2024-{new Date().getFullYear()} Matt Ouille. All rights reserved." />
-    <input type="hidden" itemprop="creativeWorkStatus" value="Published" />
-
-    
-    
     {:else}
     <Badge color="indigo">Draft</Badge>
     {/if}
     
-    <div itemprop="articleBody">
+    <div>
         <Markdown {carta} value={post.content} />
     </div>
 </article>

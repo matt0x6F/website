@@ -118,7 +118,7 @@
                     <TableBodyCell>{post.authorId}</TableBodyCell>
                     <TableBodyCell class="text-right">
                         <ButtonGroup class="*:!ring-primary-700">
-                            <Button size="xs" href="/blog/drafts/{formatPostYear(post.published)}/{post.slug}">
+                            <Button size="xs" href="/blog/drafts/{formatPostYear(post.published)}/{post.id}">
                                 <EyeSolid class="inline-block" ariaLabel="Preview this post" />
                                 Preview
                             </Button>
