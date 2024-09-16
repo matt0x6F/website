@@ -17,7 +17,7 @@ export const load: PageLoad = async () => {
     let draftPosts: PostDetails[] = [];
 
     try {
-        publishedPosts = (await api.blogApiListPosts({all: false, limit: 100, offset: 0})).items;
+        publishedPosts = (await api.blogApiListPosts({all: false, drafts: false, limit: 100, offset: 0})).items;
 
         console.log("Fetched posts: " + publishedPosts.length);
     } catch (error)

@@ -2,10 +2,7 @@
 
 	import { Button, ButtonGroup, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
 	import type { PageData } from "./$types";
-	import { EyeSolid, TrashBinSolid } from "flowbite-svelte-icons";
-	import { PUBLIC_BASE_URL } from "$env/static/public";
-	import { Configuration, PostsApi } from "$lib/api";
-	import { getAccessToken } from "../../../stores/auth";
+	import { EyeSolid } from "flowbite-svelte-icons";
 	import DeleteButton from "$lib/components/DeleteButton.svelte";
 	import { addToast } from "../../../stores/notifications";
 
@@ -59,7 +56,7 @@
 
         addToast({
                 message: "Deleted draft post"
-            })
+        })
     }
 </script>
 
@@ -78,20 +75,22 @@
             <TableHeadCell></TableHeadCell>
             </TableHead>
             <TableBody tableBodyClass="divide-y">
-                {#each publishedPosts as post }
+                {#each publishedPosts as publishedPost }
+                {#key publishedPost.id}
                 <TableBodyRow>
-                    <TableBodyCell><a href="/admin/write/{post.id}">{post.title}</a></TableBodyCell>
-                    <TableBodyCell>{post.authorId}</TableBodyCell>
-                    <TableBodyCell>{formatDate(post.published)}</TableBodyCell>
+                    <TableBodyCell><a href="/admin/write/{publishedPost.id}">{publishedPost.title}</a></TableBodyCell>
+                    <TableBodyCell>{publishedPost.authorId}</TableBodyCell>
+                    <TableBodyCell>{formatDate(publishedPost.published)}</TableBodyCell>
                     <TableBodyCell class="text-right">
                         <ButtonGroup class="*:!ring-primary-700">
-                            <Button size="xs" href="/blog/posts/{formatPostYear(post.published)}/{post.slug}">
+                            <Button size="xs" href="/blog/posts/{formatPostYear(publishedPost.published)}/{publishedPost.slug}">
                                 <EyeSolid class="inline-block" ariaLabel="Preview this post" />
                                 Preview
                             </Button>
                           </ButtonGroup>    
                     </TableBodyCell>
                 </TableBodyRow>
+                {/key}
                 {:else}
                 <TableBodyRow>
                     <TableBodyCell>No published posts</TableBodyCell>
@@ -112,20 +111,22 @@
             <TableHeadCell></TableHeadCell>
             </TableHead>
             <TableBody tableBodyClass="divide-y">
-                {#each draftPosts as post }
+                {#each draftPosts as draftPost }
+                {#key draftPost.id}
                 <TableBodyRow>
-                    <TableBodyCell><a href="/admin/write/{post.id}">{post.title}</a></TableBodyCell>
-                    <TableBodyCell>{post.authorId}</TableBodyCell>
+                    <TableBodyCell><a href="/admin/write/{draftPost.id}">{draftPost.title}</a></TableBodyCell>
+                    <TableBodyCell>{draftPost.authorId}</TableBodyCell>
                     <TableBodyCell class="text-right">
                         <ButtonGroup class="*:!ring-primary-700">
-                            <Button size="xs" href="/blog/drafts/{formatPostYear(post.published)}/{post.id}">
+                            <Button size="xs" href="/blog/drafts/{formatPostYear(draftPost.published)}/{draftPost.id}">
                                 <EyeSolid class="inline-block" ariaLabel="Preview this post" />
                                 Preview
                             </Button>
-                            <DeleteButton postID={post.id} on:postDeleted={removeDraft} />
+                            <DeleteButton postID={draftPost.id} on:postDeleted={removeDraft} />
                           </ButtonGroup>
                     </TableBodyCell>
                 </TableBodyRow>
+                {/key}
                 {:else}
                 <TableBodyRow>
                     <TableBodyCell>No drafts</TableBodyCell>
