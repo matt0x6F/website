@@ -105,7 +105,7 @@ export const removeUserData = () => {
         isStaff: false,
         dateJoined: new Date(),
     })
-    removeCookie("userData")
+    removeCookie("user_data")
 }
 
 export const getUsername = (): string => {
