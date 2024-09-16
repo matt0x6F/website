@@ -151,7 +151,9 @@ export const getAccessToken = async (): Promise<string | undefined> => {
         // verify the token from storage
         try {
             api.tokenVerify({tokenVerifyInputSchema: {token: accessToken}})
-        } catch {
+        } catch (error) {
+            console.error("Error verifying access token: ", error);
+
             accessToken = undefined;
 
             removeAccessToken();
@@ -167,7 +169,8 @@ export const getAccessToken = async (): Promise<string | undefined> => {
 
         console.log("Making call to refresh token with URL: " + PUBLIC_BASE_URL);
 
-        api.tokenRefresh({tokenRefreshInputSchema: { refresh: refreshToken}}).then((response) => {
+        try {
+            let response = await api.tokenRefresh({tokenRefreshInputSchema: { refresh: refreshToken}})
             if (!response.access) {
                 refreshToken = undefined;
                 return
@@ -178,15 +181,15 @@ export const getAccessToken = async (): Promise<string | undefined> => {
 
             accessToken = response.access;
             refreshToken = response.refresh;
-        }).catch((error) => {
-            console.error(error);
+        } catch (error) {
+            console.error("Error refreshing access token: ", error);
 
             removeAccessToken();
             removeRefreshToken();
 
             accessToken = undefined;
             refreshToken = undefined;
-        });
+        }
     }
 
     return accessToken;
