@@ -147,9 +147,19 @@ export const getAccessToken = async (): Promise<string | undefined> => {
 
     let api = new TokenApi(config);
 
+    if (accessToken) {
+        // verify the token from storage
+        try {
+            api.tokenVerify({tokenVerifyInputSchema: {token: accessToken}})
+        } catch {
+            accessToken = undefined;
 
-    // access token is missing
+            removeAccessToken();
+        }
+    } 
+    
     if (!accessToken) {
+        // use the refresh token to get a new access token
         let refreshToken = await getRefreshToken();
         if (!refreshToken) {
             return undefined;
@@ -168,50 +178,16 @@ export const getAccessToken = async (): Promise<string | undefined> => {
 
             accessToken = response.access;
             refreshToken = response.refresh;
-
-            return accessToken
         }).catch((error) => {
             console.error(error);
 
+            removeAccessToken();
+            removeRefreshToken();
+
+            accessToken = undefined;
             refreshToken = undefined;
-            return ""
         });
     }
-
-    // validate the access token
-    if (accessToken !== undefined) {
-        try {
-            api.tokenVerify({tokenVerifyInputSchema: {token: accessToken}})
-        } catch {
-            let refreshToken = await getRefreshToken();
-            if (!refreshToken) {
-                return undefined;
-            }
-    
-            console.log("Making call to refresh token with URL: " + PUBLIC_BASE_URL);
-    
-            api.tokenRefresh({tokenRefreshInputSchema: { refresh: refreshToken}}).then((response) => {
-                if (!response.access) {
-                    refreshToken = undefined;
-                    return
-                }
-    
-                setAccessToken(response.access);
-                setRefreshToken(response.refresh);
-    
-                accessToken = response.access;
-                refreshToken = response.refresh;
-
-                return accessToken
-            }).catch((error) => {
-                console.error(error);
-    
-                refreshToken = undefined;
-                return ""
-            });
-        }
-    }
-
 
     return accessToken;
 }
