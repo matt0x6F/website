@@ -2,14 +2,15 @@ from datetime import datetime
 from typing import List
 
 import structlog
+from django.db.utils import IntegrityError
 from django.http import HttpRequest
 from ninja import Router
-from ninja.errors import HttpError
+from ninja.errors import HttpError, ValidationError
 from ninja.pagination import paginate
 
 from auth.middleware import JWTAuth, StaffOnlyModify
 from blog.models import Post
-from blog.schema import PostDetails, PostMutate
+from blog.schema import PostDetails, PostMutate, ValidationErrorResponse
 
 logger = structlog.get_logger(__name__)
 
@@ -79,27 +80,38 @@ def get_post_by_id(request: HttpRequest, id: int):
 
 @posts_router.post(
     "/",
-    response={201: PostDetails},
+    response={201: PostDetails, 422: ValidationErrorResponse},
     tags=["posts"],
     auth=JWTAuth(permissions=StaffOnlyModify),
 )
 def create_post(request: HttpRequest, post: PostMutate):
-    return Post.objects.create(**post.dict(), author=request.user)
+    try:
+        post = Post.objects.create(**post.dict(), author=request.user)
+    except IntegrityError as err:
+        logger.error("Error creating post", error=err)
+
+        raise ValidationError("Post with this slug already exists") from err
+    return post
 
 
 @posts_router.put(
     "/{id}",
-    response={200: PostDetails},
+    response={200: PostDetails, 422: ValidationErrorResponse},
     tags=["posts"],
     auth=JWTAuth(permissions=StaffOnlyModify),
 )
 def update_post(request, id: int, post: PostMutate):
-    # only update fields that are present in the request
-    original = Post.objects.get(id=id)
+    try:
+        # only update fields that are present in the request
+        original = Post.objects.get(id=id)
 
-    for attr, value in post.__dict__.items():
-        setattr(original, attr, value)
-    original.save()
+        for attr, value in post.__dict__.items():
+            setattr(original, attr, value)
+        original.save()
+    except IntegrityError as err:
+        logger.error("Error creating post", error=err)
+
+        raise ValidationError("Post with this slug already exists") from err
     return original
 
 

@@ -18,6 +18,7 @@ import type {
   PagedPostDetails,
   PostDetails,
   PostMutate,
+  ValidationErrorResponse,
 } from '../models/index';
 import {
     PagedPostDetailsFromJSON,
@@ -26,6 +27,8 @@ import {
     PostDetailsToJSON,
     PostMutateFromJSON,
     PostMutateToJSON,
+    ValidationErrorResponseFromJSON,
+    ValidationErrorResponseToJSON,
 } from '../models/index';
 
 export interface BlogApiCreatePostRequest {

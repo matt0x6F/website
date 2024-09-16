@@ -20,3 +20,7 @@ class PostDetails(Schema):
     published: Optional[datetime] = None
     author_id: int
     slug: str
+
+
+class ValidationErrorResponse(Schema):
+    detail: str

@@ -13,3 +13,4 @@ export * from './TokenRefreshInputSchema';
 export * from './TokenRefreshOutputSchema';
 export * from './TokenVerifyInputSchema';
 export * from './UserSelf';
+export * from './ValidationErrorResponse';

@@ -17,5 +17,6 @@ models/TokenRefreshInputSchema.ts
 models/TokenRefreshOutputSchema.ts
 models/TokenVerifyInputSchema.ts
 models/UserSelf.ts
+models/ValidationErrorResponse.ts
 models/index.ts
 runtime.ts
