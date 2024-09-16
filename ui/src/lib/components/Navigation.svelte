@@ -61,7 +61,7 @@
     onMount(async () => {
         authenticated = await isAuthenticated();
 
-        if (!authenticated) {
+        if (!authenticated && staffOnly) {
             console.log("User is not authenticated. Redirecting to login page.");
             goto("/login");
         }

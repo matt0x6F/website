@@ -3,6 +3,6 @@
     import '../../app.css';
 </script>
 
-<Navigation>
+<Navigation staffOnly={false}>
     <slot></slot>
 </Navigation>
