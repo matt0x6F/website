@@ -12,10 +12,11 @@
     import { slash } from '@cartamd/plugin-slash';
     import { anchor } from '@cartamd/plugin-anchor';
 	import 'carta-md/default.css'; /* Default theme */
-	import { Input, Label, Tabs, TabItem, Button } from 'flowbite-svelte';
+	import { Input, Label, Tabs, TabItem, Button, ButtonGroup } from 'flowbite-svelte';
     import DOMPurify from 'isomorphic-dompurify';
 	import { addToast } from '../../stores/notifications';
 	import { getAccessToken } from '../../stores/auth';
+	import { ArrowsRepeatOutline } from 'flowbite-svelte-icons';
 	
 
 	const carta = new Carta({
@@ -45,6 +46,14 @@
         const [hours, minutes] = time.split(':');
 
         return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes));
+    }
+
+    const slugify = (title: string): string => {
+        return title.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
+    }
+
+    const generateSlugFromTitle = () => {
+        slug = slugify(title)
     }
 
     const savePost = async () => {
@@ -129,7 +138,10 @@
         <div class="flex flex-row space-x-4">
             <div class="mb-6 flex-grow max-w-screen-sm">
                 <Label for="slug" class="block mb-2">Slug</Label>
-                <Input id="slug" size="lg" placeholder="Slug" bind:value={slug} />
+                <ButtonGroup class="w-full">
+                    <Input id="slug" size="lg" placeholder="Slug" bind:value={slug} />
+                    <Button on:click={() => generateSlugFromTitle()}><ArrowsRepeatOutline /> Generate</Button>
+                </ButtonGroup>
             </div>
             <div class="mb-6">
                 <Label for="published_at" class="block mb-2">Publish</Label>

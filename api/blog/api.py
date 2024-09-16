@@ -80,7 +80,7 @@ def get_post_by_id(request: HttpRequest, id: int):
 
 @posts_router.post(
     "/",
-    response={201: PostDetails, 422: ValidationErrorResponse},
+    response={200: PostDetails, 422: ValidationErrorResponse},
     tags=["posts"],
     auth=JWTAuth(permissions=StaffOnlyModify),
 )
