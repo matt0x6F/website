@@ -5,5 +5,8 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	server: {
 		host: '0.0.0.0'
+	},
+	esbuild: {
+		drop: ['console', 'debugger']
 	}
 });

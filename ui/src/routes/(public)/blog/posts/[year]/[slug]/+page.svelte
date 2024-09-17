@@ -104,6 +104,22 @@
     }
 </script>
 
+<svelte:head>
+	<meta property="og:title" content={post.title} />
+	<meta property="og:type" content="website" />
+	<meta property="og:image" content="https://ooo-yay.com/img/opengraph.png" />
+	<meta property="og:url" content="https://ooo-yay.com/blog/posts/{parseDateAsYear(post.published)}/{post.slug}" />
+
+	<title>{post.title} | Matt Ouille | ooo-yay.com</title>
+	<meta
+		name="description"
+		content={post.content
+			.replaceAll(/(<([^>]+)>)/gi, '')
+			.replace(/&ndash;/g, '')
+			.slice(0, 200)}
+	/>
+</svelte:head>
+
 <article class="markdown-body">
     <p><a href="/blog">Back to posts</a></p>
 
