@@ -11,8 +11,10 @@
     import { emoji } from '@cartamd/plugin-emoji';
     import { slash } from '@cartamd/plugin-slash';
     import { anchor } from '@cartamd/plugin-anchor';
-	import { Badge } from 'flowbite-svelte';
-	
+    import { Badge } from 'flowbite-svelte';
+    import { MetaTags } from 'svelte-meta-tags';
+	import DeleteButton from '$lib/components/DeleteButton.svelte';
+
 
     export let data
 
@@ -27,6 +29,14 @@
             anchor()
         ]
 	});
+
+    function iso8601String(date: Date | null | undefined): string {
+        if (!date) {
+            return "";
+        }
+        
+        return date.toISOString();
+    }
 
     function formatDate(date: Date | null | undefined): string {
         if (!date) {
@@ -104,28 +114,39 @@
     }
 </script>
 
-<svelte:head>
-	<meta property="og:title" content="{post.title}">
-	<meta property="og:type" content="website">
-	<meta property="og:image" content="https://ooo-yay.com/img/opengraph.png">
-	<meta property="og:url" content="https://ooo-yay.com/blog/posts/{parseDateAsYear(post.published)}/{post.slug}">
-    <meta
-        name="og:description"
-        content="{post.content
+<MetaTags 
+    title={post.title}
+    titleTemplate="%s | Matt Ouille | ooo-yay.com"
+    description={post.content
+        .replaceAll(/(<([^>]+)>)/gi, '')
+        .replace(/&ndash;/g, '')
+        .slice(0, 200)}
+    canonical="https://ooo-yay.com/"
+    openGraph={{
+        title: post.title,
+        type: "website",
+        article: {
+            publishedTime: iso8601String(post.published),
+            modifiedTime: iso8601String(post.updatedAt),
+            authors: ["Matt Ouille"],
+            section: "Blog",
+        },
+        images: [
+            {
+                url: "https://ooo-yay.com/img/opengraph.png",
+                width: 1200,
+                height: 630,
+                alt: "ooo-yay.com opengraph image"
+            }
+        ],
+        url: "https://ooo-yay.com/blog/posts/{parseDateAsYear(post.published)}/{post.slug}",
+        description: post.content
             .replaceAll(/(<([^>]+)>)/gi, '')
             .replace(/&ndash;/g, '')
-            .slice(0, 200)}"
-    >
-
-	<title>{post.title} | Matt Ouille | ooo-yay.com</title>
-	<meta
-		name="description"
-		content="{post.content
-			.replaceAll(/(<([^>]+)>)/gi, '')
-			.replace(/&ndash;/g, '')
-			.slice(0, 200)}"
-	>
-</svelte:head>
+            .slice(0, 200),
+        siteName:"ooo-yay.com"
+    }}
+/>
 
 <article class="markdown-body">
     <p><a href="/blog">Back to posts</a></p>
