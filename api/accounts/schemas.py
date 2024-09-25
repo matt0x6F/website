@@ -16,6 +16,10 @@ class UserSelf(Schema):
     avatar_link: Optional[str] = None
 
 
+class AuthError(Schema):
+    details: str
+
+
 class NewAccount(Schema):
     username: str
     email: str

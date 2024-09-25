@@ -13,7 +13,6 @@
     import { anchor } from '@cartamd/plugin-anchor';
     import { Badge } from 'flowbite-svelte';
     import { MetaTags } from 'svelte-meta-tags';
-	import DeleteButton from '$lib/components/DeleteButton.svelte';
 
 
     export let data
@@ -139,7 +138,7 @@
                 alt: "ooo-yay.com opengraph image"
             }
         ],
-        url: "https://ooo-yay.com/blog/posts/{parseDateAsYear(post.published)}/{post.slug}",
+        url: "https://ooo-yay.com/blog/posts/" + parseDateAsYear(post.published) + "/" + post.slug,
         description: post.content
             .replaceAll(/(<([^>]+)>)/gi, '')
             .replace(/&ndash;/g, '')

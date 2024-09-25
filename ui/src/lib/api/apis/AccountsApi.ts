@@ -15,10 +15,13 @@
 
 import * as runtime from '../runtime';
 import type {
+  AuthError,
   NewAccount,
   UserSelf,
 } from '../models/index';
 import {
+    AuthErrorFromJSON,
+    AuthErrorToJSON,
     NewAccountFromJSON,
     NewAccountToJSON,
     UserSelfFromJSON,

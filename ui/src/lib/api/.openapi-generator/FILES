@@ -4,6 +4,7 @@ apis/PostsApi.ts
 apis/TokenApi.ts
 apis/index.ts
 index.ts
+models/AuthError.ts
 models/HealthResponse.ts
 models/HealthStatus.ts
 models/Input.ts

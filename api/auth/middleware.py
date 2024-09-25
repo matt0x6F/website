@@ -5,9 +5,11 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, AnonymousUser
 from django.http import HttpRequest
 from ninja.errors import HttpError
-from ninja_jwt.authentication import JWTAuth
+from ninja_jwt.authentication import InvalidToken, JWTAuth
 
-logger = structlog.get_logger(__name__)
+logger: structlog.stdlib.BoundLogger = structlog.get_logger(__name__)
+
+TOKEN_UNSET = "undefined"
 
 
 class StaffOnlyModify:
@@ -63,28 +65,44 @@ class JWTAuth(JWTAuth):
             return None
         token = " ".join(parts[1:])
 
+        user: AbstractUser = AnonymousUser()
+
         try:
             user = self.authenticate(request, token)
             request.user = user
             return user
-        except Exception as e:
-            logger.error("Failed to authenticate user", exception=e)
+        except Exception:
+            logger.error("Failed to authenticate user")
 
-            return AnonymousUser()
+            request.user = AnonymousUser()
 
-        return
+        return self.authorize(request, user)
 
     def authenticate(self, request: HttpRequest, token: str) -> Type[AbstractUser]:
         user: AbstractUser = AnonymousUser()
+
+        if token == TOKEN_UNSET:
+            logger.debug("Token is not set; defaulting to AnonymousUser")
+
+            return user
+
         try:
             logger.debug("Authenticating user with token", token=token)
 
             user = super().jwt_authenticate(request, token)
 
             logger.info("Successfully authenticated user", user=user)
+        except InvalidToken:
+            logger.error("Token is invalid; defaulting to AnonymousUser")
 
-        except Exception as e:
-            logger.debug("Failed to authenticate user; defaulting to AnonymousUser", exception=e)
+        except Exception:
+            logger.error("Failed to authenticate user; defaulting to AnonymousUser")
+
+        return user
+
+    def authorize(self, request: HttpRequest, user: AbstractUser) -> Type[AbstractUser]:
+        if request.user == AnonymousUser() and not self.allow_anonymous:
+            raise HttpError(401, "Token invalid")
 
         if self.permissions:
             logger.debug("Checking permissions for user", user=user)

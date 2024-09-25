@@ -1,9 +1,9 @@
-from datetime import datetime
 from typing import List
 
 import structlog
 from django.db.utils import IntegrityError
 from django.http import HttpRequest
+from django.utils import timezone
 from ninja import Router
 from ninja.errors import HttpError, ValidationError
 from ninja.pagination import paginate
@@ -45,11 +45,14 @@ def list_posts(request: HttpRequest, all: bool = False, drafts: bool = False):
             raise HttpError(500, "Fail to fetch draft posts") from err
 
     logger.debug(
-        "Returning published posts", user=request.user.username, is_staff=request.user.is_staff
+        "Returning published posts",
+        user=request.user.username,
+        is_staff=request.user.is_staff,
+        method=request.method,
     )
 
     try:
-        return Post.objects.filter(published__lte=datetime.now()).order_by("-published")
+        return Post.objects.filter(published__lte=timezone.now()).order_by("-published")
     except Exception as err:
         logger.error("Error fetching published posts", error=err)
 
@@ -65,7 +68,7 @@ def get_post_by_slug(request: HttpRequest, slug: str, year: int = None, draft=Fa
         return Post.objects.filter(published__year=year).get(slug=slug)
 
     return (
-        Post.objects.filter(published__lte=datetime.now())
+        Post.objects.filter(published__lte=timezone.now())
         .filter(published__year=year)
         .get(slug=slug)
     )
@@ -75,7 +78,7 @@ def get_post_by_slug(request: HttpRequest, slug: str, year: int = None, draft=Fa
 def get_post_by_id(request: HttpRequest, id: int):
     if request.user.is_staff:
         return Post.objects.get(id=id)
-    return Post.objects.filter(published__lte=datetime.now()).get(id=id)
+    return Post.objects.filter(published__lte=timezone.now()).get(id=id)
 
 
 @posts_router.post(

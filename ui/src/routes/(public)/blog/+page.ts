@@ -16,7 +16,8 @@ export const load: PageLoad = async () => {
     let posts: PostDetails[] = [];
 
     try {
-        posts = (await api.blogApiListPosts({all: false, limit: 10, offset: 0})).items;
+        const response = await api.blogApiListPosts({all: false, limit: 10, offset: 0})
+        posts = response.items;
 
         console.log("Fetched posts: " + posts.length);
     } catch (error)

@@ -137,6 +137,16 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
           }
         },
         "description": "Returns the calling users details",
@@ -162,6 +172,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserSelf"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
                 }
               }
             }
@@ -662,6 +682,19 @@
           "date_joined"
         ],
         "title": "UserSelf",
+        "type": "object"
+      },
+      "AuthError": {
+        "properties": {
+          "details": {
+            "title": "Details",
+            "type": "string"
+          }
+        },
+        "required": [
+          "details"
+        ],
+        "title": "AuthError",
         "type": "object"
       },
       "NewAccount": {

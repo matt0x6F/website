@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './AuthError';
 export * from './HealthResponse';
 export * from './HealthStatus';
 export * from './Input';
