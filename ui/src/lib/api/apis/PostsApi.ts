@@ -15,12 +15,15 @@
 
 import * as runtime from '../runtime';
 import type {
+  FileDetails,
   PagedPostDetails,
   PostDetails,
   PostMutate,
   ValidationErrorResponse,
 } from '../models/index';
 import {
+    FileDetailsFromJSON,
+    FileDetailsToJSON,
     PagedPostDetailsFromJSON,
     PagedPostDetailsToJSON,
     PostDetailsFromJSON,
@@ -47,6 +50,10 @@ export interface BlogApiGetPostBySlugRequest {
     slug: string;
     year?: number;
     draft?: boolean;
+}
+
+export interface BlogApiGetPostFilesByIdRequest {
+    id: number;
 }
 
 export interface BlogApiListPostsRequest {
@@ -237,6 +244,47 @@ export class PostsApi extends runtime.BaseAPI {
      */
     async blogApiGetPostBySlug(requestParameters: BlogApiGetPostBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
         const response = await this.blogApiGetPostBySlugRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get Post Files By Id
+     */
+    async blogApiGetPostFilesByIdRaw(requestParameters: BlogApiGetPostFilesByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<FileDetails>>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling blogApiGetPostFilesById().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/posts/{id}/files`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(FileDetailsFromJSON));
+    }
+
+    /**
+     * Get Post Files By Id
+     */
+    async blogApiGetPostFilesById(requestParameters: BlogApiGetPostFilesByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<FileDetails>> {
+        const response = await this.blogApiGetPostFilesByIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

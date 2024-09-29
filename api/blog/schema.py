@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from ninja import Schema
 
@@ -22,5 +22,33 @@ class PostDetails(Schema):
     slug: str
 
 
+class PostSummary(Schema):
+    id: int
+    title: str
+    published: Optional[datetime] = None
+    slug: str
+
+
 class ValidationErrorResponse(Schema):
     detail: str
+
+
+class FileDetails(Schema):
+    id: int
+    name: str
+    content_type: str
+    charset: Optional[str]
+    size: int
+    location: str
+    created_at: datetime
+    posts: List[PostSummary]
+    visibility: str
+
+
+class FileMetadata(Schema):
+    posts: Optional[List[int]] = None
+    visibility: str = "public"
+
+
+class FileMutateMetadata(Schema):
+    posts: Optional[List[int]] = None

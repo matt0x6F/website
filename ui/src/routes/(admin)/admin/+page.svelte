@@ -66,7 +66,7 @@
 
 <div class="flex flex-row space-x-4 w-full">
     <div class="flex-grow">
-        <h2 class="text-lg font-bold">Posts</h2>
+        <h2 class="text-lg font-bold">Published</h2>
         <Table hoverable>
             <TableHead>
             <TableHeadCell>Title</TableHeadCell>
@@ -85,7 +85,7 @@
                         <ButtonGroup class="*:!ring-primary-700">
                             <Button size="xs" href="/blog/posts/{formatPostYear(publishedPost.published)}/{publishedPost.slug}">
                                 <EyeSolid class="inline-block" ariaLabel="Preview this post" />
-                                Preview
+                                View
                             </Button>
                           </ButtonGroup>    
                     </TableBodyCell>

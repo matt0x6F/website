@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from blog.models import Post
+from blog.models import File, Post
 
 
 # Register your models here.
@@ -12,3 +12,12 @@ class PostAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Post, PostAdmin)
+
+
+class FileAdmin(admin.ModelAdmin):
+    list_display = ("name", "content_type", "size", "created_at")
+    list_filter = ("content_type", "created_at")
+    search_fields = ("location", "name")
+
+
+admin.site.register(File, FileAdmin)

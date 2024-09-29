@@ -9,10 +9,12 @@ from accounts.schemas import AuthError, NewAccount, UserSelf
 from auth.middleware import JWTAuth
 
 logger: structlog.stdlib.BoundLogger = structlog.get_logger(__name__)  # noqa: F821
-router = Router()
+accounts_router = Router()
 
 
-@router.get("/whoami", auth=JWTAuth(), response={200: UserSelf, 401: AuthError}, tags=["accounts"])
+@accounts_router.get(
+    "/whoami", auth=JWTAuth(), response={200: UserSelf, 401: AuthError}, tags=["accounts"]
+)
 def whoami(request: HttpRequest):
     """
     Returns the calling users details
@@ -26,7 +28,9 @@ def whoami(request: HttpRequest):
     return request.user
 
 
-@router.get("/sign_up", auth=JWTAuth(), response={200: UserSelf, 403: AuthError}, tags=["accounts"])
+@accounts_router.get(
+    "/sign_up", auth=JWTAuth(), response={200: UserSelf, 403: AuthError}, tags=["accounts"]
+)
 def sign_up(request: HttpRequest, new_acct_details: NewAccount):
     """
     Creates a new user

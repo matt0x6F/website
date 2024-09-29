@@ -43,6 +43,8 @@ tasks:
   
   create-super-user:
     desc: "Create super user"
+    env:
+      DATABASE__HOST: "localhost"
     cmds:
       - python api/manage.py createsuperuser
 

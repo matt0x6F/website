@@ -34,6 +34,8 @@ export interface HealthResponse {
     status: HealthStatus;
 }
 
+
+
 /**
  * Check if a given object implements the HealthResponse interface.
  */

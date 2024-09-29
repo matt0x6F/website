@@ -1,6 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import structlog
 from pydantic import BaseModel
@@ -12,6 +12,16 @@ from pydantic_settings import (
 logger = structlog.get_logger(__name__)
 
 CURRENT_DIR = Path(__file__).resolve().parent
+
+
+class S3(BaseModel):
+    region: str
+    access_key_id: str
+    secret_access_key: str
+    bucket_name: str
+    endpoint_url: str
+    prefix: Optional[str] = None
+    cdn_endpoint: str
 
 
 class Database(BaseModel):
@@ -28,7 +38,8 @@ class CORS(BaseModel):
 
 class Configuration(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(CURRENT_DIR / ".env", CURRENT_DIR / ".env.prod"),
+        # right side is preferred
+        env_file=(CURRENT_DIR / ".env", CURRENT_DIR / ".env.dev", CURRENT_DIR / ".env.prod"),
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
     )
@@ -38,6 +49,7 @@ class Configuration(BaseSettings):
     allowed_hosts: List[str] = ["*"]
     cors: CORS
     secret_key: str
+    s3: S3
 
 
 @lru_cache()

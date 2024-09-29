@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     "ninja_extra",
     "ninja_jwt",
     "ninja_jwt.token_blacklist",
+    "storages",
+    "django_cleanup.apps.CleanupConfig",
     "accounts",
     "blog",
 ]
@@ -128,6 +130,29 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "static/"
+
+STORAGES = {
+    # media storage
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "access_key": config.s3.access_key_id,
+            "secret_key": config.s3.secret_access_key,
+            "bucket_name": config.s3.bucket_name,
+            "region_name": config.s3.region,
+            "endpoint_url": config.s3.endpoint_url,
+            "location": config.s3.prefix,
+            "file_overwrite": False,
+            "default_acl": "public-read",
+            "custom_domain": config.s3.cdn_endpoint,
+        },
+    },
+    # static storage
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -209,8 +234,7 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            # "level": "INFO",
-            "filters": ["require_debug_true"],
+            # "filters": ["require_debug_true"],
             "class": "logging.StreamHandler",
             "formatter": "plain_console",
         },
@@ -226,8 +250,7 @@ LOGGING = {
         },
     },
     "loggers": {
-        "core": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
-        "blog": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
+        "api": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
         "": {"handlers": ["console"], "level": "DEBUG", "propagate": True},
         "django": {
             "handlers": ["console"],

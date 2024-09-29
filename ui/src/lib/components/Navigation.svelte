@@ -110,6 +110,7 @@
         {:else}
         <div class="flex items-center md:order-2">
             <Button href="/login">Sign in</Button>
+            <NavHamburger class1="w-full md:flex md:w-auto md:order-1"></NavHamburger>
         </div>
         {/if}
         <NavUl>
@@ -123,6 +124,7 @@
             <Dropdown class="w-44 z-20">
                 <DropdownItem href="/admin">Dashboard</DropdownItem>
                 <DropdownItem href="/admin/write">Write</DropdownItem>
+                <DropdownItem href="/admin/files">Files</DropdownItem>
             </Dropdown>
             {/if}
         </NavUl>

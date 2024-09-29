@@ -27,7 +27,7 @@ export type HealthStatus = typeof HealthStatus[keyof typeof HealthStatus];
 export function instanceOfHealthStatus(value: any): boolean {
     for (const key in HealthStatus) {
         if (Object.prototype.hasOwnProperty.call(HealthStatus, key)) {
-            if ((HealthStatus as Record<string, HealthStatus>)[key] === value) {
+            if (HealthStatus[key as keyof typeof HealthStatus] === value) {
                 return true;
             }
         }

@@ -51,8 +51,9 @@ def add(request) -> HealthResponse:
     return {"status": "ok"}
 
 
-api.add_router("/accounts/", "accounts.api.router")
+api.add_router("/accounts/", "accounts.api.accounts_router")
 api.add_router("/posts/", "blog.api.posts_router", auth=JWTAuth(permissions=StaffOnlyModify))
+api.add_router("/files/", "blog.api.files_router", auth=JWTAuth(permissions=StaffOnlyModify))
 
 
 urlpatterns = [

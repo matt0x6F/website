@@ -7,3 +7,4 @@ config.ini
 # Python
 __pycache__/
 .env.prod
+.env.dev

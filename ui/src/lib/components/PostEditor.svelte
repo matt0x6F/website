@@ -5,7 +5,7 @@
     import '@cartamd/plugin-anchor/default.css';
     
     import { PUBLIC_BASE_URL } from '$env/static/public';
-	import { Configuration, PostsApi, ResponseError, ValidationErrorResponseFromJSONTyped } from '$lib/api';
+	import { Configuration, PostsApi, ResponseError, ValidationErrorResponseFromJSONTyped, type FileDetails } from '$lib/api';
 	import { Carta, MarkdownEditor } from 'carta-md';
     import { code } from '@cartamd/plugin-code';
     import { emoji } from '@cartamd/plugin-emoji';
@@ -17,17 +17,7 @@
 	import { addToast } from '../../stores/notifications';
 	import { getAccessToken } from '../../stores/auth';
 	import { ArrowsRepeatOutline } from 'flowbite-svelte-icons';
-	
-
-	const carta = new Carta({
-        sanitizer: DOMPurify.sanitize,
-        extensions: [
-            code(),
-            emoji(),
-            slash(),
-            anchor()
-        ]
-	});
+	import { attachment } from '@cartamd/plugin-attachment';
 
     export let id = -1; // -1 means new post
     export let title = "";
@@ -55,6 +45,59 @@
     const generateSlugFromTitle = () => {
         slug = slugify(title)
     }
+
+    const uploadFile = async (file: File): Promise<string | null> => {
+        if (id === -1) {
+            addToast({
+                message: "Please save the post before uploading files"
+            });
+
+            return null;
+        }
+
+        const token = await getAccessToken();
+        
+        const formData = new FormData();
+        formData.append("upload", file);
+
+        const metadata = {
+            posts: [id],
+            visibility: "public"
+        };
+
+        formData.append("metadata", JSON.stringify(metadata));
+        try {
+            const response = await fetch(PUBLIC_BASE_URL + "/api/files/", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token
+                },
+                body: formData
+            });
+
+            const fileMetadata: FileDetails = await response.json();
+
+            if (response.ok) {
+                addToast({
+                    message: "Uploaded " + fileMetadata.name + " successfully"
+                });
+            } else {
+                addToast({
+                    message: "Failed to upload file: " + response.statusText
+                })
+            }
+
+            return fileMetadata.location;
+        } catch (error) {
+            console.error(error);
+
+            addToast({
+                message: "Failed to upload file: " + error
+            })
+
+            return null;
+        }
+    };
 
     const savePost = async () => {
         let token = await getAccessToken()
@@ -119,6 +162,19 @@
             }
         }
     }
+
+    const carta = new Carta({
+        sanitizer: DOMPurify.sanitize,
+        extensions: [
+            code(),
+            emoji(),
+            slash(),
+            anchor(),
+            attachment({
+                upload: uploadFile
+            })
+        ]
+	});
 </script>
 
 <p class="py-4"><a href="/admin">Back to admin dashboard</a></p>
