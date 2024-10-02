@@ -1,15 +1,19 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AuthError';
+export * from './ContentType';
 export * from './FileDetails';
 export * from './FileMetadata';
 export * from './FileMutateMetadata';
+export * from './Group';
 export * from './HealthResponse';
 export * from './HealthStatus';
 export * from './Input';
 export * from './NewAccount';
 export * from './PagedFileDetails';
 export * from './PagedPostDetails';
+export * from './PagedUserDetails';
+export * from './Permission';
 export * from './PostDetails';
 export * from './PostMutate';
 export * from './PostSummary';
@@ -18,5 +22,8 @@ export * from './TokenObtainPairOutputSchema';
 export * from './TokenRefreshInputSchema';
 export * from './TokenRefreshOutputSchema';
 export * from './TokenVerifyInputSchema';
+export * from './UpdateAccount';
+export * from './UserDetails';
+export * from './UserModify';
 export * from './UserSelf';
 export * from './ValidationErrorResponse';

@@ -1,5 +1,5 @@
 import { PUBLIC_BASE_URL } from "$env/static/public";
-import { Configuration, PostsApi, type PostDetails } from "$lib/api";
+import { AccountsApi, Configuration, FilesApi, PostsApi, type PostDetails } from "$lib/api";
 import { getAccessToken } from "../../../stores/auth"
 import type { PageLoad } from "./$types"
 
@@ -11,13 +11,14 @@ export const load: PageLoad = async () => {
             "Authorization": "Bearer " + token
         }
     });
-    const api = new PostsApi(config);
+
+    const postsAPI = new PostsApi(config);
 
     let publishedPosts: PostDetails[] = [];
     let draftPosts: PostDetails[] = [];
 
     try {
-        publishedPosts = (await api.blogApiListPosts({all: false, drafts: false, limit: 100, offset: 0})).items;
+        publishedPosts = (await postsAPI.blogApiListPosts({all: false, drafts: false, limit: 100, offset: 0})).items;
 
         console.log("Fetched posts: " + publishedPosts.length);
     } catch (error)
@@ -26,7 +27,7 @@ export const load: PageLoad = async () => {
     }
 
     try {
-        draftPosts = (await api.blogApiListPosts({all: false, drafts: true, limit: 100, offset: 0})).items;
+        draftPosts = (await postsAPI.blogApiListPosts({all: false, drafts: true, limit: 100, offset: 0})).items;
 
         console.log("Fetched posts: " + draftPosts.length);
     } catch (error)

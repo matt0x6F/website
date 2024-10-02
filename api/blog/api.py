@@ -27,7 +27,7 @@ posts_router = Router()
 files_router = Router()
 
 
-@posts_router.get("/", response={200: List[PostDetails]}, tags=["posts"])
+@posts_router.get("/", auth=JWTAuth(None, True), response={200: List[PostDetails]}, tags=["posts"])
 @paginate
 def list_posts(request: HttpRequest, all: bool = False, drafts: bool = False):
     if all and request.user.is_staff:
@@ -69,7 +69,9 @@ def list_posts(request: HttpRequest, all: bool = False, drafts: bool = False):
         raise HttpError(500, "Fail to fetch published posts") from err
 
 
-@posts_router.get("/slug/{slug}", response={200: PostDetails}, tags=["posts"])
+@posts_router.get(
+    "/slug/{slug}", auth=JWTAuth(None, True), response={200: PostDetails}, tags=["posts"]
+)
 def get_post_by_slug(request: HttpRequest, slug: str, year: int = None, draft=False):
     if request.user.is_staff:
         if draft:
@@ -84,14 +86,16 @@ def get_post_by_slug(request: HttpRequest, slug: str, year: int = None, draft=Fa
     )
 
 
-@posts_router.get("/{id}", response={200: PostDetails}, tags=["posts"])
+@posts_router.get("/{id}", auth=JWTAuth(None, True), response={200: PostDetails}, tags=["posts"])
 def get_post_by_id(request: HttpRequest, id: int):
     if request.user.is_staff:
         return Post.objects.get(id=id)
     return Post.objects.filter(published__lte=timezone.now()).get(id=id)
 
 
-@posts_router.get("/{id}/files", response={200: List[FileDetails]}, tags=["posts"])
+@posts_router.get(
+    "/{id}/files", auth=JWTAuth(StaffOnly, True), response={200: List[FileDetails]}, tags=["posts"]
+)
 def get_post_files_by_id(request: HttpRequest, id: int):
     post = Post.objects.get(id=id)
     return post.files.all()

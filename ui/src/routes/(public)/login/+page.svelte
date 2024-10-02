@@ -68,7 +68,7 @@
         </div>
 
         <div>
-            <p>Not a user? <a href="/sign_up">Sign up!</a></p>
+            <p>Not a user? <a href="/sign-up">Sign up!</a></p>
         </div>
 
         <div class="text-center">

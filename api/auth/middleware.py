@@ -70,7 +70,6 @@ class JWTAuth(JWTAuth):
         try:
             user = self.authenticate(request, token)
             request.user = user
-            return user
         except Exception:
             logger.error("Failed to authenticate user")
 

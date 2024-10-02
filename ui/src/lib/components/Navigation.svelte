@@ -104,6 +104,7 @@
             {#if userData.isStaff == true}
                 <DropdownItem href="/admin">Admin</DropdownItem>
             {/if}
+            <DropdownItem href="/account">Account</DropdownItem>
             <DropdownDivider></DropdownDivider>
             <DropdownItem on:click={() => signOut()}>Sign out</DropdownItem>
         </Dropdown>

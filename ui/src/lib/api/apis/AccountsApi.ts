@@ -17,6 +17,10 @@ import * as runtime from '../runtime';
 import type {
   AuthError,
   NewAccount,
+  PagedUserDetails,
+  UpdateAccount,
+  UserDetails,
+  UserModify,
   UserSelf,
 } from '../models/index';
 import {
@@ -24,18 +28,166 @@ import {
     AuthErrorToJSON,
     NewAccountFromJSON,
     NewAccountToJSON,
+    PagedUserDetailsFromJSON,
+    PagedUserDetailsToJSON,
+    UpdateAccountFromJSON,
+    UpdateAccountToJSON,
+    UserDetailsFromJSON,
+    UserDetailsToJSON,
+    UserModifyFromJSON,
+    UserModifyToJSON,
     UserSelfFromJSON,
     UserSelfToJSON,
 } from '../models/index';
 
+export interface AccountsApiDeleteUserRequest {
+    userId: number;
+}
+
+export interface AccountsApiListUsersRequest {
+    limit?: number;
+    offset?: number;
+}
+
 export interface AccountsApiSignUpRequest {
     newAccount: NewAccount;
+}
+
+export interface AccountsApiUpdateSelfRequest {
+    updateAccount: UpdateAccount;
+}
+
+export interface AccountsApiUpdateUserRequest {
+    userId: number;
+    userModify: UserModify;
 }
 
 /**
  * 
  */
 export class AccountsApi extends runtime.BaseAPI {
+
+    /**
+     * Deletes the calling user
+     * Delete Self
+     */
+    async accountsApiDeleteSelfRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/accounts/me`,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Deletes the calling user
+     * Delete Self
+     */
+    async accountsApiDeleteSelf(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.accountsApiDeleteSelfRaw(initOverrides);
+    }
+
+    /**
+     * Deletes a user
+     * Delete User
+     */
+    async accountsApiDeleteUserRaw(requestParameters: AccountsApiDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserDetails>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling accountsApiDeleteUser().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/accounts/{user_id}`.replace(`{${"user_id"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserDetailsFromJSON(jsonValue));
+    }
+
+    /**
+     * Deletes a user
+     * Delete User
+     */
+    async accountsApiDeleteUser(requestParameters: AccountsApiDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserDetails> {
+        const response = await this.accountsApiDeleteUserRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Returns a list of all users
+     * List Users
+     */
+    async accountsApiListUsersRaw(requestParameters: AccountsApiListUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedUserDetails>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/accounts/`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PagedUserDetailsFromJSON(jsonValue));
+    }
+
+    /**
+     * Returns a list of all users
+     * List Users
+     */
+    async accountsApiListUsers(requestParameters: AccountsApiListUsersRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedUserDetails> {
+        const response = await this.accountsApiListUsersRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates a new user
@@ -65,7 +217,7 @@ export class AccountsApi extends runtime.BaseAPI {
         }
         const response = await this.request({
             path: `/api/accounts/sign_up`,
-            method: 'GET',
+            method: 'POST',
             headers: headerParameters,
             query: queryParameters,
             body: NewAccountToJSON(requestParameters['newAccount']),
@@ -80,6 +232,105 @@ export class AccountsApi extends runtime.BaseAPI {
      */
     async accountsApiSignUp(requestParameters: AccountsApiSignUpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSelf> {
         const response = await this.accountsApiSignUpRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Updates the calling users details
+     * Update Self
+     */
+    async accountsApiUpdateSelfRaw(requestParameters: AccountsApiUpdateSelfRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSelf>> {
+        if (requestParameters['updateAccount'] == null) {
+            throw new runtime.RequiredError(
+                'updateAccount',
+                'Required parameter "updateAccount" was null or undefined when calling accountsApiUpdateSelf().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/accounts/me`,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateAccountToJSON(requestParameters['updateAccount']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserSelfFromJSON(jsonValue));
+    }
+
+    /**
+     * Updates the calling users details
+     * Update Self
+     */
+    async accountsApiUpdateSelf(requestParameters: AccountsApiUpdateSelfRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSelf> {
+        const response = await this.accountsApiUpdateSelfRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Updates a user
+     * Update User
+     */
+    async accountsApiUpdateUserRaw(requestParameters: AccountsApiUpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserDetails>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling accountsApiUpdateUser().'
+            );
+        }
+
+        if (requestParameters['userModify'] == null) {
+            throw new runtime.RequiredError(
+                'userModify',
+                'Required parameter "userModify" was null or undefined when calling accountsApiUpdateUser().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/accounts/{user_id}`.replace(`{${"user_id"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UserModifyToJSON(requestParameters['userModify']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserDetailsFromJSON(jsonValue));
+    }
+
+    /**
+     * Updates a user
+     * Update User
+     */
+    async accountsApiUpdateUser(requestParameters: AccountsApiUpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserDetails> {
+        const response = await this.accountsApiUpdateUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -101,7 +352,7 @@ export class AccountsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/api/accounts/whoami`,
+            path: `/api/accounts/me`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
