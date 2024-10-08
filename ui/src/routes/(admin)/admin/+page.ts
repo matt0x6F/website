@@ -1,5 +1,5 @@
 import { PUBLIC_BASE_URL } from "$env/static/public";
-import { AccountsApi, Configuration, FilesApi, PostsApi, type PostDetails } from "$lib/api";
+import { AccountsApi, Configuration, FilesApi, PostsApi, type FileDetails, type PostDetails, type UserDetails } from "$lib/api";
 import { getAccessToken } from "../../../stores/auth"
 import type { PageLoad } from "./$types"
 
@@ -13,9 +13,13 @@ export const load: PageLoad = async () => {
     });
 
     const postsAPI = new PostsApi(config);
+    const usersAPI = new AccountsApi(config);
+    const filesAPI = new FilesApi(config);
 
     let publishedPosts: PostDetails[] = [];
     let draftPosts: PostDetails[] = [];
+    let users: UserDetails[] = [];
+    let files: FileDetails[] = [];
 
     try {
         publishedPosts = (await postsAPI.blogApiListPosts({all: false, drafts: false, limit: 100, offset: 0})).items;
@@ -35,8 +39,24 @@ export const load: PageLoad = async () => {
         console.log("Error fetching draft posts: " + error);
     }
 
+    try {
+        users = (await usersAPI.accountsApiListUsers({limit: 100, offset: 0})).items;
+        console.log("Fetched users: " + users.length);
+    } catch (error) {
+        console.log("Error fetching users: " + error);
+    }
+
+    try {
+        files = (await filesAPI.blogApiListFiles({limit: 100, offset: 0})).items;
+        console.log("Fetched files: " + files.length);
+    } catch (error) {
+        console.log("Error fetching files: " + error);
+    }
+
     return {
         publishedPosts: publishedPosts,
-        draftPosts: draftPosts
+        draftPosts: draftPosts,
+        users: users,
+        files: files
     }
 }

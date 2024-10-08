@@ -34,70 +34,52 @@ import {
 export interface UserModify {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof UserModify
      */
-    id: number;
+    username?: string | null;
     /**
      * 
      * @type {string}
      * @memberof UserModify
      */
-    username: string;
+    email?: string | null;
     /**
      * 
      * @type {string}
      * @memberof UserModify
      */
-    email: string;
+    firstName?: string | null;
     /**
      * 
      * @type {string}
      * @memberof UserModify
      */
-    firstName: string;
+    lastName?: string | null;
     /**
      * 
      * @type {string}
      * @memberof UserModify
      */
-    lastName: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserModify
-     */
-    password: string;
+    password?: string | null;
     /**
      * 
      * @type {boolean}
      * @memberof UserModify
      */
-    isStaff: boolean;
+    isStaff?: boolean | null;
     /**
      * 
      * @type {boolean}
      * @memberof UserModify
      */
-    isActive: boolean;
+    isActive?: boolean | null;
     /**
      * 
      * @type {boolean}
      * @memberof UserModify
      */
-    isSuperuser: boolean;
-    /**
-     * 
-     * @type {Date}
-     * @memberof UserModify
-     */
-    dateJoined: Date;
-    /**
-     * 
-     * @type {Date}
-     * @memberof UserModify
-     */
-    lastLogin: Date;
+    isSuperuser?: boolean | null;
     /**
      * 
      * @type {string}
@@ -109,32 +91,19 @@ export interface UserModify {
      * @type {Array<Group>}
      * @memberof UserModify
      */
-    groups: Array<Group>;
+    groups?: Array<Group> | null;
     /**
      * 
      * @type {Array<Permission>}
      * @memberof UserModify
      */
-    userPermissions: Array<Permission>;
+    userPermissions?: Array<Permission> | null;
 }
 
 /**
  * Check if a given object implements the UserModify interface.
  */
 export function instanceOfUserModify(value: object): value is UserModify {
-    if (!('id' in value) || value['id'] === undefined) return false;
-    if (!('username' in value) || value['username'] === undefined) return false;
-    if (!('email' in value) || value['email'] === undefined) return false;
-    if (!('firstName' in value) || value['firstName'] === undefined) return false;
-    if (!('lastName' in value) || value['lastName'] === undefined) return false;
-    if (!('password' in value) || value['password'] === undefined) return false;
-    if (!('isStaff' in value) || value['isStaff'] === undefined) return false;
-    if (!('isActive' in value) || value['isActive'] === undefined) return false;
-    if (!('isSuperuser' in value) || value['isSuperuser'] === undefined) return false;
-    if (!('dateJoined' in value) || value['dateJoined'] === undefined) return false;
-    if (!('lastLogin' in value) || value['lastLogin'] === undefined) return false;
-    if (!('groups' in value) || value['groups'] === undefined) return false;
-    if (!('userPermissions' in value) || value['userPermissions'] === undefined) return false;
     return true;
 }
 
@@ -148,20 +117,17 @@ export function UserModifyFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     }
     return {
         
-        'id': json['id'],
-        'username': json['username'],
-        'email': json['email'],
-        'firstName': json['first_name'],
-        'lastName': json['last_name'],
-        'password': json['password'],
-        'isStaff': json['is_staff'],
-        'isActive': json['is_active'],
-        'isSuperuser': json['is_superuser'],
-        'dateJoined': (new Date(json['date_joined'])),
-        'lastLogin': (new Date(json['last_login'])),
+        'username': json['username'] == null ? undefined : json['username'],
+        'email': json['email'] == null ? undefined : json['email'],
+        'firstName': json['first_name'] == null ? undefined : json['first_name'],
+        'lastName': json['last_name'] == null ? undefined : json['last_name'],
+        'password': json['password'] == null ? undefined : json['password'],
+        'isStaff': json['is_staff'] == null ? undefined : json['is_staff'],
+        'isActive': json['is_active'] == null ? undefined : json['is_active'],
+        'isSuperuser': json['is_superuser'] == null ? undefined : json['is_superuser'],
         'avatarLink': json['avatar_link'] == null ? undefined : json['avatar_link'],
-        'groups': ((json['groups'] as Array<any>).map(GroupFromJSON)),
-        'userPermissions': ((json['user_permissions'] as Array<any>).map(PermissionFromJSON)),
+        'groups': json['groups'] == null ? undefined : ((json['groups'] as Array<any>).map(GroupFromJSON)),
+        'userPermissions': json['user_permissions'] == null ? undefined : ((json['user_permissions'] as Array<any>).map(PermissionFromJSON)),
     };
 }
 
@@ -171,7 +137,6 @@ export function UserModifyToJSON(value?: UserModify | null): any {
     }
     return {
         
-        'id': value['id'],
         'username': value['username'],
         'email': value['email'],
         'first_name': value['firstName'],
@@ -180,11 +145,9 @@ export function UserModifyToJSON(value?: UserModify | null): any {
         'is_staff': value['isStaff'],
         'is_active': value['isActive'],
         'is_superuser': value['isSuperuser'],
-        'date_joined': ((value['dateJoined']).toISOString()),
-        'last_login': ((value['lastLogin']).toISOString()),
         'avatar_link': value['avatarLink'],
-        'groups': ((value['groups'] as Array<any>).map(GroupToJSON)),
-        'user_permissions': ((value['userPermissions'] as Array<any>).map(PermissionToJSON)),
+        'groups': value['groups'] == null ? undefined : ((value['groups'] as Array<any>).map(GroupToJSON)),
+        'user_permissions': value['userPermissions'] == null ? undefined : ((value['userPermissions'] as Array<any>).map(PermissionToJSON)),
     };
 }
 

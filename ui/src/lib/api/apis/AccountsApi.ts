@@ -44,6 +44,10 @@ export interface AccountsApiDeleteUserRequest {
     userId: number;
 }
 
+export interface AccountsApiGetUserRequest {
+    userId: number;
+}
+
 export interface AccountsApiListUsersRequest {
     limit?: number;
     offset?: number;
@@ -142,6 +146,49 @@ export class AccountsApi extends runtime.BaseAPI {
      */
     async accountsApiDeleteUser(requestParameters: AccountsApiDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserDetails> {
         const response = await this.accountsApiDeleteUserRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Returns a specific user
+     * Get User
+     */
+    async accountsApiGetUserRaw(requestParameters: AccountsApiGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserDetails>> {
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling accountsApiGetUser().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/accounts/{user_id}`.replace(`{${"user_id"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserDetailsFromJSON(jsonValue));
+    }
+
+    /**
+     * Returns a specific user
+     * Get User
+     */
+    async accountsApiGetUser(requestParameters: AccountsApiGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserDetails> {
+        const response = await this.accountsApiGetUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

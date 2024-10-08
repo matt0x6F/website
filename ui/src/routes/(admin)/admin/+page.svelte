@@ -5,11 +5,14 @@
 	import { EyeSolid } from "flowbite-svelte-icons";
 	import DeleteButton from "$lib/components/DeleteButton.svelte";
 	import { addToast } from "../../../stores/notifications";
+	import { formatBytes } from "$lib/utils";
 
     export let data: PageData
 
     let draftPosts = data.draftPosts
     let publishedPosts = data.publishedPosts
+    let users = data.users
+    let files = data.files
 
     function formatDate(date: Date | null | undefined): string {
         if (!date) {
@@ -66,7 +69,7 @@
 
 <div class="flex flex-row space-x-4 w-full">
     <div class="flex-grow">
-        <h2 class="text-lg font-bold">Published</h2>
+        <h2 class="text-lg font-bold">Published posts</h2>
         <Table hoverable>
             <TableHead>
             <TableHeadCell>Title</TableHeadCell>
@@ -103,7 +106,7 @@
         </Table>
     </div>
     <div class="flex-grow">
-        <h2 class="text-lg font-bold">Drafts</h2>
+        <h2 class="text-lg font-bold">Draft posts</h2>
         <Table hoverable>
             <TableHead>
             <TableHeadCell>Title</TableHeadCell>
@@ -137,4 +140,89 @@
             </TableBody>
         </Table>
     </div>
+</div>
+
+<div class="flex flex-row space-x-4 w-full">
+    <div class="flex-grow">
+        <h2 class="text-lg font-bold">Users</h2>
+        <Table hoverable>
+            <TableHead>
+                <TableHeadCell>Username</TableHeadCell>
+                <TableHeadCell>Name</TableHeadCell>
+                <TableHeadCell>Email</TableHeadCell>
+                <TableHeadCell>Groups</TableHeadCell>
+                <TableHeadCell></TableHeadCell>
+            </TableHead>
+            <TableBody tableBodyClass="divide-y">
+                {#each users as user }
+                {#key user.id}
+                    <TableBodyRow>
+                        <TableBodyCell>{user.username}</TableBodyCell>
+                        <TableBodyCell>{user.firstName} {user.lastName}</TableBodyCell>
+                        <TableBodyCell>{user.email}</TableBodyCell>
+                        <TableBodyCell>{user.groups}</TableBodyCell>
+                        <TableBodyCell class="text-right">
+                            <ButtonGroup class="*:!ring-primary-700">
+                                <Button size="xs" href="/admin/users/{user.id}">
+                                    View
+                                </Button>
+                                <Button size="xs" href="/admin/users/{user.id}/edit">
+                                    Edit
+                                </Button>
+                            </ButtonGroup>
+                        </TableBodyCell>
+                    </TableBodyRow>
+                {/key}
+                {:else}
+                <TableBodyRow>
+                    <TableBodyCell>No users</TableBodyCell>
+                    <TableBodyCell></TableBodyCell>
+                    <TableBodyCell></TableBodyCell>
+                    <TableBodyCell></TableBodyCell>
+                </TableBodyRow>
+                {/each}
+            </TableBody>
+        </Table>
+    </div>
+</div>
+
+<div class="flex flex-row space-x-4 w-full">
+    <div class="flex-grow">
+        <h2 class="text-lg font-bold">Files</h2>
+        <Table hoverable>
+            <TableHead>
+                <TableHeadCell>Filename</TableHeadCell>
+                <TableHeadCell>Size</TableHeadCell>
+                <TableHeadCell>Uploaded</TableHeadCell>
+                <TableHeadCell>Visibility</TableHeadCell>
+                <TableHeadCell></TableHeadCell>
+            </TableHead>
+            <TableBody tableBodyClass="divide-y">
+                {#each files as file }
+                {#key file.id}
+                    <TableBodyRow>
+                        <TableBodyCell>{file.name}</TableBodyCell>
+                        <TableBodyCell>{formatBytes(file.size)}</TableBodyCell>
+                        <TableBodyCell>{formatDate(file.createdAt)}</TableBodyCell>
+                        <TableBodyCell>{file.visibility}</TableBodyCell>
+                        <TableBodyCell class="text-right">
+                            <ButtonGroup class="*:!ring-primary-700">
+                                <Button size="xs" href="/admin/files/{file.id}">
+                                    View
+                                </Button>
+                            </ButtonGroup>
+                        </TableBodyCell>
+                    </TableBodyRow>
+                {/key}
+                {:else}
+                <TableBodyRow>
+                    <TableBodyCell>No files</TableBodyCell>
+                    <TableBodyCell></TableBodyCell>
+                    <TableBodyCell></TableBodyCell>
+                    <TableBodyCell></TableBodyCell>
+                </TableBodyRow>
+                {/each}
+            </TableBody>
+        </Table>
+    </div>  
 </div>

@@ -345,6 +345,52 @@
       }
     },
     "/api/accounts/{user_id}": {
+      "get": {
+        "operationId": "accounts_api_get_user",
+        "summary": "Get User",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "schema": {
+              "title": "User Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns a specific user",
+        "tags": [
+          "accounts"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
       "put": {
         "operationId": "accounts_api_update_user",
         "summary": "Update User",
@@ -1492,9 +1538,16 @@
             "type": "string"
           },
           "last_login": {
-            "format": "date-time",
-            "title": "Last Login",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login"
           },
           "avatar_link": {
             "anyOf": [
@@ -1532,7 +1585,6 @@
           "is_active",
           "is_superuser",
           "date_joined",
-          "last_login",
           "groups",
           "user_permissions"
         ],
@@ -1541,51 +1593,93 @@
       },
       "UserModify": {
         "properties": {
-          "id": {
-            "title": "Id",
-            "type": "integer"
-          },
           "username": {
-            "title": "Username",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
           },
           "email": {
-            "title": "Email",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
           },
           "first_name": {
-            "title": "First Name",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
           },
           "last_name": {
-            "title": "Last Name",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
           },
           "password": {
-            "title": "Password",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Password"
           },
           "is_staff": {
-            "title": "Is Staff",
-            "type": "boolean"
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Staff"
           },
           "is_active": {
-            "title": "Is Active",
-            "type": "boolean"
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
           },
           "is_superuser": {
-            "title": "Is Superuser",
-            "type": "boolean"
-          },
-          "date_joined": {
-            "format": "date-time",
-            "title": "Date Joined",
-            "type": "string"
-          },
-          "last_login": {
-            "format": "date-time",
-            "title": "Last Login",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Superuser"
           },
           "avatar_link": {
             "anyOf": [
@@ -1599,35 +1693,34 @@
             "title": "Avatar Link"
           },
           "groups": {
-            "items": {
-              "$ref": "#/components/schemas/Group"
-            },
-            "title": "Groups",
-            "type": "array"
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Group"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Groups"
           },
           "user_permissions": {
-            "items": {
-              "$ref": "#/components/schemas/Permission"
-            },
-            "title": "User Permissions",
-            "type": "array"
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Permission"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Permissions"
           }
         },
-        "required": [
-          "id",
-          "username",
-          "email",
-          "first_name",
-          "last_name",
-          "password",
-          "is_staff",
-          "is_active",
-          "is_superuser",
-          "date_joined",
-          "last_login",
-          "groups",
-          "user_permissions"
-        ],
         "title": "UserModify",
         "type": "object"
       },

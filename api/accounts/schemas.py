@@ -35,27 +35,24 @@ class UserDetails(Schema):
     is_active: bool
     is_superuser: bool
     date_joined: datetime
-    last_login: datetime
+    last_login: Optional[datetime] = None
     avatar_link: Optional[str] = None
     groups: List[Group]
     user_permissions: List[Permission]
 
 
 class UserModify(Schema):
-    id: int
-    username: str
-    email: str
-    first_name: str
-    last_name: str
-    password: str
-    is_staff: bool
-    is_active: bool
-    is_superuser: bool
-    date_joined: datetime
-    last_login: datetime
+    username: Optional[str] = None
+    email: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    password: Optional[str] = None
+    is_staff: Optional[bool] = None
+    is_active: Optional[bool] = None
+    is_superuser: Optional[bool] = None
     avatar_link: Optional[str] = None
-    groups: List[Group]
-    user_permissions: List[Permission]
+    groups: Optional[List[Group]] = None
+    user_permissions: Optional[List[Permission]] = None
 
 
 class UserSelf(Schema):

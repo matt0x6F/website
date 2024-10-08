@@ -139,9 +139,30 @@ def list_users(request: HttpRequest):
     """
     Returns a list of all users
     """
-    users = User.objects.all()
+    try:
+        users = User.objects.all()
+    except Exception as e:
+        raise ValidationError([e]) from e
 
     return users
+
+
+@accounts_router.get(
+    "/{user_id}",
+    auth=JWTAuth(permissions=StaffOnly),
+    response={200: UserDetails, 403: AuthError},
+    tags=["accounts"],
+)
+def get_user(request: HttpRequest, user_id: int):
+    """
+    Returns a specific user
+    """
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist as err:
+        raise HttpError(404, "User not found") from err
+
+    return user
 
 
 @accounts_router.put(
@@ -174,7 +195,7 @@ def update_user(request: HttpRequest, user_id: int, new_details: UserModify):
 @accounts_router.delete(
     "/{user_id}",
     auth=JWTAuth(permissions=StaffOnly),
-    response={200: UserDetails, 403: AuthError},
+    response={200: None, 403: AuthError},
     tags=["accounts"],
 )
 def delete_user(request: HttpRequest, user_id: int):
@@ -199,4 +220,4 @@ def delete_user(request: HttpRequest, user_id: int):
 
         raise ValidationError([e]) from e
 
-    return user
+    return None

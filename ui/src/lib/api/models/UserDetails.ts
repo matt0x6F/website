@@ -91,7 +91,7 @@ export interface UserDetails {
      * @type {Date}
      * @memberof UserDetails
      */
-    lastLogin: Date;
+    lastLogin?: Date | null;
     /**
      * 
      * @type {string}
@@ -125,7 +125,6 @@ export function instanceOfUserDetails(value: object): value is UserDetails {
     if (!('isActive' in value) || value['isActive'] === undefined) return false;
     if (!('isSuperuser' in value) || value['isSuperuser'] === undefined) return false;
     if (!('dateJoined' in value) || value['dateJoined'] === undefined) return false;
-    if (!('lastLogin' in value) || value['lastLogin'] === undefined) return false;
     if (!('groups' in value) || value['groups'] === undefined) return false;
     if (!('userPermissions' in value) || value['userPermissions'] === undefined) return false;
     return true;
@@ -150,7 +149,7 @@ export function UserDetailsFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'isActive': json['is_active'],
         'isSuperuser': json['is_superuser'],
         'dateJoined': (new Date(json['date_joined'])),
-        'lastLogin': (new Date(json['last_login'])),
+        'lastLogin': json['last_login'] == null ? undefined : (new Date(json['last_login'])),
         'avatarLink': json['avatar_link'] == null ? undefined : json['avatar_link'],
         'groups': ((json['groups'] as Array<any>).map(GroupFromJSON)),
         'userPermissions': ((json['user_permissions'] as Array<any>).map(PermissionFromJSON)),
@@ -172,7 +171,7 @@ export function UserDetailsToJSON(value?: UserDetails | null): any {
         'is_active': value['isActive'],
         'is_superuser': value['isSuperuser'],
         'date_joined': ((value['dateJoined']).toISOString()),
-        'last_login': ((value['lastLogin']).toISOString()),
+        'last_login': value['lastLogin'] == null ? undefined : ((value['lastLogin'] as any).toISOString()),
         'avatar_link': value['avatarLink'],
         'groups': ((value['groups'] as Array<any>).map(GroupToJSON)),
         'user_permissions': ((value['userPermissions'] as Array<any>).map(PermissionToJSON)),
