@@ -58,7 +58,7 @@ tasks:
   generate-sdk:
     desc: "Generate SDK"
     cmds:
-      - openapi-generator-cli generate -g typescript-fetch -i api/schema.json -o ui/src/lib/api
+      - npx openapi-generator-cli generate -g typescript-fetch -i api/schema.json -o ui/src/lib/api
     generates:
       - ui/src/lib/api
     sources:
@@ -68,7 +68,7 @@ tasks:
       - export-schema
 
   build:
-    desc: "Build the frontend and backend"
+    desc: "Build the frontend and backend static files"
     env:
       PUBLIC_BASE_URL: "https://ooo-yay.com"
     cmds:

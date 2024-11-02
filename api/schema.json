@@ -8,8 +8,8 @@
   "paths": {
     "/api/health": {
       "get": {
-        "operationId": "core_api_add",
-        "summary": "Add",
+        "operationId": "core_api_healthcheck",
+        "summary": "Health check",
         "parameters": [],
         "responses": {
           "200": {
@@ -317,7 +317,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedUserDetails"
+                  "$ref": "#/components/schemas/PagedAdminUserDetails"
                 }
               }
             }
@@ -365,7 +365,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserDetails"
+                  "$ref": "#/components/schemas/AdminUserDetails"
                 }
               }
             }
@@ -411,7 +411,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserDetails"
+                  "$ref": "#/components/schemas/AdminUserDetails"
                 }
               }
             }
@@ -435,7 +435,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserModify"
+                "$ref": "#/components/schemas/AdminUserModify"
               }
             }
           },
@@ -463,14 +463,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserDetails"
-                }
-              }
-            }
+            "description": "OK"
           },
           "403": {
             "description": "Forbidden",
@@ -1055,6 +1048,346 @@
           }
         ]
       }
+    },
+    "/api/comments/": {
+      "get": {
+        "operationId": "blog_api_list_comments",
+        "summary": "List Comments",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "post_id",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Post Id"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "top_level",
+            "schema": {
+              "default": false,
+              "title": "Top Level",
+              "type": "boolean"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedCommentList"
+                }
+              }
+            }
+          }
+        },
+        "description": "List all comments for a post",
+        "tags": [
+          "comments"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "blog_api_create_comment",
+        "summary": "Create Comment",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentList"
+                }
+              }
+            }
+          }
+        },
+        "description": "Creates a comment",
+        "tags": [
+          "comments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/comments/moderation/queue": {
+      "get": {
+        "operationId": "blog_api_mod_queue_list",
+        "summary": "Mod Queue List",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "reviewed",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": false,
+              "title": "Reviewed"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedAdminCommentList"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "moderation",
+          "comments"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/comments/moderation/{id}": {
+      "put": {
+        "operationId": "blog_api_mod_update_comment",
+        "summary": "Mod Update Comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "title": "Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCommentList"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "moderation",
+          "comments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCommentUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/comments/{id}": {
+      "get": {
+        "operationId": "blog_api_get_comment",
+        "summary": "Get Comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "title": "Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentList"
+                }
+              }
+            }
+          }
+        },
+        "description": "Gets all the details of a comment.",
+        "tags": [
+          "comments"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "blog_api_update_comment",
+        "summary": "Update Comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "title": "Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentList"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "comments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentMutate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "blog_api_delete_comment",
+        "summary": "Delete Comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "title": "Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "comments"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1182,6 +1515,7 @@
         "type": "object"
       },
       "UserSelf": {
+        "description": "Specifies fields that users can see about themselves",
         "properties": {
           "id": {
             "title": "Id",
@@ -1255,6 +1589,7 @@
         "type": "object"
       },
       "UpdateAccount": {
+        "description": "Specifies fields that users can provide to update their account",
         "properties": {
           "username": {
             "anyOf": [
@@ -1327,6 +1662,7 @@
         "type": "object"
       },
       "NewAccount": {
+        "description": "Specifies fields that users can provide to create an account",
         "properties": {
           "username": {
             "title": "Username",
@@ -1391,114 +1727,8 @@
         "title": "Input",
         "type": "object"
       },
-      "ContentType": {
-        "properties": {
-          "id": {
-            "title": "Id",
-            "type": "integer"
-          },
-          "app_label": {
-            "title": "App Label",
-            "type": "string"
-          },
-          "model": {
-            "title": "Model",
-            "type": "string"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "app_labeled_name": {
-            "title": "App Labeled Name",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "app_label",
-          "model",
-          "name",
-          "app_labeled_name"
-        ],
-        "title": "ContentType",
-        "type": "object"
-      },
-      "Group": {
-        "properties": {
-          "id": {
-            "title": "Id",
-            "type": "integer"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "permissions": {
-            "items": {
-              "$ref": "#/components/schemas/Permission"
-            },
-            "title": "Permissions",
-            "type": "array"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "permissions"
-        ],
-        "title": "Group",
-        "type": "object"
-      },
-      "PagedUserDetails": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/UserDetails"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "count": {
-            "title": "Count",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "items",
-          "count"
-        ],
-        "title": "PagedUserDetails",
-        "type": "object"
-      },
-      "Permission": {
-        "properties": {
-          "id": {
-            "title": "Id",
-            "type": "integer"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          },
-          "codename": {
-            "title": "Codename",
-            "type": "string"
-          },
-          "content_type": {
-            "$ref": "#/components/schemas/ContentType"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "codename",
-          "content_type"
-        ],
-        "title": "Permission",
-        "type": "object"
-      },
-      "UserDetails": {
+      "AdminUserDetails": {
+        "description": "Specifies fields that admins can see",
         "properties": {
           "id": {
             "title": "Id",
@@ -1573,6 +1803,17 @@
             },
             "title": "User Permissions",
             "type": "array"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
           }
         },
         "required": [
@@ -1588,10 +1829,118 @@
           "groups",
           "user_permissions"
         ],
-        "title": "UserDetails",
+        "title": "AdminUserDetails",
         "type": "object"
       },
-      "UserModify": {
+      "ContentType": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "app_label": {
+            "title": "App Label",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "app_labeled_name": {
+            "title": "App Labeled Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "app_label",
+          "model",
+          "name",
+          "app_labeled_name"
+        ],
+        "title": "ContentType",
+        "type": "object"
+      },
+      "Group": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "title": "Permissions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "permissions"
+        ],
+        "title": "Group",
+        "type": "object"
+      },
+      "PagedAdminUserDetails": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AdminUserDetails"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "PagedAdminUserDetails",
+        "type": "object"
+      },
+      "Permission": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "codename": {
+            "title": "Codename",
+            "type": "string"
+          },
+          "content_type": {
+            "$ref": "#/components/schemas/ContentType"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "codename",
+          "content_type"
+        ],
+        "title": "Permission",
+        "type": "object"
+      },
+      "AdminUserModify": {
+        "description": "Specifies fields that admins can change",
         "properties": {
           "username": {
             "anyOf": [
@@ -1719,9 +2068,20 @@
               }
             ],
             "title": "User Permissions"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
           }
         },
-        "title": "UserModify",
+        "title": "AdminUserModify",
         "type": "object"
       },
       "PagedPostDetails": {
@@ -2013,6 +2373,414 @@
           }
         },
         "title": "FileMutateMetadata",
+        "type": "object"
+      },
+      "AuthorSummary": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username"
+        ],
+        "title": "AuthorSummary",
+        "type": "object"
+      },
+      "CommentList": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "author": {
+            "$ref": "#/components/schemas/AuthorSummary"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/CommentList"
+            },
+            "title": "Children",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "post": {
+            "$ref": "#/components/schemas/PostDetails"
+          }
+        },
+        "required": [
+          "id",
+          "author",
+          "content",
+          "children",
+          "created_at",
+          "updated_at",
+          "post"
+        ],
+        "title": "CommentList",
+        "type": "object"
+      },
+      "PagedCommentList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CommentList"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "PagedCommentList",
+        "type": "object"
+      },
+      "CommentCreate": {
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "post_id": {
+            "title": "Post Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "content",
+          "post_id"
+        ],
+        "title": "CommentCreate",
+        "type": "object"
+      },
+      "AdminChildCommentList": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "author": {
+            "$ref": "#/components/schemas/AuthorSummary"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "post": {
+            "$ref": "#/components/schemas/PostDetails"
+          },
+          "children": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AdminCommentList"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Children"
+          },
+          "visible": {
+            "title": "Visible",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "reviewed": {
+            "title": "Reviewed",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "id",
+          "author",
+          "content",
+          "post",
+          "visible",
+          "created_at",
+          "updated_at",
+          "reviewed"
+        ],
+        "title": "AdminChildCommentList",
+        "type": "object"
+      },
+      "AdminCommentList": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "author": {
+            "$ref": "#/components/schemas/AuthorSummary"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "post": {
+            "$ref": "#/components/schemas/PostDetails"
+          },
+          "children": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AdminChildCommentList"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Children"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminParentCommentList"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visible": {
+            "title": "Visible",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "reviewed": {
+            "title": "Reviewed",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "id",
+          "author",
+          "content",
+          "post",
+          "visible",
+          "created_at",
+          "updated_at",
+          "reviewed"
+        ],
+        "title": "AdminCommentList",
+        "type": "object"
+      },
+      "AdminParentCommentList": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "author": {
+            "$ref": "#/components/schemas/AuthorSummary"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "post": {
+            "$ref": "#/components/schemas/PostDetails"
+          },
+          "parent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminParentCommentList"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visible": {
+            "title": "Visible",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "reviewed": {
+            "title": "Reviewed",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "id",
+          "author",
+          "content",
+          "post",
+          "visible",
+          "created_at",
+          "updated_at",
+          "reviewed"
+        ],
+        "title": "AdminParentCommentList",
+        "type": "object"
+      },
+      "PagedAdminCommentList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AdminCommentList"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "PagedAdminCommentList",
+        "type": "object"
+      },
+      "AdminCommentUpdate": {
+        "properties": {
+          "visible": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visible"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "reviewed": {
+            "title": "Reviewed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "reviewed"
+        ],
+        "title": "AdminCommentUpdate",
+        "type": "object"
+      },
+      "CommentMutate": {
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "title": "CommentMutate",
         "type": "object"
       }
     },

@@ -10,7 +10,14 @@ from ninja.pagination import paginate
 from ninja_jwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 
 from accounts.models import User
-from accounts.schemas import AuthError, NewAccount, UpdateAccount, UserDetails, UserModify, UserSelf
+from accounts.schemas import (
+    AdminUserDetails,
+    AdminUserModify,
+    AuthError,
+    NewAccount,
+    UpdateAccount,
+    UserSelf,
+)
 from auth.middleware import JWTAuth, StaffOnly
 
 logger: structlog.stdlib.BoundLogger = structlog.get_logger(__name__)  # noqa: F821
@@ -131,7 +138,7 @@ def sign_up(request: HttpRequest, new_acct_details: NewAccount):
 @accounts_router.get(
     "/",
     auth=JWTAuth(permissions=StaffOnly),
-    response={200: List[UserDetails], 403: AuthError},
+    response={200: List[AdminUserDetails], 403: AuthError},
     tags=["accounts"],
 )
 @paginate
@@ -150,7 +157,7 @@ def list_users(request: HttpRequest):
 @accounts_router.get(
     "/{user_id}",
     auth=JWTAuth(permissions=StaffOnly),
-    response={200: UserDetails, 403: AuthError},
+    response={200: AdminUserDetails, 403: AuthError},
     tags=["accounts"],
 )
 def get_user(request: HttpRequest, user_id: int):
@@ -168,10 +175,10 @@ def get_user(request: HttpRequest, user_id: int):
 @accounts_router.put(
     "/{user_id}",
     auth=JWTAuth(permissions=StaffOnly),
-    response={200: UserDetails, 403: AuthError},
+    response={200: AdminUserDetails, 403: AuthError},
     tags=["accounts"],
 )
-def update_user(request: HttpRequest, user_id: int, new_details: UserModify):
+def update_user(request: HttpRequest, user_id: int, new_details: AdminUserModify):
     """
     Updates a user
     """

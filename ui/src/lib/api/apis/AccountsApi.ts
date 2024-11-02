@@ -15,27 +15,27 @@
 
 import * as runtime from '../runtime';
 import type {
+  AdminUserDetails,
+  AdminUserModify,
   AuthError,
   NewAccount,
-  PagedUserDetails,
+  PagedAdminUserDetails,
   UpdateAccount,
-  UserDetails,
-  UserModify,
   UserSelf,
 } from '../models/index';
 import {
+    AdminUserDetailsFromJSON,
+    AdminUserDetailsToJSON,
+    AdminUserModifyFromJSON,
+    AdminUserModifyToJSON,
     AuthErrorFromJSON,
     AuthErrorToJSON,
     NewAccountFromJSON,
     NewAccountToJSON,
-    PagedUserDetailsFromJSON,
-    PagedUserDetailsToJSON,
+    PagedAdminUserDetailsFromJSON,
+    PagedAdminUserDetailsToJSON,
     UpdateAccountFromJSON,
     UpdateAccountToJSON,
-    UserDetailsFromJSON,
-    UserDetailsToJSON,
-    UserModifyFromJSON,
-    UserModifyToJSON,
     UserSelfFromJSON,
     UserSelfToJSON,
 } from '../models/index';
@@ -63,7 +63,7 @@ export interface AccountsApiUpdateSelfRequest {
 
 export interface AccountsApiUpdateUserRequest {
     userId: number;
-    userModify: UserModify;
+    adminUserModify: AdminUserModify;
 }
 
 /**
@@ -110,7 +110,7 @@ export class AccountsApi extends runtime.BaseAPI {
      * Deletes a user
      * Delete User
      */
-    async accountsApiDeleteUserRaw(requestParameters: AccountsApiDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserDetails>> {
+    async accountsApiDeleteUserRaw(requestParameters: AccountsApiDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['userId'] == null) {
             throw new runtime.RequiredError(
                 'userId',
@@ -137,23 +137,22 @@ export class AccountsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => UserDetailsFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      * Deletes a user
      * Delete User
      */
-    async accountsApiDeleteUser(requestParameters: AccountsApiDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserDetails> {
-        const response = await this.accountsApiDeleteUserRaw(requestParameters, initOverrides);
-        return await response.value();
+    async accountsApiDeleteUser(requestParameters: AccountsApiDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.accountsApiDeleteUserRaw(requestParameters, initOverrides);
     }
 
     /**
      * Returns a specific user
      * Get User
      */
-    async accountsApiGetUserRaw(requestParameters: AccountsApiGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserDetails>> {
+    async accountsApiGetUserRaw(requestParameters: AccountsApiGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminUserDetails>> {
         if (requestParameters['userId'] == null) {
             throw new runtime.RequiredError(
                 'userId',
@@ -180,14 +179,14 @@ export class AccountsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => UserDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AdminUserDetailsFromJSON(jsonValue));
     }
 
     /**
      * Returns a specific user
      * Get User
      */
-    async accountsApiGetUser(requestParameters: AccountsApiGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserDetails> {
+    async accountsApiGetUser(requestParameters: AccountsApiGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminUserDetails> {
         const response = await this.accountsApiGetUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -196,7 +195,7 @@ export class AccountsApi extends runtime.BaseAPI {
      * Returns a list of all users
      * List Users
      */
-    async accountsApiListUsersRaw(requestParameters: AccountsApiListUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedUserDetails>> {
+    async accountsApiListUsersRaw(requestParameters: AccountsApiListUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedAdminUserDetails>> {
         const queryParameters: any = {};
 
         if (requestParameters['limit'] != null) {
@@ -224,14 +223,14 @@ export class AccountsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PagedUserDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PagedAdminUserDetailsFromJSON(jsonValue));
     }
 
     /**
      * Returns a list of all users
      * List Users
      */
-    async accountsApiListUsers(requestParameters: AccountsApiListUsersRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedUserDetails> {
+    async accountsApiListUsers(requestParameters: AccountsApiListUsersRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedAdminUserDetails> {
         const response = await this.accountsApiListUsersRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -332,7 +331,7 @@ export class AccountsApi extends runtime.BaseAPI {
      * Updates a user
      * Update User
      */
-    async accountsApiUpdateUserRaw(requestParameters: AccountsApiUpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserDetails>> {
+    async accountsApiUpdateUserRaw(requestParameters: AccountsApiUpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminUserDetails>> {
         if (requestParameters['userId'] == null) {
             throw new runtime.RequiredError(
                 'userId',
@@ -340,10 +339,10 @@ export class AccountsApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['userModify'] == null) {
+        if (requestParameters['adminUserModify'] == null) {
             throw new runtime.RequiredError(
-                'userModify',
-                'Required parameter "userModify" was null or undefined when calling accountsApiUpdateUser().'
+                'adminUserModify',
+                'Required parameter "adminUserModify" was null or undefined when calling accountsApiUpdateUser().'
             );
         }
 
@@ -366,17 +365,17 @@ export class AccountsApi extends runtime.BaseAPI {
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: UserModifyToJSON(requestParameters['userModify']),
+            body: AdminUserModifyToJSON(requestParameters['adminUserModify']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => UserDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AdminUserDetailsFromJSON(jsonValue));
     }
 
     /**
      * Updates a user
      * Update User
      */
-    async accountsApiUpdateUser(requestParameters: AccountsApiUpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserDetails> {
+    async accountsApiUpdateUser(requestParameters: AccountsApiUpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminUserDetails> {
         const response = await this.accountsApiUpdateUserRaw(requestParameters, initOverrides);
         return await response.value();
     }

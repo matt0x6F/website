@@ -14,7 +14,7 @@
 
 import { mapValues } from '../runtime';
 /**
- * 
+ * Specifies fields that users can provide to create an account
  * @export
  * @interface NewAccount
  */

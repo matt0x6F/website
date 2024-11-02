@@ -1,10 +1,17 @@
+import { goto } from "$app/navigation";
 import { PUBLIC_BASE_URL } from "$env/static/public";
 import { AccountsApi, Configuration, type UserSelf } from "$lib/api";
-import { getAccessToken } from "../../../stores/auth";
+import { retrieveAccessToken } from "../../../stores/auth";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async () => {
-    const token = await getAccessToken();
+    let token = undefined;
+    try {
+        token = await retrieveAccessToken();
+    } catch {
+        goto('/login');
+    }
+
     const config = new Configuration({
         basePath: PUBLIC_BASE_URL,
         headers: {

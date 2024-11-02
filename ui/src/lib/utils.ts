@@ -69,3 +69,14 @@ export function parseDateAsYear(date: Date | null | undefined): string {
     
     return date.getFullYear().toString();
 }
+
+export function parseUTCDateTimeToLocal(date: string): string {
+    const dateObject = new Date(date);
+
+    // change date to the user's local timezone
+    const offset = new Date().getTimezoneOffset();
+    const localDate = new Date(dateObject.getTime() - offset * 60000);
+
+    // format the date as YYYY-MM-DDTHH:MM:SS
+    return localDate.getFullYear() + "-" + String(localDate.getMonth() + 1).padStart(2, '0') + "-" + String(localDate.getDate()).padStart(2, '0') + "T" + String(localDate.getHours()).padStart(2, '0') + ":" + String(localDate.getMinutes()).padStart(2, '0') + ":" + String(localDate.getSeconds()).padStart(2, '0');
+}

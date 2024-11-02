@@ -43,8 +43,8 @@ class HealthResponse(Schema):
     status: HealthStatus
 
 
-@api.get("/health")
-def add(request) -> HealthResponse:
+@api.get("/health", summary="Health check")
+def healthcheck(request) -> HealthResponse:
     """
     Returns a simple health check response.
     """
@@ -54,6 +54,7 @@ def add(request) -> HealthResponse:
 api.add_router("/accounts/", "accounts.api.accounts_router")
 api.add_router("/posts/", "blog.api.posts_router", auth=JWTAuth(permissions=StaffOnlyModify))
 api.add_router("/files/", "blog.api.files_router", auth=JWTAuth(permissions=StaffOnlyModify))
+api.add_router("/comments/", "blog.api.comments_router", auth=JWTAuth())
 
 
 urlpatterns = [

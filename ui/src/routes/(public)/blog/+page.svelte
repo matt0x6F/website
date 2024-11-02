@@ -11,7 +11,6 @@
     import { emoji } from '@cartamd/plugin-emoji';
     import { slash } from '@cartamd/plugin-slash';
     import { anchor } from '@cartamd/plugin-anchor';
-	
 
     export let data
 
@@ -78,4 +77,6 @@
     </article>
 
     <hr class="my-8" />
+    {:else}
+    <p>No posts yet! Check back later.</p>
 {/each}

@@ -25,7 +25,11 @@ class Group(Schema):
     permissions: List[Permission]
 
 
-class UserDetails(Schema):
+class AdminUserDetails(Schema):
+    """
+    Specifies fields that admins can see
+    """
+
     id: int
     username: str
     email: str
@@ -39,9 +43,14 @@ class UserDetails(Schema):
     avatar_link: Optional[str] = None
     groups: List[Group]
     user_permissions: List[Permission]
+    notes: Optional[str] = None
 
 
-class UserModify(Schema):
+class AdminUserModify(Schema):
+    """
+    Specifies fields that admins can change
+    """
+
     username: Optional[str] = None
     email: Optional[str] = None
     first_name: Optional[str] = None
@@ -53,9 +62,14 @@ class UserModify(Schema):
     avatar_link: Optional[str] = None
     groups: Optional[List[Group]] = None
     user_permissions: Optional[List[Permission]] = None
+    notes: Optional[str] = None
 
 
 class UserSelf(Schema):
+    """
+    Specifies fields that users can see about themselves
+    """
+
     id: int
     username: str
     email: str
@@ -72,6 +86,10 @@ class AuthError(Schema):
 
 
 class NewAccount(Schema):
+    """
+    Specifies fields that users can provide to create an account
+    """
+
     username: str
     email: str
     password: str
@@ -80,6 +98,10 @@ class NewAccount(Schema):
 
 
 class UpdateAccount(Schema):
+    """
+    Specifies fields that users can provide to update their account
+    """
+
     username: Optional[str] = None
     email: Optional[str] = None
     old_password: Optional[str] = None

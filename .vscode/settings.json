@@ -1,14 +1,22 @@
 {
-    "python.defaultInterpreterPath": "api/.venv/bin/python",
-    "[python]": {
-      "editor.formatOnSave": true,
-      "editor.codeActionsOnSave": {
-        "source.fixAll": "explicit",
-        "source.organizeImports": "explicit"
-      },
-      "editor.defaultFormatter": "charliermarsh.ruff"
+  "python.defaultInterpreterPath": "api/.venv/bin/python",
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
     },
-    "[svelte]": {
-      "editor.defaultFormatter": "svelte.svelte-vscode"
-    },
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "always"
+    }
+  },
+  "eslint.options": { "overrideConfigFile": "./eslint.config.js" },
+  "eslint.validate": [
+    "typescript"
+  ]
 }

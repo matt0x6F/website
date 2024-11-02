@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from blog.models import File, Post
+from blog.models import Comment, File, Post
 
 
 # Register your models here.
@@ -21,3 +21,12 @@ class FileAdmin(admin.ModelAdmin):
 
 
 admin.site.register(File, FileAdmin)
+
+
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ("content", "author", "post", "created_at")
+    list_filter = ("author", "created_at")
+    search_fields = ("content", "author__username", "post__title")
+
+
+admin.site.register(Comment, CommentAdmin)

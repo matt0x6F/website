@@ -14,7 +14,7 @@
 
 import { mapValues } from '../runtime';
 /**
- * 
+ * Specifies fields that users can see about themselves
  * @export
  * @interface UserSelf
  */
