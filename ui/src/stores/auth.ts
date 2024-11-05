@@ -33,15 +33,6 @@ export const getRefreshToken = async (): Promise<string | undefined> => {
     return refreshToken;
 }
 
-export const getUserData = (): UserSelf | undefined => {
-    const userData = getCookie("user_data")
-    if (!userData) {
-        return undefined
-    }
-
-    return JSON.parse(userData)
-}
-
 export const retrieveAccessToken = async (): Promise<string> => {
     let accessToken = getCookie("access_token");
     let refreshToken = getCookie("refresh_token");
@@ -57,14 +48,17 @@ export const retrieveAccessToken = async (): Promise<string> => {
         try {
             await api.tokenVerify({tokenVerifyInputSchema: {token: accessToken}})
         } catch (error) {
-            console.error("Error validating access token. Attempting to refresh token: ", error);
+            console.error("Error validating access token");
 
-            accessToken = undefined;    
+            removeCookie("access_token");
+            accessToken = undefined;
         }
     }
 
     // refresh the token
     if (!accessToken && refreshToken) {
+        console.log("Attempting to refresh access token");
+
         const config = new Configuration({
             basePath: PUBLIC_BASE_URL,
         })
@@ -78,9 +72,9 @@ export const retrieveAccessToken = async (): Promise<string> => {
             }
 
             // expires in 5 minutes
-            setCookie("access_token", response.access, {expires: new Date().getTime() + 300000});
+            setCookie("access_token", response.access, {path:"/", expires: new Date().getTime() + 300000});
             // expires in 24 hours
-            setCookie("refresh_token", response.refresh, {expires: new Date().getTime() + 86400000});
+            setCookie("refresh_token", response.refresh, {path: "/", expires: new Date().getTime() + 86400000});
 
             accessToken = response.access;
             refreshToken = response.refresh;

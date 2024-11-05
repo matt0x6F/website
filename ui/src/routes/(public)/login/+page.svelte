@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { PUBLIC_BASE_URL } from '$env/static/public';
 	import { Configuration, TokenApi } from '$lib/api';
 
@@ -7,6 +6,7 @@
 	import { LockSolid, UserCircleSolid } from 'flowbite-svelte-icons';
 	import { addToast } from '../../../stores/notifications';
 	import { setCookie } from 'typescript-cookie';
+	import { goto } from '$app/navigation';
 
 	let username = '';
 	let password = '';
@@ -35,7 +35,7 @@
 				message: "You're logged in!"
 			});
 
-			window.location.href = '/';
+			goto('/');
 		} catch (error) {
 			console.log('Error while signing in ' + error);
 		}
@@ -50,7 +50,7 @@
 				<InputAddon>
 					<UserCircleSolid class="h-4 w-4 text-gray-500 dark:text-gray-400" />
 				</InputAddon>
-				<Input id="username" bind:value={username} placeholder="your username" />
+				<Input id="username" bind:value={username} placeholder="username" />
 			</ButtonGroup>
 		</div>
 

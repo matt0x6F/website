@@ -11,7 +11,10 @@
 		PostsApi,
 		ResponseError,
 		ValidationErrorResponseFromJSONTyped,
-		type FileDetails
+		type FileDetails,
+
+		type PostMutate
+
 	} from '$lib/api';
 	import { Carta, MarkdownEditor } from 'carta-md';
 	import { code } from '@cartamd/plugin-code';
@@ -121,15 +124,24 @@
 		const api = new PostsApi(config);
 
 		if (id === -1) {
+			// Create new post
+			console.log('Creating new post');
 			try {
+				let details: PostMutate = {
+					title: title,
+					slug: slug,
+					content: content,
+				}
+
+				if (published_at !== '') {
+					details.published = new Date(published_at);
+				}
+
 				const post = await api.blogApiCreatePost({
-					postMutate: {
-						title: title,
-						slug: slug,
-						published: new Date(published_at),
-						content: content
-					}
+					postMutate: details
 				});
+
+				console.log('Created post with id: ' + post.id);
 
 				id = post.id;
 
@@ -146,9 +158,12 @@
 					addToast({
 						message: 'Error saving post: ' + body.detail
 					});
+				} else {
+					console.error('Error saving post: ', error);
 				}
 			}
 		} else {
+			console.log('Updating post. id=' + id);
 			try {
 				await api.blogApiUpdatePost({
 					id: id,

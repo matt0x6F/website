@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { PUBLIC_BASE_URL } from '$env/static/public';
-	import { AccountsApi, Configuration, TokenApi, type UpdateAccount } from '$lib/api';
+	import { AccountsApi, Configuration, type UpdateAccount } from '$lib/api';
 
 	import { Button, ButtonGroup, Input, InputAddon, Label } from 'flowbite-svelte';
 	import { LockSolid, UserCircleSolid, TrashBinSolid, EnvelopeSolid } from 'flowbite-svelte-icons';
-	import { retrieveAccessToken, getRefreshToken } from '../../../stores/auth';
+	import { retrieveAccessToken } from '../../../stores/auth';
 	import { addToast } from '../../../stores/notifications';
 	import type { PageData } from './$types';
 	import { removeCookie } from 'typescript-cookie';
