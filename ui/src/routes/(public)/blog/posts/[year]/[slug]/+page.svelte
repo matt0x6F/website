@@ -104,7 +104,12 @@
 	};
 
 	onMount(async () => {
-		userDetails = await getUserDetails();
+		if ($userDetails === undefined) {
+			// Redirect to login if user is not logged in
+			userDetails = await getUserDetails();
+		} else {
+			userDetails = $userDetails;
+		}
 	});
 </script>
 

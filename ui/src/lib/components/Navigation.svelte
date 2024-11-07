@@ -14,7 +14,7 @@
 		Toast,
 		Button
 	} from 'flowbite-svelte';
-	import { getUserDetails } from '../../stores/auth';
+	import { getUserDetails, userDetailsStore } from '../../stores/auth';
 	import { type UserSelf } from '$lib/api';
 	import { addToast, notifications } from '../../stores/notifications';
 	import { CheckCircleSolid, ChevronDownOutline } from 'flowbite-svelte-icons';
@@ -33,12 +33,12 @@
 	});
 
 	const signOut = () => {
-		console.log('Sign out');
-
-		removeCookie('access_token');
-		removeCookie('refresh_token');
+		console.log('User signed out');
 
 		userDetails = undefined;
+		userDetailsStore.set(undefined);
+		removeCookie('access_token');
+		removeCookie('refresh_token');
 
 		addToast({
 			message: "You're logged out!"
@@ -48,11 +48,17 @@
 	};
 
 	onMount(async () => {
-		try {
-			userDetails = await getUserDetails();
-		} catch {
-			if (staffOnly) {
-				goto('/login');
+		userDetailsStore.subscribe((user) => {
+			userDetails = user;
+		});
+
+		if ($userDetailsStore === undefined) {
+			try {
+				userDetails = await getUserDetails();
+			} catch {
+				if (staffOnly) {
+					goto('/login');
+				}
 			}
 		}
 

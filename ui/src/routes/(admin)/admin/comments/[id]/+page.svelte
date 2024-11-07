@@ -10,7 +10,7 @@
 	import Comment from '$lib/components/Comment.svelte';
 
 	import type { PageData } from './$types';
-	import { getUserDetails } from '../../../../../stores/auth';
+	import { getUserDetails, userDetailsStore } from '../../../../../stores/auth';
 	import { onMount } from 'svelte';
 	import type { UserSelf } from '$lib/api';
 	import { goto } from '$app/navigation';
@@ -26,11 +26,15 @@
 	});
 
 	onMount(async () => {
-		try {
-			userDetails = await getUserDetails();
-		} catch {
-			// Redirect to login if user is not logged in
-			goto('/login');
+		if ($userDetailsStore === undefined) {
+			try {
+				userDetails = await getUserDetails();
+			} catch {
+				// Redirect to login if user is not logged in
+				goto('/login');
+			}
+		} else {
+			userDetails = $userDetails;
 		}
 	});
 </script>

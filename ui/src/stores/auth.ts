@@ -1,6 +1,9 @@
 import { AccountsApi, Configuration, TokenApi, type UserSelf } from "$lib/api";
 import { getCookie, setCookie, removeCookie } from "typescript-cookie"
 import { PUBLIC_BASE_URL } from "$env/static/public";
+import  { type Writable, writable } from "svelte/store";
+
+export const userDetailsStore: Writable<UserSelf | undefined> = writable(undefined);
 
 export const getUserDetails = async (): Promise<UserSelf> => {
     const accessToken = getCookie("access_token");
@@ -18,19 +21,11 @@ export const getUserDetails = async (): Promise<UserSelf> => {
 
     const api = new AccountsApi(config)
 
-    return await api.accountsApiWhoami()
-}
+    const payload = await api.accountsApiWhoami()
 
+    userDetailsStore.set(payload)
 
-// This function will remove both the access and refresh tokens from the cookies.
-export const getRefreshToken = async (): Promise<string | undefined> => {
-    const refreshToken = getCookie("refresh_token");
-
-    if (!refreshToken) {
-        return undefined;
-    }
-
-    return refreshToken;
+    return payload
 }
 
 export const retrieveAccessToken = async (): Promise<string> => {

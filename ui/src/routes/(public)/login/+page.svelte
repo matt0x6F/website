@@ -7,6 +7,7 @@
 	import { addToast } from '../../../stores/notifications';
 	import { setCookie } from 'typescript-cookie';
 	import { goto } from '$app/navigation';
+	import { getUserDetails } from '../../../stores/auth';
 
 	let username = '';
 	let password = '';
@@ -34,6 +35,12 @@
 			addToast({
 				message: "You're logged in!"
 			});
+
+			try {
+				await getUserDetails();
+			} catch (error) {
+				console.log('Error while getting user details ' + error);
+			}
 
 			goto('/');
 		} catch (error) {
