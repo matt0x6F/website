@@ -90,5 +90,7 @@ export const retrieveAccessToken = async (): Promise<string> => {
         throw new Error("Access token not found");
     }
 
+    console.log("Access token: ", accessToken);
+
     return accessToken;
 }

@@ -11,10 +11,9 @@
 		PostsApi,
 		ResponseError,
 		ValidationErrorResponseFromJSONTyped,
+		type BlogApiUpdatePostRequest,
 		type FileDetails,
-
 		type PostMutate
-
 	} from '$lib/api';
 	import { Carta, MarkdownEditor } from 'carta-md';
 	import { code } from '@cartamd/plugin-code';
@@ -130,8 +129,8 @@
 				let details: PostMutate = {
 					title: title,
 					slug: slug,
-					content: content,
-				}
+					content: content
+				};
 
 				if (published_at !== '') {
 					details.published = new Date(published_at);
@@ -163,17 +162,24 @@
 				}
 			}
 		} else {
-			console.log('Updating post. id=' + id);
+			console.log('Updating post with id: ' + id);
 			try {
-				await api.blogApiUpdatePost({
+				let details: BlogApiUpdatePostRequest = {
 					id: id,
 					postMutate: {
 						title: title,
 						slug: slug,
-						published: new Date(published_at),
 						content: content
 					}
-				});
+				};
+
+				if (published_at !== '') {
+					details.postMutate.published = new Date(published_at);
+				}
+
+				await api.blogApiUpdatePost(details);
+
+				console.log('Updated post with id: ' + id);
 
 				addToast({
 					message: 'Saved post!'
