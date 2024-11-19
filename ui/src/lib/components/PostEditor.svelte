@@ -194,6 +194,12 @@
 					addToast({
 						message: 'Error saving post: ' + body.detail
 					});
+				} else {
+					console.error('Error saving post: ', error);
+
+					addToast({
+						message: 'Error saving post: ' + error
+					});
 				}
 			}
 		}
