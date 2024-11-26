@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PUBLIC_BASE_URL } from '$env/static/public';
-	import { Configuration, TokenApi } from '$lib/api';
+	import { Configuration, ResponseError, TokenApi } from '$lib/api';
 
 	import { Button, ButtonGroup, Input, InputAddon, Label } from 'flowbite-svelte';
 	import { LockSolid, UserCircleSolid } from 'flowbite-svelte-icons';
@@ -44,7 +44,19 @@
 
 			goto('/');
 		} catch (error) {
-			console.log('Error while signing in ' + error);
+			if (error instanceof ResponseError) {
+				const body = await error.response.json();
+
+				addToast({
+					message: body.detail
+				});
+			} else {
+				addToast({
+					message: 'An error occurred while signing in'
+				});
+
+				console.log('Error while signing in ' + error);
+			}
 		}
 	};
 </script>
