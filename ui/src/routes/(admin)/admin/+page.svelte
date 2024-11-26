@@ -106,8 +106,8 @@
 	</p>
 </div>
 
-<div class="flex w-full flex-row space-x-4">
-	<div class="flex-grow">
+<div class="w-screen-2xl flex max-w-screen-2xl flex-col space-y-2">
+	<div class="flex-auto basis-1/2">
 		<h2 class="text-lg font-bold">Published posts</h2>
 		<Table hoverable>
 			<TableHead>
@@ -151,7 +151,8 @@
 			</TableBody>
 		</Table>
 	</div>
-	<div class="flex-grow">
+	<!-- Drafts -->
+	<div class="flex-auto basis-1/2">
 		<h2 class="text-lg font-bold">Draft posts</h2>
 		<Table hoverable>
 			<TableHead>
