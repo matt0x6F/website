@@ -47,8 +47,14 @@
 				}
 			});
 
-			setCookie('access_token', tokens.access, { expires: new Date().getTime() + 300000 });
-			setCookie('refresh_token', tokens.refresh, { expires: new Date().getTime() + 86400000 });
+			setCookie('access_token', tokens.access, {
+				path: '/',
+				expires: new Date().getTime() + 300000
+			});
+			setCookie('refresh_token', tokens.refresh, {
+				path: '/',
+				expires: new Date().getTime() + 86400000
+			});
 
 			addToast({
 				message: "You're logged in!"
