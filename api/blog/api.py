@@ -2,6 +2,7 @@ from typing import List, Literal, Optional
 
 import structlog
 from django.db.utils import IntegrityError
+from django.db.models import Q
 from django.http import HttpRequest
 from django.utils import timezone
 from ninja import File as NinjaFile
@@ -54,7 +55,9 @@ def list_posts(request: HttpRequest, all: bool = False, drafts: bool = False):
         )
 
         try:
-            return Post.objects.filter(published__isnull=True).order_by("-id")
+            today = timezone.now()
+            # published is null OR published is in the future
+            return Post.objects.filter(Q(published__isnull=True) | Q(published__gte=today)).order_by("-id")
         except Exception as err:
             logger.error("Error fetching draft posts", error=err)
 
