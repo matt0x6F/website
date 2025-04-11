@@ -1,0 +1,117 @@
+# Commonly ignored files and directories
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+
+# Log files
+*.log
+*.log.*
+*.txt~
+
+# Cache and temporary directories
+.cache/
+.tmp/
+temp/
+tmp/
+__pycache__/
+
+# System and hidden files
+.Spotlight-V100/
+.Trashes/
+.Trash-*/
+.AppleDouble/
+.fuse_hidden*/
+
+# Package manager directories
+node_modules/
+vendor/
+bower_components/
+
+# Database data
+dbdata/
+
+# Compiled and binary files
+*.class
+*.o
+*.obj
+*.pyc
+*.pyo
+*.dll
+*.exe
+*.so
+*.dylib
+
+# Editor backup and swap files
+*~
+.*~
+*#
+.#*
+*.swp
+
+# Images and media files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.ico
+
+# Audio and video files
+*.mp3
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.swf
+
+# Font files
+*.woff
+*.ttf
+*.eot
+*.otf
+
+# Archive files
+*.zip
+*.tar
+*.rar
+*.7z
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+
+# Minified and map files
+*.min.*
+*.map
+
+# Configuration and data files
+*.csv
+*.json
+*.xml
+*.psd
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.pdf
+
+# Custom ignore patterns (add more based on your needs)
+
+# Windows specific directories
+$RECYCLE.BIN/
+System Volume Information/
+
+# Linux specific directories
+# Add Linux specific directories here
+
+# macOS specific directories
+# Add macOS specific directories here

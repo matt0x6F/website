@@ -1,8 +1,8 @@
 from typing import List, Literal, Optional
 
 import structlog
-from django.db.utils import IntegrityError
 from django.db.models import Q
+from django.db.utils import IntegrityError
 from django.http import HttpRequest
 from django.utils import timezone
 from ninja import File as NinjaFile
@@ -57,7 +57,9 @@ def list_posts(request: HttpRequest, all: bool = False, drafts: bool = False):
         try:
             today = timezone.now()
             # published is null OR published is in the future
-            return Post.objects.filter(Q(published__isnull=True) | Q(published__gte=today)).order_by("-id")
+            return Post.objects.filter(
+                Q(published__isnull=True) | Q(published__gte=today)
+            ).order_by("-id")
         except Exception as err:
             logger.error("Error fetching draft posts", error=err)
 
@@ -398,6 +400,10 @@ def create_comment(request: HttpRequest, comment: CommentCreate):
     """
     Creates a comment
     """
+    # Check if user is authenticated
+    if not request.user.is_authenticated:
+        raise HttpError(401, "You must be logged in to create a comment")
+
     parent = None
     if comment.parent_id:
         try:
@@ -446,6 +452,8 @@ def update_comment(request, id: int, comment: CommentMutate):
         # If the author did this, add it to the review queue
         original.reviewed = False
         original.save()
+
+        return original
     except IntegrityError as err:
         logger.error("Error creating comment", error=err)
 

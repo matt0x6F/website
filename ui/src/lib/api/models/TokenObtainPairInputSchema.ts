@@ -26,11 +26,11 @@ export interface TokenObtainPairInputSchema {
      */
     password: string;
     /**
-     * Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+     * 
      * @type {string}
      * @memberof TokenObtainPairInputSchema
      */
-    username: string;
+    email: string;
 }
 
 /**
@@ -38,7 +38,7 @@ export interface TokenObtainPairInputSchema {
  */
 export function instanceOfTokenObtainPairInputSchema(value: object): value is TokenObtainPairInputSchema {
     if (!('password' in value) || value['password'] === undefined) return false;
-    if (!('username' in value) || value['username'] === undefined) return false;
+    if (!('email' in value) || value['email'] === undefined) return false;
     return true;
 }
 
@@ -53,7 +53,7 @@ export function TokenObtainPairInputSchemaFromJSONTyped(json: any, ignoreDiscrim
     return {
         
         'password': json['password'],
-        'username': json['username'],
+        'email': json['email'],
     };
 }
 
@@ -64,7 +64,7 @@ export function TokenObtainPairInputSchemaToJSON(value?: TokenObtainPairInputSch
     return {
         
         'password': value['password'],
-        'username': value['username'],
+        'email': value['email'],
     };
 }
 

@@ -187,12 +187,26 @@ def update_user(request: HttpRequest, user_id: int, new_details: AdminUserModify
     except User.DoesNotExist as err:
         raise HttpError(404, "User not found") from err
 
-    for key, value in new_details.dict().items():
-        if key != "password":
-            setattr(user, key, value)
-        else:
-            # encrypt the password
-            user.set_password(value)
+    details_dict = new_details.dict()
+
+    # Handle groups separately
+    groups = details_dict.pop("groups", None)
+    if groups is not None:
+        user.groups.set(groups)
+
+    # Handle user_permissions separately
+    user_permissions = details_dict.pop("user_permissions", None)
+    if user_permissions is not None:
+        user.user_permissions.set(user_permissions)
+
+    # Handle password separately
+    password = details_dict.pop("password", None)
+    if password:
+        user.set_password(password)
+
+    # Handle remaining fields
+    for key, value in details_dict.items():
+        setattr(user, key, value)
 
     user.save()
 

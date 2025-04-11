@@ -1414,10 +1414,9 @@
       },
       "TokenObtainPairOutputSchema": {
         "properties": {
-          "username": {
-            "description": "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
-            "maxLength": 150,
-            "title": "Username",
+          "email": {
+            "maxLength": 254,
+            "title": "Email",
             "type": "string"
           },
           "refresh": {
@@ -1430,7 +1429,7 @@
           }
         },
         "required": [
-          "username",
+          "email",
           "refresh",
           "access"
         ],
@@ -1444,16 +1443,15 @@
             "title": "Password",
             "type": "string"
           },
-          "username": {
-            "description": "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
-            "maxLength": 150,
-            "title": "Username",
+          "email": {
+            "maxLength": 254,
+            "title": "Email",
             "type": "string"
           }
         },
         "required": [
           "password",
-          "username"
+          "email"
         ],
         "title": "TokenObtainPairInputSchema",
         "type": "object"

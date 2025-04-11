@@ -18,5 +18,27 @@
   "eslint.options": { "overrideConfigFile": "./eslint.config.js" },
   "eslint.validate": [
     "typescript"
-  ]
+  ],
+  "todo-tree.general.showActivityBarBadge": true,
+  "todo-tree.general.showIconsInsteadOfTagsInStatusBar": true,
+  "todo-tree.general.statusBar": "tags",
+  "todo-tree.general.tags": [
+    "BUG",
+    "HACK",
+    "FIXME",
+    "TODO",
+    "XXX",
+    "[ ]",
+    "[x]",
+    "todo",
+    "bug"
+  ],
+  "todo-tree.general.tagGroups": {
+    "BUG": [
+      "bug",
+    ],
+    "TODO": [
+      "todo"
+    ]
+  }
 }

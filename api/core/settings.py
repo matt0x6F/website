@@ -74,7 +74,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "core.api"
 
-NINJA_JWT = {"BLACKLIST_AFTER_ROTATION": True, "ROTATE_REFRESH_TOKENS": True}
+NINJA_JWT = {
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ROTATE_REFRESH_TOKENS": True,
+    "USER_ID_FIELD": "id",
+}
 
 TEMPLATES = [
     {
@@ -264,3 +268,7 @@ LOGGING = {
         },
     },
 }
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]

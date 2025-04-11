@@ -20,11 +20,11 @@ import { mapValues } from '../runtime';
  */
 export interface TokenObtainPairOutputSchema {
     /**
-     * Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+     * 
      * @type {string}
      * @memberof TokenObtainPairOutputSchema
      */
-    username: string;
+    email: string;
     /**
      * 
      * @type {string}
@@ -43,7 +43,7 @@ export interface TokenObtainPairOutputSchema {
  * Check if a given object implements the TokenObtainPairOutputSchema interface.
  */
 export function instanceOfTokenObtainPairOutputSchema(value: object): value is TokenObtainPairOutputSchema {
-    if (!('username' in value) || value['username'] === undefined) return false;
+    if (!('email' in value) || value['email'] === undefined) return false;
     if (!('refresh' in value) || value['refresh'] === undefined) return false;
     if (!('access' in value) || value['access'] === undefined) return false;
     return true;
@@ -59,7 +59,7 @@ export function TokenObtainPairOutputSchemaFromJSONTyped(json: any, ignoreDiscri
     }
     return {
         
-        'username': json['username'],
+        'email': json['email'],
         'refresh': json['refresh'],
         'access': json['access'],
     };
@@ -71,7 +71,7 @@ export function TokenObtainPairOutputSchemaToJSON(value?: TokenObtainPairOutputS
     }
     return {
         
-        'username': value['username'],
+        'email': value['email'],
         'refresh': value['refresh'],
         'access': value['access'],
     };

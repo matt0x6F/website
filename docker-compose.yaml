@@ -30,16 +30,17 @@ services:
       - postgres
     restart: on-failure
 
-  svelte:
+  ui:
     build: 
       context: ./ui
       target: development
-    container_name: svelte
+    container_name: ui
     command: npm run dev
+    environment:
+      - VITE_API_URL=http://localhost:8000
     volumes:
       - ./ui:/app
     ports:
-      - "5173:5173"
-      - "24678:24678"
+      - "3000:3000"
     depends_on:
       - django
