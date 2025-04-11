@@ -17,7 +17,8 @@
           </div>
         </header>
         
-        <div class="prose lg:prose-xl" v-html="post.content"></div>
+        <!-- Use MdPreview to render markdown content -->
+        <MdPreview :id="id" :modelValue="post.content" preview-theme="vuepress" />
       </article>
       
       <!-- Comments section -->
@@ -66,6 +67,8 @@ import { useAuthStore } from '@/stores/auth'
 import Comments from '@/components/Comments.vue'
 import LoginDialog from '@/components/LoginDialog.vue'
 import SignupDialog from '@/components/SignupDialog.vue'
+import { MdPreview, MdCatalog } from 'md-editor-v3'
+import 'md-editor-v3/lib/preview.css'
 
 const route = useRoute()
 const posts = useApiClient(PostsApi)
@@ -80,6 +83,9 @@ const showLoginDialog = ref(false)
 const showSignupDialog = ref(false)
 
 const isLoggedIn = computed(() => authStore.isLoggedIn)
+
+const id = 'preview-only'
+const scrollElement = document.documentElement
 
 onMounted(async () => {
   try {

@@ -48,6 +48,7 @@
             class="w-full"
             language="en-US"
             height="800px"
+            preview-theme="vuepress"
             :theme="isDarkMode ? 'dark' : 'light'"
           />
         </div>

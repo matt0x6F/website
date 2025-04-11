@@ -100,3 +100,28 @@ body {
   height: 24px!important;
   width: 24px!important;
 }
+
+.md-editor {
+  background-color: inherit !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .md-editor p {
+    color: white !important;
+  }
+
+  // use tailwinds emerald-600 for links
+  .md-editor a {
+    color: var(--p-primary-color) !important;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .md-editor p {
+    color: black !important;
+  }
+
+  .md-editor a {
+    color: var(--p-primary-color) !important;
+  }
+}
