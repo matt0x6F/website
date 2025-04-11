@@ -114,6 +114,40 @@ body {
   .md-editor a {
     color: var(--p-primary-color) !important;
   }
+
+  .md-editor a:hover {
+    color: var(--p-primary-color) !important;
+  }
+
+  .md-editor h1 {
+    color: white !important;
+    border-bottom-color: var(--p-surface-700) !important;
+  }
+
+  .md-editor h2 {
+    color: white !important;
+    border-bottom-color: var(--p-surface-700) !important;
+  }
+
+  .md-editor h3 {
+    color: white !important;
+    border-bottom-color: var(--p-surface-700) !important;
+  }
+
+  .md-editor h4 {
+    color: white !important;
+    border-bottom-color: var(--p-surface-700) !important;
+  }
+
+  .md-editor ul {
+    color: white !important;
+  }
+
+  .md-editor ol {
+    color: white !important;
+  }
+  
+  
 }
 
 @media (prefers-color-scheme: light) {
@@ -124,4 +158,20 @@ body {
   .md-editor a {
     color: var(--p-primary-color) !important;
   }
+
+  .md-editor a:hover {
+    color: var(--p-primary-color) !important;
+  }
+}
+
+.md-editor ol {
+  list-style-type: disc !important;
+}
+
+.md-editor a {
+  font-weight: 400 !important;
+}
+
+.md-editor a:hover {
+  text-decoration: underline !important;
 }
