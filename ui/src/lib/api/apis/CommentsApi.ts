@@ -15,27 +15,18 @@
 
 import * as runtime from '../runtime';
 import type {
-  AdminCommentList,
-  AdminCommentUpdate,
   CommentCreate,
   CommentList,
   CommentMutate,
-  PagedAdminCommentList,
   PagedCommentList,
 } from '../models/index';
 import {
-    AdminCommentListFromJSON,
-    AdminCommentListToJSON,
-    AdminCommentUpdateFromJSON,
-    AdminCommentUpdateToJSON,
     CommentCreateFromJSON,
     CommentCreateToJSON,
     CommentListFromJSON,
     CommentListToJSON,
     CommentMutateFromJSON,
     CommentMutateToJSON,
-    PagedAdminCommentListFromJSON,
-    PagedAdminCommentListToJSON,
     PagedCommentListFromJSON,
     PagedCommentListToJSON,
 } from '../models/index';
@@ -57,17 +48,6 @@ export interface BlogApiListCommentsRequest {
     topLevel?: boolean;
     limit?: number;
     offset?: number;
-}
-
-export interface BlogApiModQueueListRequest {
-    reviewed?: boolean | null;
-    limit?: number;
-    offset?: number;
-}
-
-export interface BlogApiModUpdateCommentRequest {
-    id: number;
-    adminCommentUpdate: AdminCommentUpdate;
 }
 
 export interface BlogApiUpdateCommentRequest {
@@ -258,103 +238,6 @@ export class CommentsApi extends runtime.BaseAPI {
      */
     async blogApiListComments(requestParameters: BlogApiListCommentsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedCommentList> {
         const response = await this.blogApiListCommentsRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Mod Queue List
-     */
-    async blogApiModQueueListRaw(requestParameters: BlogApiModQueueListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedAdminCommentList>> {
-        const queryParameters: any = {};
-
-        if (requestParameters['reviewed'] != null) {
-            queryParameters['reviewed'] = requestParameters['reviewed'];
-        }
-
-        if (requestParameters['limit'] != null) {
-            queryParameters['limit'] = requestParameters['limit'];
-        }
-
-        if (requestParameters['offset'] != null) {
-            queryParameters['offset'] = requestParameters['offset'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("JWTAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-        const response = await this.request({
-            path: `/api/comments/moderation/queue`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => PagedAdminCommentListFromJSON(jsonValue));
-    }
-
-    /**
-     * Mod Queue List
-     */
-    async blogApiModQueueList(requestParameters: BlogApiModQueueListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedAdminCommentList> {
-        const response = await this.blogApiModQueueListRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Mod Update Comment
-     */
-    async blogApiModUpdateCommentRaw(requestParameters: BlogApiModUpdateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminCommentList>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling blogApiModUpdateComment().'
-            );
-        }
-
-        if (requestParameters['adminCommentUpdate'] == null) {
-            throw new runtime.RequiredError(
-                'adminCommentUpdate',
-                'Required parameter "adminCommentUpdate" was null or undefined when calling blogApiModUpdateComment().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("JWTAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-        const response = await this.request({
-            path: `/api/comments/moderation/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: AdminCommentUpdateToJSON(requestParameters['adminCommentUpdate']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => AdminCommentListFromJSON(jsonValue));
-    }
-
-    /**
-     * Mod Update Comment
-     */
-    async blogApiModUpdateComment(requestParameters: BlogApiModUpdateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminCommentList> {
-        const response = await this.blogApiModUpdateCommentRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
