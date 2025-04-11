@@ -335,7 +335,7 @@ def list_comments(
 @comments_router.get(
     "/moderation/queue",
     response={200: List[AdminCommentList]},
-    tags=["moderation", "comments"],
+    tags=["moderation"],
     auth=JWTAuth(permissions=StaffOnly, allow_anonymous=False),
 )
 @paginate
@@ -353,7 +353,7 @@ def mod_queue_list(request: HttpRequest, reviewed: Optional[bool] = False):
 @comments_router.put(
     "/moderation/{id}",
     response={200: AdminCommentList},
-    tags=["moderation", "comments"],
+    tags=["moderation"],
     auth=JWTAuth(permissions=StaffOnly, allow_anonymous=False),
 )
 def mod_update_comment(request: HttpRequest, id: int, comment: AdminCommentUpdate):

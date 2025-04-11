@@ -1220,8 +1220,7 @@
           }
         },
         "tags": [
-          "moderation",
-          "comments"
+          "moderation"
         ],
         "security": [
           {
@@ -1258,8 +1257,7 @@
           }
         },
         "tags": [
-          "moderation",
-          "comments"
+          "moderation"
         ],
         "requestBody": {
           "content": {
