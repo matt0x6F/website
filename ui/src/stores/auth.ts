@@ -17,7 +17,8 @@ export const useAuthStore = defineStore('auth', () => {
     isActive: false,
     dateJoined: new Date(),
   })
-  const isLoggedIn = computed(() => !!storedRefreshToken.value)
+  // refresh token is not undefined or blank
+  const isLoggedIn = computed(() => storedRefreshToken.value !== "")
   const router = useRouter()
   const redirectUrl = ref<string | null>(null)
 
