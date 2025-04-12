@@ -27,13 +27,39 @@ class StaffOnlyModify:
                 path=request.path,
             )
 
-            raise HttpError(401, "This operation is not allowed")
+            raise HttpError(403, "This operation is not allowed")
+
+
+class AuthenticatedOnly:
+    "Simple permission that allows modify only to authenticated users"
+
+    def check(request: HttpRequest, user: AbstractUser):
+        if request.user.is_anonymous:
+            raise HttpError(403, "This operation is not allowed")
+
+
+class AnonymousOnly:
+    "Simple permission that allows modify only to superuser"
+
+    def check(request: HttpRequest, user: AbstractUser):
+        if not request.user.is_anonymous:
+            raise HttpError(403, "This operation is not allowed")
 
 
 class StaffOnly:
     "Simple permission that allows modify only to superuser"
 
     def check(request: HttpRequest, user: AbstractUser):
+        # if user is anonymous, reject them
+        if request.user.is_anonymous:
+            logger.info(
+                "User attempted to access restricted endpoint and was rejected",
+                user=user,
+                permission="StaffOnly",
+            )
+
+            raise HttpError(403, "This operation is not allowed")
+
         if not user.is_staff:
             logger.info(
                 "User attempted to access restricted endpoint and was rejected",
@@ -43,7 +69,7 @@ class StaffOnly:
                 path=request.path,
             )
 
-            raise HttpError(401, "This operation is not allowed")
+            raise HttpError(403, "This operation is not allowed")
 
 
 class JWTAuth(JWTAuth):
@@ -55,15 +81,16 @@ class JWTAuth(JWTAuth):
     def __call__(self, request: HttpRequest) -> Any | None:
         headers = request.headers
         auth_value = headers.get(self.header)
-        if not auth_value:
-            return AnonymousUser()  # if there is no key, we return AnonymousUser object
-        parts = auth_value.split(" ")
+        if auth_value is not None:
+            parts = auth_value.split(" ")
 
-        if parts[0].lower() != self.openapi_scheme:
-            if settings.DEBUG:
-                logger.error(f"Unexpected auth - '{auth_value}'")
-            return None
-        token = " ".join(parts[1:])
+            if parts[0].lower() != self.openapi_scheme:
+                if settings.DEBUG:
+                    logger.error(f"Unexpected auth - '{auth_value}'")
+                return None
+            token = " ".join(parts[1:])
+        else:
+            token = TOKEN_UNSET
 
         user: AbstractUser = AnonymousUser()
 
@@ -73,7 +100,8 @@ class JWTAuth(JWTAuth):
         except Exception:
             logger.error("Failed to authenticate user")
 
-            request.user = AnonymousUser()
+        if not self.permissions:
+            return user
 
         return self.authorize(request, user)
 
@@ -100,9 +128,6 @@ class JWTAuth(JWTAuth):
         return user
 
     def authorize(self, request: HttpRequest, user: AbstractUser) -> Type[AbstractUser]:
-        if request.user == AnonymousUser() and not self.allow_anonymous:
-            raise HttpError(401, "Token invalid")
-
         if self.permissions:
             logger.debug("Checking permissions for user", user=user)
 

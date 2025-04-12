@@ -17,6 +17,7 @@ django-structlog = "^8.1.0"
 pydantic-settings = "^2.4.0"
 django-storages = {extras = ["s3"], version = "^1.14.4"}
 django-cleanup = "^9.0.0"
+pytest-django = "^4.11.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.5.7"
@@ -64,7 +65,8 @@ exclude = [
 known-first-party = ["api"]
 
 [tool.pytest.ini_options]
-addopts = "--verbose --cov-report term --cov-report html --cov=."
+addopts = "--verbose"
+DJANGO_SETTINGS_MODULE = "core.settings"
 testpaths = [
     "tests",
 ]

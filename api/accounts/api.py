@@ -18,7 +18,7 @@ from accounts.schemas import (
     UpdateAccount,
     UserSelf,
 )
-from auth.middleware import JWTAuth, StaffOnly
+from auth.middleware import AnonymousOnly, AuthenticatedOnly, JWTAuth, StaffOnly
 
 logger: structlog.stdlib.BoundLogger = structlog.get_logger(__name__)  # noqa: F821
 accounts_router = Router()
@@ -42,7 +42,7 @@ def whoami(request: HttpRequest):
 
 @accounts_router.put(
     "/me",
-    auth=JWTAuth(),
+    auth=JWTAuth(AuthenticatedOnly),
     response={200: UserSelf, 403: AuthError},
     tags=["accounts"],
 )
@@ -51,14 +51,14 @@ def update_self(request: HttpRequest, new_details: UpdateAccount):
     Updates the calling users details
     """
 
-    if request.user == AnonymousUser():
-        raise HttpError(403, "Token invalid")
-
     # pop these out so we can handle them separately
     old_password = new_details.dict().pop("old_password", None)
     new_password = new_details.dict().pop("new_password", None)
 
     for key, value in new_details.dict().items():
+        if value is None:
+            continue
+
         setattr(request.user, key, value)
 
     # password changes are a specific workflow
@@ -110,7 +110,10 @@ def delete_self(request: HttpRequest):
 
 
 @accounts_router.post(
-    "/sign_up", auth=JWTAuth(), response={200: UserSelf, 403: AuthError}, tags=["accounts"]
+    "/sign_up",
+    auth=JWTAuth(permissions=AnonymousOnly),
+    response={200: UserSelf, 403: AuthError},
+    tags=["accounts"],
 )
 def sign_up(request: HttpRequest, new_acct_details: NewAccount):
     """
@@ -120,9 +123,6 @@ def sign_up(request: HttpRequest, new_acct_details: NewAccount):
     new_acct_details_dict = new_acct_details.dict()
 
     password = new_acct_details_dict.pop("password")
-
-    if request.user != AnonymousUser():
-        raise HttpError(403, "This operation is not allowed")
 
     try:
         user = User.objects.create(**new_acct_details_dict, is_active=True)
@@ -206,6 +206,9 @@ def update_user(request: HttpRequest, user_id: int, new_details: AdminUserModify
 
     # Handle remaining fields
     for key, value in details_dict.items():
+        if value is None:
+            continue
+
         setattr(user, key, value)
 
     user.save()

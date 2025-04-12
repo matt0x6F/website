@@ -1,2 +1,4 @@
 .venv/
 static/
+.env.docker
+.pytest_cache/
