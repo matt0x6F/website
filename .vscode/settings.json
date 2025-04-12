@@ -40,5 +40,13 @@
     "TODO": [
       "todo"
     ]
-  }
+  },
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.cwd": "${workspaceFolder}/api",
+  "python.analysis.extraPaths": [
+    "accounts",
+    "core",
+    "blog"
+  ]
 }
