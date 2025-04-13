@@ -487,6 +487,404 @@
         ]
       }
     },
+    "/api/groups/": {
+      "get": {
+        "operationId": "accounts_groups_list_groups",
+        "summary": "List Groups",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedGroup"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns a list of all groups",
+        "tags": [
+          "groups"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "accounts_groups_create_group",
+        "summary": "Create Group",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Creates a new group",
+        "tags": [
+          "groups"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupMutate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/groups/{group_id}": {
+      "put": {
+        "operationId": "accounts_groups_update_group",
+        "summary": "Update Group",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "group_id",
+            "schema": {
+              "title": "Group Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Updates a group",
+        "tags": [
+          "groups"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupMutate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "accounts_groups_delete_group",
+        "summary": "Delete Group",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "group_id",
+            "schema": {
+              "title": "Group Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Deletes a group",
+        "tags": [
+          "groups"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/permissions/": {
+      "get": {
+        "operationId": "accounts_groups_list_permissions",
+        "summary": "List Permissions",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedPermission"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Returns a list of all permissions",
+        "tags": [
+          "permissions"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "accounts_groups_create_permission",
+        "summary": "Create Permission",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Creates a new permission",
+        "tags": [
+          "permissions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermissionMutate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/permissions/{permission_id}": {
+      "put": {
+        "operationId": "accounts_groups_update_permission",
+        "summary": "Update Permission",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "permission_id",
+            "schema": {
+              "title": "Permission Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Permission"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthError"
+                }
+              }
+            }
+          }
+        },
+        "description": "Updates a permission",
+        "tags": [
+          "permissions"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermissionMutate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/contenttypes/": {
+      "get": {
+        "operationId": "accounts_contenttypes_list_content_types",
+        "summary": "List content types",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ContentType"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "description": "List all available content types in the system.\nContent types represent the models available in the Django application.\nThis endpoint is restricted to staff users only as it's primarily used for administrative purposes.",
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
     "/api/posts/": {
       "get": {
         "operationId": "blog_api_list_posts",
@@ -1652,6 +2050,17 @@
               }
             ],
             "title": "Last Name"
+          },
+          "avatar_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Link"
           }
         },
         "title": "UpdateAccount",
@@ -2078,6 +2487,99 @@
           }
         },
         "title": "AdminUserModify",
+        "type": "object"
+      },
+      "PagedGroup": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Group"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "PagedGroup",
+        "type": "object"
+      },
+      "GroupMutate": {
+        "description": "Schema for creating and updating groups",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "permissions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permissions"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "GroupMutate",
+        "type": "object"
+      },
+      "PagedPermission": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "PagedPermission",
+        "type": "object"
+      },
+      "PermissionMutate": {
+        "description": "Schema for creating and updating permissions",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "codename": {
+            "title": "Codename",
+            "type": "string"
+          },
+          "content_type": {
+            "$ref": "#/components/schemas/ContentType"
+          }
+        },
+        "required": [
+          "name",
+          "codename",
+          "content_type"
+        ],
+        "title": "PermissionMutate",
         "type": "object"
       },
       "PagedPostDetails": {

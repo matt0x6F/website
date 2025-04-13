@@ -15,9 +15,12 @@
 
 import * as runtime from '../runtime';
 import type {
+  ContentType,
   HealthResponse,
 } from '../models/index';
 import {
+    ContentTypeFromJSON,
+    ContentTypeToJSON,
     HealthResponseFromJSON,
     HealthResponseToJSON,
 } from '../models/index';
@@ -26,6 +29,42 @@ import {
  * 
  */
 export class DefaultApi extends runtime.BaseAPI {
+
+    /**
+     * List all available content types in the system. Content types represent the models available in the Django application. This endpoint is restricted to staff users only as it\'s primarily used for administrative purposes.
+     * List content types
+     */
+    async accountsContenttypesListContentTypesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ContentType>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/contenttypes/`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ContentTypeFromJSON));
+    }
+
+    /**
+     * List all available content types in the system. Content types represent the models available in the Django application. This endpoint is restricted to staff users only as it\'s primarily used for administrative purposes.
+     * List content types
+     */
+    async accountsContenttypesListContentTypes(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ContentType>> {
+        const response = await this.accountsContenttypesListContentTypesRaw(initOverrides);
+        return await response.value();
+    }
 
     /**
      * Returns a simple health check response.

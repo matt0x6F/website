@@ -55,6 +55,12 @@ export interface UpdateAccount {
      * @memberof UpdateAccount
      */
     lastName?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateAccount
+     */
+    avatarLink?: string | null;
 }
 
 /**
@@ -80,6 +86,7 @@ export function UpdateAccountFromJSONTyped(json: any, ignoreDiscriminator: boole
         'newPassword': json['new_password'] == null ? undefined : json['new_password'],
         'firstName': json['first_name'] == null ? undefined : json['first_name'],
         'lastName': json['last_name'] == null ? undefined : json['last_name'],
+        'avatarLink': json['avatar_link'] == null ? undefined : json['avatar_link'],
     };
 }
 
@@ -95,6 +102,7 @@ export function UpdateAccountToJSON(value?: UpdateAccount | null): any {
         'new_password': value['newPassword'],
         'first_name': value['firstName'],
         'last_name': value['lastName'],
+        'avatar_link': value['avatarLink'],
     };
 }
 

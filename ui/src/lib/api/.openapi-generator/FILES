@@ -2,7 +2,9 @@ apis/AccountsApi.ts
 apis/CommentsApi.ts
 apis/DefaultApi.ts
 apis/FilesApi.ts
+apis/GroupsApi.ts
 apis/ModerationApi.ts
+apis/PermissionsApi.ts
 apis/PostsApi.ts
 apis/TokenApi.ts
 apis/index.ts
@@ -23,6 +25,7 @@ models/FileDetails.ts
 models/FileMetadata.ts
 models/FileMutateMetadata.ts
 models/Group.ts
+models/GroupMutate.ts
 models/HealthResponse.ts
 models/HealthStatus.ts
 models/Input.ts
@@ -31,8 +34,11 @@ models/PagedAdminCommentList.ts
 models/PagedAdminUserDetails.ts
 models/PagedCommentList.ts
 models/PagedFileDetails.ts
+models/PagedGroup.ts
+models/PagedPermission.ts
 models/PagedPostDetails.ts
 models/Permission.ts
+models/PermissionMutate.ts
 models/PostDetails.ts
 models/PostMutate.ts
 models/PostSummary.ts
