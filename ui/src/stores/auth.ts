@@ -160,9 +160,6 @@ export const useAuthStore = defineStore('auth', () => {
   async function refreshToken() {
     const params: ConfigurationParameters = {
       basePath: import.meta.env.VITE_API_URL,
-      headers: {
-        'Authorization': `Bearer ${storedRefreshToken.value}`
-      }
     }
 
     const config = new Configuration(params)

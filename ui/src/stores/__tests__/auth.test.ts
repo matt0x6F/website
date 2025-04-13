@@ -61,11 +61,13 @@ describe('Auth Store', () => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
     vi.useFakeTimers()
+    vi.spyOn(global, 'setTimeout')
   })
 
   afterEach(() => {
     vi.clearAllTimers()
     vi.useRealTimers()
+    vi.restoreAllMocks()
   })
 
   describe('Initialization', () => {
