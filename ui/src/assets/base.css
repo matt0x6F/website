@@ -118,6 +118,14 @@ body {
   background-color: var(--p-surface-100) !important;
 }
 
+.preview-only-preview-wrapper {
+  z-index: -1 !important;
+}
+
+.md-editor-previewOnly {
+  z-index: -1 !important;
+}
+
 @media (prefers-color-scheme: dark) {
   .md-editor {
     background-color: inherit !important;
