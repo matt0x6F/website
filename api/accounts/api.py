@@ -76,7 +76,7 @@ def update_self(request: HttpRequest, new_details: UpdateAccount):
 
 @accounts_router.delete(
     "/me",
-    auth=JWTAuth(),
+    auth=JWTAuth(permissions=AuthenticatedOnly),
     response={200: None, 403: AuthError},
     tags=["accounts"],
 )
@@ -84,9 +84,6 @@ def delete_self(request: HttpRequest):
     """
     Deletes the calling user
     """
-
-    if request.user == AnonymousUser():
-        raise HttpError(403, "Token invalid")
 
     try:
         # blacklist all refresh tokens for this user

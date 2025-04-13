@@ -16,6 +16,14 @@ class Permission(Schema):
     id: int
     name: str
     codename: str
+    content_type: "ContentType"
+
+
+class PermissionMutate(Schema):
+    """Schema for creating and updating permissions"""
+
+    name: str
+    codename: str
     content_type: ContentType
 
 
@@ -23,6 +31,13 @@ class Group(Schema):
     id: int
     name: str
     permissions: List[Permission]
+
+
+class GroupMutate(Schema):
+    """Schema for creating and updating groups"""
+
+    name: str
+    permissions: Optional[List[int]] = None
 
 
 class AdminUserDetails(Schema):

@@ -16,13 +16,15 @@ CURRENT_DIR = Path(__file__).resolve().parent
 
 
 class S3(BaseModel):
-    region: Optional[str] = ""
-    access_key_id: Optional[str] = ""
-    secret_access_key: Optional[str] = ""
-    bucket_name: Optional[str] = ""
-    endpoint_url: Optional[str] = ""
-    prefix: Optional[str] = None
-    cdn_endpoint: Optional[str] = ""
+    model_config = {"extra": "allow"}
+
+    region: str = ""
+    access_key_id: str = ""
+    secret_access_key: str = ""
+    bucket_name: str = ""
+    endpoint_url: str = ""
+    prefix: str = ""
+    cdn_endpoint: str = ""
 
 
 class Database(BaseModel):
@@ -43,6 +45,7 @@ class Configuration(BaseSettings):
         env_file=(CURRENT_DIR / ".env", CURRENT_DIR / os.getenv("ENV_FILE", ".env.prod")),
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
+        extra="allow",
     )
 
     debug: bool = False
