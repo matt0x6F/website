@@ -34,15 +34,15 @@ import {
     TokenVerifyInputSchemaToJSON,
 } from '../models/index';
 
-export interface TokenObtainPairRequest {
+export interface ObtainPairRequest {
     tokenObtainPairInputSchema: TokenObtainPairInputSchema;
 }
 
-export interface TokenRefreshRequest {
+export interface RefreshRequest {
     tokenRefreshInputSchema: TokenRefreshInputSchema;
 }
 
-export interface TokenVerifyRequest {
+export interface VerifyRequest {
     tokenVerifyInputSchema: TokenVerifyInputSchema;
 }
 
@@ -54,11 +54,11 @@ export class TokenApi extends runtime.BaseAPI {
     /**
      * Obtain Token
      */
-    async tokenObtainPairRaw(requestParameters: TokenObtainPairRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TokenObtainPairOutputSchema>> {
+    async obtainPairRaw(requestParameters: ObtainPairRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TokenObtainPairOutputSchema>> {
         if (requestParameters['tokenObtainPairInputSchema'] == null) {
             throw new runtime.RequiredError(
                 'tokenObtainPairInputSchema',
-                'Required parameter "tokenObtainPairInputSchema" was null or undefined when calling tokenObtainPair().'
+                'Required parameter "tokenObtainPairInputSchema" was null or undefined when calling obtainPair().'
             );
         }
 
@@ -82,19 +82,19 @@ export class TokenApi extends runtime.BaseAPI {
     /**
      * Obtain Token
      */
-    async tokenObtainPair(requestParameters: TokenObtainPairRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TokenObtainPairOutputSchema> {
-        const response = await this.tokenObtainPairRaw(requestParameters, initOverrides);
+    async obtainPair(requestParameters: ObtainPairRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TokenObtainPairOutputSchema> {
+        const response = await this.obtainPairRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Refresh Token
      */
-    async tokenRefreshRaw(requestParameters: TokenRefreshRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TokenRefreshOutputSchema>> {
+    async refreshRaw(requestParameters: RefreshRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TokenRefreshOutputSchema>> {
         if (requestParameters['tokenRefreshInputSchema'] == null) {
             throw new runtime.RequiredError(
                 'tokenRefreshInputSchema',
-                'Required parameter "tokenRefreshInputSchema" was null or undefined when calling tokenRefresh().'
+                'Required parameter "tokenRefreshInputSchema" was null or undefined when calling refresh().'
             );
         }
 
@@ -118,19 +118,19 @@ export class TokenApi extends runtime.BaseAPI {
     /**
      * Refresh Token
      */
-    async tokenRefresh(requestParameters: TokenRefreshRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TokenRefreshOutputSchema> {
-        const response = await this.tokenRefreshRaw(requestParameters, initOverrides);
+    async refresh(requestParameters: RefreshRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TokenRefreshOutputSchema> {
+        const response = await this.refreshRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Verify Token
      */
-    async tokenVerifyRaw(requestParameters: TokenVerifyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async verifyRaw(requestParameters: VerifyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         if (requestParameters['tokenVerifyInputSchema'] == null) {
             throw new runtime.RequiredError(
                 'tokenVerifyInputSchema',
-                'Required parameter "tokenVerifyInputSchema" was null or undefined when calling tokenVerify().'
+                'Required parameter "tokenVerifyInputSchema" was null or undefined when calling verify().'
             );
         }
 
@@ -154,8 +154,8 @@ export class TokenApi extends runtime.BaseAPI {
     /**
      * Verify Token
      */
-    async tokenVerify(requestParameters: TokenVerifyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.tokenVerifyRaw(requestParameters, initOverrides);
+    async verify(requestParameters: VerifyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.verifyRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

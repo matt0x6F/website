@@ -31,26 +31,26 @@ import {
     PagedFileDetailsToJSON,
 } from '../models/index';
 
-export interface BlogApiCreateFileRequest {
+export interface ApiCreateFileRequest {
     upload: Blob;
     metadata: FileMetadata;
 }
 
-export interface BlogApiDeleteFileRequest {
+export interface ApiDeleteFileRequest {
     id: number;
 }
 
-export interface BlogApiGetFileRequest {
+export interface ApiGetFileRequest {
     id: number;
 }
 
-export interface BlogApiListFilesRequest {
-    visibility?: BlogApiListFilesVisibilityEnum;
+export interface ApiListFilesRequest {
+    visibility?: ApiListFilesVisibilityEnum;
     limit?: number;
     offset?: number;
 }
 
-export interface BlogApiUpdateFileRequest {
+export interface ApiUpdateFileRequest {
     id: number;
     fileMutateMetadata: FileMutateMetadata;
 }
@@ -64,18 +64,18 @@ export class FilesApi extends runtime.BaseAPI {
      * Creates a file with or without post associations.
      * Create File
      */
-    async blogApiCreateFileRaw(requestParameters: BlogApiCreateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FileDetails>> {
+    async apiCreateFileRaw(requestParameters: ApiCreateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FileDetails>> {
         if (requestParameters['upload'] == null) {
             throw new runtime.RequiredError(
                 'upload',
-                'Required parameter "upload" was null or undefined when calling blogApiCreateFile().'
+                'Required parameter "upload" was null or undefined when calling apiCreateFile().'
             );
         }
 
         if (requestParameters['metadata'] == null) {
             throw new runtime.RequiredError(
                 'metadata',
-                'Required parameter "metadata" was null or undefined when calling blogApiCreateFile().'
+                'Required parameter "metadata" was null or undefined when calling apiCreateFile().'
             );
         }
 
@@ -130,8 +130,8 @@ export class FilesApi extends runtime.BaseAPI {
      * Creates a file with or without post associations.
      * Create File
      */
-    async blogApiCreateFile(requestParameters: BlogApiCreateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FileDetails> {
-        const response = await this.blogApiCreateFileRaw(requestParameters, initOverrides);
+    async apiCreateFile(requestParameters: ApiCreateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FileDetails> {
+        const response = await this.apiCreateFileRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -139,11 +139,11 @@ export class FilesApi extends runtime.BaseAPI {
      * Deletes a file from the database and S3.
      * Delete File
      */
-    async blogApiDeleteFileRaw(requestParameters: BlogApiDeleteFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiDeleteFileRaw(requestParameters: ApiDeleteFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling blogApiDeleteFile().'
+                'Required parameter "id" was null or undefined when calling apiDeleteFile().'
             );
         }
 
@@ -173,19 +173,19 @@ export class FilesApi extends runtime.BaseAPI {
      * Deletes a file from the database and S3.
      * Delete File
      */
-    async blogApiDeleteFile(requestParameters: BlogApiDeleteFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.blogApiDeleteFileRaw(requestParameters, initOverrides);
+    async apiDeleteFile(requestParameters: ApiDeleteFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiDeleteFileRaw(requestParameters, initOverrides);
     }
 
     /**
      * Gets all the details of a file.
      * Get File
      */
-    async blogApiGetFileRaw(requestParameters: BlogApiGetFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FileDetails>> {
+    async apiGetFileRaw(requestParameters: ApiGetFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FileDetails>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling blogApiGetFile().'
+                'Required parameter "id" was null or undefined when calling apiGetFile().'
             );
         }
 
@@ -215,8 +215,8 @@ export class FilesApi extends runtime.BaseAPI {
      * Gets all the details of a file.
      * Get File
      */
-    async blogApiGetFile(requestParameters: BlogApiGetFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FileDetails> {
-        const response = await this.blogApiGetFileRaw(requestParameters, initOverrides);
+    async apiGetFile(requestParameters: ApiGetFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FileDetails> {
+        const response = await this.apiGetFileRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -224,7 +224,7 @@ export class FilesApi extends runtime.BaseAPI {
      * List all files
      * List Files
      */
-    async blogApiListFilesRaw(requestParameters: BlogApiListFilesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedFileDetails>> {
+    async apiListFilesRaw(requestParameters: ApiListFilesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedFileDetails>> {
         const queryParameters: any = {};
 
         if (requestParameters['visibility'] != null) {
@@ -263,8 +263,8 @@ export class FilesApi extends runtime.BaseAPI {
      * List all files
      * List Files
      */
-    async blogApiListFiles(requestParameters: BlogApiListFilesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedFileDetails> {
-        const response = await this.blogApiListFilesRaw(requestParameters, initOverrides);
+    async apiListFiles(requestParameters: ApiListFilesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedFileDetails> {
+        const response = await this.apiListFilesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -272,18 +272,18 @@ export class FilesApi extends runtime.BaseAPI {
      * Updates a file, namely the posts associated with the file. File properties are immutable.
      * Update File
      */
-    async blogApiUpdateFileRaw(requestParameters: BlogApiUpdateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FileDetails>> {
+    async apiUpdateFileRaw(requestParameters: ApiUpdateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FileDetails>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling blogApiUpdateFile().'
+                'Required parameter "id" was null or undefined when calling apiUpdateFile().'
             );
         }
 
         if (requestParameters['fileMutateMetadata'] == null) {
             throw new runtime.RequiredError(
                 'fileMutateMetadata',
-                'Required parameter "fileMutateMetadata" was null or undefined when calling blogApiUpdateFile().'
+                'Required parameter "fileMutateMetadata" was null or undefined when calling apiUpdateFile().'
             );
         }
 
@@ -316,8 +316,8 @@ export class FilesApi extends runtime.BaseAPI {
      * Updates a file, namely the posts associated with the file. File properties are immutable.
      * Update File
      */
-    async blogApiUpdateFile(requestParameters: BlogApiUpdateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FileDetails> {
-        const response = await this.blogApiUpdateFileRaw(requestParameters, initOverrides);
+    async apiUpdateFile(requestParameters: ApiUpdateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FileDetails> {
+        const response = await this.apiUpdateFileRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -326,9 +326,9 @@ export class FilesApi extends runtime.BaseAPI {
 /**
  * @export
  */
-export const BlogApiListFilesVisibilityEnum = {
+export const ApiListFilesVisibilityEnum = {
     Public: 'public',
     Private: 'private',
     All: 'all'
 } as const;
-export type BlogApiListFilesVisibilityEnum = typeof BlogApiListFilesVisibilityEnum[keyof typeof BlogApiListFilesVisibilityEnum];
+export type ApiListFilesVisibilityEnum = typeof ApiListFilesVisibilityEnum[keyof typeof ApiListFilesVisibilityEnum];

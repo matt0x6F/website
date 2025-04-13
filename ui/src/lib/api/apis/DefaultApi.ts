@@ -31,10 +31,38 @@ import {
 export class DefaultApi extends runtime.BaseAPI {
 
     /**
+     * Returns a simple health check response.
+     * Health check
+     */
+    async apiHealthcheckRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HealthResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/health`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => HealthResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Returns a simple health check response.
+     * Health check
+     */
+    async apiHealthcheck(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HealthResponse> {
+        const response = await this.apiHealthcheckRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
      * List all available content types in the system. Content types represent the models available in the Django application. This endpoint is restricted to staff users only as it\'s primarily used for administrative purposes.
      * List content types
      */
-    async accountsContenttypesListContentTypesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ContentType>>> {
+    async contenttypesListContentTypesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ContentType>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -61,36 +89,8 @@ export class DefaultApi extends runtime.BaseAPI {
      * List all available content types in the system. Content types represent the models available in the Django application. This endpoint is restricted to staff users only as it\'s primarily used for administrative purposes.
      * List content types
      */
-    async accountsContenttypesListContentTypes(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ContentType>> {
-        const response = await this.accountsContenttypesListContentTypesRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Returns a simple health check response.
-     * Health check
-     */
-    async coreApiHealthcheckRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HealthResponse>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/health`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => HealthResponseFromJSON(jsonValue));
-    }
-
-    /**
-     * Returns a simple health check response.
-     * Health check
-     */
-    async coreApiHealthcheck(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HealthResponse> {
-        const response = await this.coreApiHealthcheckRaw(initOverrides);
+    async contenttypesListContentTypes(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ContentType>> {
+        const response = await this.contenttypesListContentTypesRaw(initOverrides);
         return await response.value();
     }
 

@@ -52,7 +52,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
         const accountsApi = new AccountsApi(config)
-        const user = await accountsApi.accountsApiWhoami()
+        const user = await accountsApi.apiWhoami()
 
         userData.id = user.id
         userData.username = user.username
@@ -84,7 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
     const tokenApi = new TokenApi(anonConfig)
 
     try {
-        const tokens = await tokenApi.tokenObtainPair({ 
+        const tokens = await tokenApi.obtainPair({ 
           tokenObtainPairInputSchema: { email: username, password: password } 
         })
         
@@ -104,7 +104,7 @@ export const useAuthStore = defineStore('auth', () => {
         const authedConfig = new Configuration(authedParams)
         const accountsApi = new AccountsApi(authedConfig)
 
-        const user = await accountsApi.accountsApiWhoami()
+        const user = await accountsApi.apiWhoami()
         
         userData.id = user.id
         userData.username = user.username
@@ -169,7 +169,7 @@ export const useAuthStore = defineStore('auth', () => {
     const tokenApi = new TokenApi(config)
     
     try {
-      const tokens = await tokenApi.tokenRefresh({ 
+      const tokens = await tokenApi.refresh({ 
         tokenRefreshInputSchema: { refresh: storedRefreshToken.value } 
       })
 
@@ -233,7 +233,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const accountsApi = new AccountsApi(config)
-      const response = await accountsApi.accountsApiUpdateSelf({
+      const response = await accountsApi.apiUpdateSelf({
         updateAccount: data
       })
       
@@ -262,7 +262,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function signup(newAccount: NewAccount) {
     const api = new AccountsApi();
-    const response = await api.accountsApiSignUp({ newAccount });
+    const response = await api.apiSignUp({ newAccount });
     return response;
   }
 

@@ -172,7 +172,7 @@ const loadComment = async () => {
     const commentId = parseInt(route.params.id as string);
     
     // Use the comments API to get detailed comment info including parent and children
-    const response = await commentsApi.blogApiGetComment({ id: commentId });
+    const response = await commentsApi.apiGetComment({ id: commentId });
     comment.value = response;
     
     console.log('Loaded comment with parent:', comment.value);
@@ -192,7 +192,7 @@ const approveComment = async (id: number) => {
       note: 'Approved by moderator'
     };
     
-    await moderationApi.blogApiModUpdateComment({
+    await moderationApi.apiModUpdateComment({
       id,
       adminCommentUpdate: update
     });
@@ -225,7 +225,7 @@ const rejectComment = async (id: number) => {
       note: 'Rejected by moderator'
     };
     
-    await moderationApi.blogApiModUpdateComment({
+    await moderationApi.apiModUpdateComment({
       id,
       adminCommentUpdate: update
     });
@@ -262,7 +262,7 @@ const confirmDelete = (comment: { id: number }) => {
 
 const deleteComment = async (id: number) => {
   try {
-    await commentsApi.blogApiDeleteComment({ id });
+    await commentsApi.apiDeleteComment({ id });
     
     toast.add({
       severity: 'success',

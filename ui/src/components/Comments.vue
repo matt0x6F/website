@@ -83,7 +83,7 @@ async function submitNewComment() {
   if (!newCommentContent.value.trim()) return
   
   try {
-    await api.blogApiCreateComment({
+    await api.apiCreateComment({
       commentCreate: {
         content: newCommentContent.value,
         postId: props.postId

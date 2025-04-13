@@ -155,7 +155,7 @@ config(editorConfig)
 onMounted(async () => {
   if (isEditing.value) {
     try {
-      const response = await postsApi.blogApiGetPostById({
+      const response = await postsApi.apiGetPostById({
         id: parseInt(route.params.id as string)
       })
       post.value = {
@@ -180,7 +180,7 @@ onMounted(async () => {
 const handleSubmit = async () => {
   try {
     if (isEditing.value) {
-      await postsApi.blogApiUpdatePost({
+      await postsApi.apiUpdatePost({
         id: parseInt(route.params.id as string),
         postMutate: post.value
       })
@@ -192,7 +192,7 @@ const handleSubmit = async () => {
       })
       router.push({ name: 'admin-posts' })
     } else {
-      const response = await postsApi.blogApiCreatePost({
+      const response = await postsApi.apiCreatePost({
         postMutate: post.value
       })
       toast.add({

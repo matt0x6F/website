@@ -28,13 +28,13 @@ import {
     PagedAdminCommentListToJSON,
 } from '../models/index';
 
-export interface BlogApiModQueueListRequest {
+export interface ApiModQueueListRequest {
     reviewed?: boolean | null;
     limit?: number;
     offset?: number;
 }
 
-export interface BlogApiModUpdateCommentRequest {
+export interface ApiModUpdateCommentRequest {
     id: number;
     adminCommentUpdate: AdminCommentUpdate;
 }
@@ -47,7 +47,7 @@ export class ModerationApi extends runtime.BaseAPI {
     /**
      * Mod Queue List
      */
-    async blogApiModQueueListRaw(requestParameters: BlogApiModQueueListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedAdminCommentList>> {
+    async apiModQueueListRaw(requestParameters: ApiModQueueListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedAdminCommentList>> {
         const queryParameters: any = {};
 
         if (requestParameters['reviewed'] != null) {
@@ -85,26 +85,26 @@ export class ModerationApi extends runtime.BaseAPI {
     /**
      * Mod Queue List
      */
-    async blogApiModQueueList(requestParameters: BlogApiModQueueListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedAdminCommentList> {
-        const response = await this.blogApiModQueueListRaw(requestParameters, initOverrides);
+    async apiModQueueList(requestParameters: ApiModQueueListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedAdminCommentList> {
+        const response = await this.apiModQueueListRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Mod Update Comment
      */
-    async blogApiModUpdateCommentRaw(requestParameters: BlogApiModUpdateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminCommentList>> {
+    async apiModUpdateCommentRaw(requestParameters: ApiModUpdateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminCommentList>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling blogApiModUpdateComment().'
+                'Required parameter "id" was null or undefined when calling apiModUpdateComment().'
             );
         }
 
         if (requestParameters['adminCommentUpdate'] == null) {
             throw new runtime.RequiredError(
                 'adminCommentUpdate',
-                'Required parameter "adminCommentUpdate" was null or undefined when calling blogApiModUpdateComment().'
+                'Required parameter "adminCommentUpdate" was null or undefined when calling apiModUpdateComment().'
             );
         }
 
@@ -136,8 +136,8 @@ export class ModerationApi extends runtime.BaseAPI {
     /**
      * Mod Update Comment
      */
-    async blogApiModUpdateComment(requestParameters: BlogApiModUpdateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminCommentList> {
-        const response = await this.blogApiModUpdateCommentRaw(requestParameters, initOverrides);
+    async apiModUpdateComment(requestParameters: ApiModUpdateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminCommentList> {
+        const response = await this.apiModUpdateCommentRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

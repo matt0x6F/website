@@ -93,7 +93,7 @@ onMounted(async () => {
     const year = route.params.year as string
     
     // First load the post
-    const postResult = await posts.blogApiGetPostBySlug({ slug: slug, year: +year })
+    const postResult = await posts.apiGetPostBySlug({ slug: slug, year: +year })
     post.value = postResult
     
     // Then load comments using the post's ID
@@ -109,7 +109,7 @@ onMounted(async () => {
 // Function to reload comments
 async function loadComments() {
   if (post.value && post.value.id) {
-    const commentsResult = await commentsApi.blogApiListComments({ 
+    const commentsResult = await commentsApi.apiListComments({ 
       postId: post.value.id,
       topLevel: true 
     })

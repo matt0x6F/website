@@ -40,28 +40,28 @@ import {
     UserSelfToJSON,
 } from '../models/index';
 
-export interface AccountsApiDeleteUserRequest {
+export interface ApiDeleteUserRequest {
     userId: number;
 }
 
-export interface AccountsApiGetUserRequest {
+export interface ApiGetUserRequest {
     userId: number;
 }
 
-export interface AccountsApiListUsersRequest {
+export interface ApiListUsersRequest {
     limit?: number;
     offset?: number;
 }
 
-export interface AccountsApiSignUpRequest {
+export interface ApiSignUpRequest {
     newAccount: NewAccount;
 }
 
-export interface AccountsApiUpdateSelfRequest {
+export interface ApiUpdateSelfRequest {
     updateAccount: UpdateAccount;
 }
 
-export interface AccountsApiUpdateUserRequest {
+export interface ApiUpdateUserRequest {
     userId: number;
     adminUserModify: AdminUserModify;
 }
@@ -75,7 +75,7 @@ export class AccountsApi extends runtime.BaseAPI {
      * Deletes the calling user
      * Delete Self
      */
-    async accountsApiDeleteSelfRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiDeleteSelfRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -102,19 +102,19 @@ export class AccountsApi extends runtime.BaseAPI {
      * Deletes the calling user
      * Delete Self
      */
-    async accountsApiDeleteSelf(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.accountsApiDeleteSelfRaw(initOverrides);
+    async apiDeleteSelf(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiDeleteSelfRaw(initOverrides);
     }
 
     /**
      * Deletes a user
      * Delete User
      */
-    async accountsApiDeleteUserRaw(requestParameters: AccountsApiDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiDeleteUserRaw(requestParameters: ApiDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['userId'] == null) {
             throw new runtime.RequiredError(
                 'userId',
-                'Required parameter "userId" was null or undefined when calling accountsApiDeleteUser().'
+                'Required parameter "userId" was null or undefined when calling apiDeleteUser().'
             );
         }
 
@@ -144,19 +144,19 @@ export class AccountsApi extends runtime.BaseAPI {
      * Deletes a user
      * Delete User
      */
-    async accountsApiDeleteUser(requestParameters: AccountsApiDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.accountsApiDeleteUserRaw(requestParameters, initOverrides);
+    async apiDeleteUser(requestParameters: ApiDeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiDeleteUserRaw(requestParameters, initOverrides);
     }
 
     /**
      * Returns a specific user
      * Get User
      */
-    async accountsApiGetUserRaw(requestParameters: AccountsApiGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminUserDetails>> {
+    async apiGetUserRaw(requestParameters: ApiGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminUserDetails>> {
         if (requestParameters['userId'] == null) {
             throw new runtime.RequiredError(
                 'userId',
-                'Required parameter "userId" was null or undefined when calling accountsApiGetUser().'
+                'Required parameter "userId" was null or undefined when calling apiGetUser().'
             );
         }
 
@@ -186,8 +186,8 @@ export class AccountsApi extends runtime.BaseAPI {
      * Returns a specific user
      * Get User
      */
-    async accountsApiGetUser(requestParameters: AccountsApiGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminUserDetails> {
-        const response = await this.accountsApiGetUserRaw(requestParameters, initOverrides);
+    async apiGetUser(requestParameters: ApiGetUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminUserDetails> {
+        const response = await this.apiGetUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -195,7 +195,7 @@ export class AccountsApi extends runtime.BaseAPI {
      * Returns a list of all users
      * List Users
      */
-    async accountsApiListUsersRaw(requestParameters: AccountsApiListUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedAdminUserDetails>> {
+    async apiListUsersRaw(requestParameters: ApiListUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedAdminUserDetails>> {
         const queryParameters: any = {};
 
         if (requestParameters['limit'] != null) {
@@ -230,8 +230,8 @@ export class AccountsApi extends runtime.BaseAPI {
      * Returns a list of all users
      * List Users
      */
-    async accountsApiListUsers(requestParameters: AccountsApiListUsersRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedAdminUserDetails> {
-        const response = await this.accountsApiListUsersRaw(requestParameters, initOverrides);
+    async apiListUsers(requestParameters: ApiListUsersRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedAdminUserDetails> {
+        const response = await this.apiListUsersRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -239,11 +239,11 @@ export class AccountsApi extends runtime.BaseAPI {
      * Creates a new user
      * Sign Up
      */
-    async accountsApiSignUpRaw(requestParameters: AccountsApiSignUpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSelf>> {
+    async apiSignUpRaw(requestParameters: ApiSignUpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSelf>> {
         if (requestParameters['newAccount'] == null) {
             throw new runtime.RequiredError(
                 'newAccount',
-                'Required parameter "newAccount" was null or undefined when calling accountsApiSignUp().'
+                'Required parameter "newAccount" was null or undefined when calling apiSignUp().'
             );
         }
 
@@ -276,8 +276,8 @@ export class AccountsApi extends runtime.BaseAPI {
      * Creates a new user
      * Sign Up
      */
-    async accountsApiSignUp(requestParameters: AccountsApiSignUpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSelf> {
-        const response = await this.accountsApiSignUpRaw(requestParameters, initOverrides);
+    async apiSignUp(requestParameters: ApiSignUpRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSelf> {
+        const response = await this.apiSignUpRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -285,11 +285,11 @@ export class AccountsApi extends runtime.BaseAPI {
      * Updates the calling users details
      * Update Self
      */
-    async accountsApiUpdateSelfRaw(requestParameters: AccountsApiUpdateSelfRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSelf>> {
+    async apiUpdateSelfRaw(requestParameters: ApiUpdateSelfRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSelf>> {
         if (requestParameters['updateAccount'] == null) {
             throw new runtime.RequiredError(
                 'updateAccount',
-                'Required parameter "updateAccount" was null or undefined when calling accountsApiUpdateSelf().'
+                'Required parameter "updateAccount" was null or undefined when calling apiUpdateSelf().'
             );
         }
 
@@ -322,8 +322,8 @@ export class AccountsApi extends runtime.BaseAPI {
      * Updates the calling users details
      * Update Self
      */
-    async accountsApiUpdateSelf(requestParameters: AccountsApiUpdateSelfRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSelf> {
-        const response = await this.accountsApiUpdateSelfRaw(requestParameters, initOverrides);
+    async apiUpdateSelf(requestParameters: ApiUpdateSelfRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSelf> {
+        const response = await this.apiUpdateSelfRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -331,18 +331,18 @@ export class AccountsApi extends runtime.BaseAPI {
      * Updates a user
      * Update User
      */
-    async accountsApiUpdateUserRaw(requestParameters: AccountsApiUpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminUserDetails>> {
+    async apiUpdateUserRaw(requestParameters: ApiUpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminUserDetails>> {
         if (requestParameters['userId'] == null) {
             throw new runtime.RequiredError(
                 'userId',
-                'Required parameter "userId" was null or undefined when calling accountsApiUpdateUser().'
+                'Required parameter "userId" was null or undefined when calling apiUpdateUser().'
             );
         }
 
         if (requestParameters['adminUserModify'] == null) {
             throw new runtime.RequiredError(
                 'adminUserModify',
-                'Required parameter "adminUserModify" was null or undefined when calling accountsApiUpdateUser().'
+                'Required parameter "adminUserModify" was null or undefined when calling apiUpdateUser().'
             );
         }
 
@@ -375,8 +375,8 @@ export class AccountsApi extends runtime.BaseAPI {
      * Updates a user
      * Update User
      */
-    async accountsApiUpdateUser(requestParameters: AccountsApiUpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminUserDetails> {
-        const response = await this.accountsApiUpdateUserRaw(requestParameters, initOverrides);
+    async apiUpdateUser(requestParameters: ApiUpdateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminUserDetails> {
+        const response = await this.apiUpdateUserRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -384,7 +384,7 @@ export class AccountsApi extends runtime.BaseAPI {
      * Returns the calling users details
      * Whoami
      */
-    async accountsApiWhoamiRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSelf>> {
+    async apiWhoamiRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserSelf>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -411,8 +411,8 @@ export class AccountsApi extends runtime.BaseAPI {
      * Returns the calling users details
      * Whoami
      */
-    async accountsApiWhoami(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSelf> {
-        const response = await this.accountsApiWhoamiRaw(initOverrides);
+    async apiWhoami(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserSelf> {
+        const response = await this.apiWhoamiRaw(initOverrides);
         return await response.value();
     }
 

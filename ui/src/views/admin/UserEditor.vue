@@ -180,7 +180,7 @@ const availablePermissions = ref<Permission[]>([])
 
 onMounted(async () => {
   try {
-    const response = await accountsApi.accountsApiGetUser({
+    const response = await accountsApi.apiGetUser({
       userId: parseInt(route.params.id as string)
     })
     
@@ -214,7 +214,7 @@ onMounted(async () => {
 
 const handleSubmit = async () => {
   try {
-    await accountsApi.accountsApiUpdateUser({
+    await accountsApi.apiUpdateUser({
       userId: parseInt(route.params.id as string),
       adminUserModify: user.value
     })

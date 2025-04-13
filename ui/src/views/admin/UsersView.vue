@@ -139,7 +139,7 @@ const loadUsers = async () => {
   const client = useApiClient(AccountsApi)
   try {
     loading.value = true
-    const response = await client.accountsApiListUsers()
+    const response = await client.apiListUsers()
     users.value = response.items
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'An error occurred'

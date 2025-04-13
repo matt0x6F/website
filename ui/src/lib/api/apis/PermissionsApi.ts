@@ -31,16 +31,16 @@ import {
     PermissionMutateToJSON,
 } from '../models/index';
 
-export interface AccountsGroupsCreatePermissionRequest {
+export interface GroupsCreatePermissionRequest {
     permissionMutate: PermissionMutate;
 }
 
-export interface AccountsGroupsListPermissionsRequest {
+export interface GroupsListPermissionsRequest {
     limit?: number;
     offset?: number;
 }
 
-export interface AccountsGroupsUpdatePermissionRequest {
+export interface GroupsUpdatePermissionRequest {
     permissionId: number;
     permissionMutate: PermissionMutate;
 }
@@ -54,11 +54,11 @@ export class PermissionsApi extends runtime.BaseAPI {
      * Creates a new permission
      * Create Permission
      */
-    async accountsGroupsCreatePermissionRaw(requestParameters: AccountsGroupsCreatePermissionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Permission>> {
+    async groupsCreatePermissionRaw(requestParameters: GroupsCreatePermissionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Permission>> {
         if (requestParameters['permissionMutate'] == null) {
             throw new runtime.RequiredError(
                 'permissionMutate',
-                'Required parameter "permissionMutate" was null or undefined when calling accountsGroupsCreatePermission().'
+                'Required parameter "permissionMutate" was null or undefined when calling groupsCreatePermission().'
             );
         }
 
@@ -91,8 +91,8 @@ export class PermissionsApi extends runtime.BaseAPI {
      * Creates a new permission
      * Create Permission
      */
-    async accountsGroupsCreatePermission(requestParameters: AccountsGroupsCreatePermissionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Permission> {
-        const response = await this.accountsGroupsCreatePermissionRaw(requestParameters, initOverrides);
+    async groupsCreatePermission(requestParameters: GroupsCreatePermissionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Permission> {
+        const response = await this.groupsCreatePermissionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -100,7 +100,7 @@ export class PermissionsApi extends runtime.BaseAPI {
      * Returns a list of all permissions
      * List Permissions
      */
-    async accountsGroupsListPermissionsRaw(requestParameters: AccountsGroupsListPermissionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPermission>> {
+    async groupsListPermissionsRaw(requestParameters: GroupsListPermissionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPermission>> {
         const queryParameters: any = {};
 
         if (requestParameters['limit'] != null) {
@@ -135,8 +135,8 @@ export class PermissionsApi extends runtime.BaseAPI {
      * Returns a list of all permissions
      * List Permissions
      */
-    async accountsGroupsListPermissions(requestParameters: AccountsGroupsListPermissionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPermission> {
-        const response = await this.accountsGroupsListPermissionsRaw(requestParameters, initOverrides);
+    async groupsListPermissions(requestParameters: GroupsListPermissionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPermission> {
+        const response = await this.groupsListPermissionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -144,18 +144,18 @@ export class PermissionsApi extends runtime.BaseAPI {
      * Updates a permission
      * Update Permission
      */
-    async accountsGroupsUpdatePermissionRaw(requestParameters: AccountsGroupsUpdatePermissionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Permission>> {
+    async groupsUpdatePermissionRaw(requestParameters: GroupsUpdatePermissionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Permission>> {
         if (requestParameters['permissionId'] == null) {
             throw new runtime.RequiredError(
                 'permissionId',
-                'Required parameter "permissionId" was null or undefined when calling accountsGroupsUpdatePermission().'
+                'Required parameter "permissionId" was null or undefined when calling groupsUpdatePermission().'
             );
         }
 
         if (requestParameters['permissionMutate'] == null) {
             throw new runtime.RequiredError(
                 'permissionMutate',
-                'Required parameter "permissionMutate" was null or undefined when calling accountsGroupsUpdatePermission().'
+                'Required parameter "permissionMutate" was null or undefined when calling groupsUpdatePermission().'
             );
         }
 
@@ -188,8 +188,8 @@ export class PermissionsApi extends runtime.BaseAPI {
      * Updates a permission
      * Update Permission
      */
-    async accountsGroupsUpdatePermission(requestParameters: AccountsGroupsUpdatePermissionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Permission> {
-        const response = await this.accountsGroupsUpdatePermissionRaw(requestParameters, initOverrides);
+    async groupsUpdatePermission(requestParameters: GroupsUpdatePermissionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Permission> {
+        const response = await this.groupsUpdatePermissionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -31,26 +31,26 @@ import {
     PagedCommentListToJSON,
 } from '../models/index';
 
-export interface BlogApiCreateCommentRequest {
+export interface ApiCreateCommentRequest {
     commentCreate: CommentCreate;
 }
 
-export interface BlogApiDeleteCommentRequest {
+export interface ApiDeleteCommentRequest {
     id: number;
 }
 
-export interface BlogApiGetCommentRequest {
+export interface ApiGetCommentRequest {
     id: number;
 }
 
-export interface BlogApiListCommentsRequest {
+export interface ApiListCommentsRequest {
     postId?: number | null;
     topLevel?: boolean;
     limit?: number;
     offset?: number;
 }
 
-export interface BlogApiUpdateCommentRequest {
+export interface ApiUpdateCommentRequest {
     id: number;
     commentMutate: CommentMutate;
 }
@@ -64,11 +64,11 @@ export class CommentsApi extends runtime.BaseAPI {
      * Creates a comment
      * Create Comment
      */
-    async blogApiCreateCommentRaw(requestParameters: BlogApiCreateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentList>> {
+    async apiCreateCommentRaw(requestParameters: ApiCreateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentList>> {
         if (requestParameters['commentCreate'] == null) {
             throw new runtime.RequiredError(
                 'commentCreate',
-                'Required parameter "commentCreate" was null or undefined when calling blogApiCreateComment().'
+                'Required parameter "commentCreate" was null or undefined when calling apiCreateComment().'
             );
         }
 
@@ -101,19 +101,19 @@ export class CommentsApi extends runtime.BaseAPI {
      * Creates a comment
      * Create Comment
      */
-    async blogApiCreateComment(requestParameters: BlogApiCreateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentList> {
-        const response = await this.blogApiCreateCommentRaw(requestParameters, initOverrides);
+    async apiCreateComment(requestParameters: ApiCreateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentList> {
+        const response = await this.apiCreateCommentRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Delete Comment
      */
-    async blogApiDeleteCommentRaw(requestParameters: BlogApiDeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiDeleteCommentRaw(requestParameters: ApiDeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling blogApiDeleteComment().'
+                'Required parameter "id" was null or undefined when calling apiDeleteComment().'
             );
         }
 
@@ -142,19 +142,19 @@ export class CommentsApi extends runtime.BaseAPI {
     /**
      * Delete Comment
      */
-    async blogApiDeleteComment(requestParameters: BlogApiDeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.blogApiDeleteCommentRaw(requestParameters, initOverrides);
+    async apiDeleteComment(requestParameters: ApiDeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiDeleteCommentRaw(requestParameters, initOverrides);
     }
 
     /**
      * Gets all the details of a comment.
      * Get Comment
      */
-    async blogApiGetCommentRaw(requestParameters: BlogApiGetCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentList>> {
+    async apiGetCommentRaw(requestParameters: ApiGetCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentList>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling blogApiGetComment().'
+                'Required parameter "id" was null or undefined when calling apiGetComment().'
             );
         }
 
@@ -184,8 +184,8 @@ export class CommentsApi extends runtime.BaseAPI {
      * Gets all the details of a comment.
      * Get Comment
      */
-    async blogApiGetComment(requestParameters: BlogApiGetCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentList> {
-        const response = await this.blogApiGetCommentRaw(requestParameters, initOverrides);
+    async apiGetComment(requestParameters: ApiGetCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentList> {
+        const response = await this.apiGetCommentRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -193,7 +193,7 @@ export class CommentsApi extends runtime.BaseAPI {
      * List all comments for a post
      * List Comments
      */
-    async blogApiListCommentsRaw(requestParameters: BlogApiListCommentsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedCommentList>> {
+    async apiListCommentsRaw(requestParameters: ApiListCommentsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedCommentList>> {
         const queryParameters: any = {};
 
         if (requestParameters['postId'] != null) {
@@ -236,26 +236,26 @@ export class CommentsApi extends runtime.BaseAPI {
      * List all comments for a post
      * List Comments
      */
-    async blogApiListComments(requestParameters: BlogApiListCommentsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedCommentList> {
-        const response = await this.blogApiListCommentsRaw(requestParameters, initOverrides);
+    async apiListComments(requestParameters: ApiListCommentsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedCommentList> {
+        const response = await this.apiListCommentsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Update Comment
      */
-    async blogApiUpdateCommentRaw(requestParameters: BlogApiUpdateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentList>> {
+    async apiUpdateCommentRaw(requestParameters: ApiUpdateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentList>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling blogApiUpdateComment().'
+                'Required parameter "id" was null or undefined when calling apiUpdateComment().'
             );
         }
 
         if (requestParameters['commentMutate'] == null) {
             throw new runtime.RequiredError(
                 'commentMutate',
-                'Required parameter "commentMutate" was null or undefined when calling blogApiUpdateComment().'
+                'Required parameter "commentMutate" was null or undefined when calling apiUpdateComment().'
             );
         }
 
@@ -287,8 +287,8 @@ export class CommentsApi extends runtime.BaseAPI {
     /**
      * Update Comment
      */
-    async blogApiUpdateComment(requestParameters: BlogApiUpdateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentList> {
-        const response = await this.blogApiUpdateCommentRaw(requestParameters, initOverrides);
+    async apiUpdateComment(requestParameters: ApiUpdateCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentList> {
+        const response = await this.apiUpdateCommentRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

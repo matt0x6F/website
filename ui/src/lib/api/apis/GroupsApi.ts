@@ -31,20 +31,20 @@ import {
     PagedGroupToJSON,
 } from '../models/index';
 
-export interface AccountsGroupsCreateGroupRequest {
+export interface GroupsCreateGroupRequest {
     groupMutate: GroupMutate;
 }
 
-export interface AccountsGroupsDeleteGroupRequest {
+export interface GroupsDeleteGroupRequest {
     groupId: number;
 }
 
-export interface AccountsGroupsListGroupsRequest {
+export interface GroupsListGroupsRequest {
     limit?: number;
     offset?: number;
 }
 
-export interface AccountsGroupsUpdateGroupRequest {
+export interface GroupsUpdateGroupRequest {
     groupId: number;
     groupMutate: GroupMutate;
 }
@@ -58,11 +58,11 @@ export class GroupsApi extends runtime.BaseAPI {
      * Creates a new group
      * Create Group
      */
-    async accountsGroupsCreateGroupRaw(requestParameters: AccountsGroupsCreateGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Group>> {
+    async groupsCreateGroupRaw(requestParameters: GroupsCreateGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Group>> {
         if (requestParameters['groupMutate'] == null) {
             throw new runtime.RequiredError(
                 'groupMutate',
-                'Required parameter "groupMutate" was null or undefined when calling accountsGroupsCreateGroup().'
+                'Required parameter "groupMutate" was null or undefined when calling groupsCreateGroup().'
             );
         }
 
@@ -95,8 +95,8 @@ export class GroupsApi extends runtime.BaseAPI {
      * Creates a new group
      * Create Group
      */
-    async accountsGroupsCreateGroup(requestParameters: AccountsGroupsCreateGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Group> {
-        const response = await this.accountsGroupsCreateGroupRaw(requestParameters, initOverrides);
+    async groupsCreateGroup(requestParameters: GroupsCreateGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Group> {
+        const response = await this.groupsCreateGroupRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -104,11 +104,11 @@ export class GroupsApi extends runtime.BaseAPI {
      * Deletes a group
      * Delete Group
      */
-    async accountsGroupsDeleteGroupRaw(requestParameters: AccountsGroupsDeleteGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async groupsDeleteGroupRaw(requestParameters: GroupsDeleteGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['groupId'] == null) {
             throw new runtime.RequiredError(
                 'groupId',
-                'Required parameter "groupId" was null or undefined when calling accountsGroupsDeleteGroup().'
+                'Required parameter "groupId" was null or undefined when calling groupsDeleteGroup().'
             );
         }
 
@@ -138,15 +138,15 @@ export class GroupsApi extends runtime.BaseAPI {
      * Deletes a group
      * Delete Group
      */
-    async accountsGroupsDeleteGroup(requestParameters: AccountsGroupsDeleteGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.accountsGroupsDeleteGroupRaw(requestParameters, initOverrides);
+    async groupsDeleteGroup(requestParameters: GroupsDeleteGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.groupsDeleteGroupRaw(requestParameters, initOverrides);
     }
 
     /**
      * Returns a list of all groups
      * List Groups
      */
-    async accountsGroupsListGroupsRaw(requestParameters: AccountsGroupsListGroupsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedGroup>> {
+    async groupsListGroupsRaw(requestParameters: GroupsListGroupsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedGroup>> {
         const queryParameters: any = {};
 
         if (requestParameters['limit'] != null) {
@@ -181,8 +181,8 @@ export class GroupsApi extends runtime.BaseAPI {
      * Returns a list of all groups
      * List Groups
      */
-    async accountsGroupsListGroups(requestParameters: AccountsGroupsListGroupsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedGroup> {
-        const response = await this.accountsGroupsListGroupsRaw(requestParameters, initOverrides);
+    async groupsListGroups(requestParameters: GroupsListGroupsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedGroup> {
+        const response = await this.groupsListGroupsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -190,18 +190,18 @@ export class GroupsApi extends runtime.BaseAPI {
      * Updates a group
      * Update Group
      */
-    async accountsGroupsUpdateGroupRaw(requestParameters: AccountsGroupsUpdateGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Group>> {
+    async groupsUpdateGroupRaw(requestParameters: GroupsUpdateGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Group>> {
         if (requestParameters['groupId'] == null) {
             throw new runtime.RequiredError(
                 'groupId',
-                'Required parameter "groupId" was null or undefined when calling accountsGroupsUpdateGroup().'
+                'Required parameter "groupId" was null or undefined when calling groupsUpdateGroup().'
             );
         }
 
         if (requestParameters['groupMutate'] == null) {
             throw new runtime.RequiredError(
                 'groupMutate',
-                'Required parameter "groupMutate" was null or undefined when calling accountsGroupsUpdateGroup().'
+                'Required parameter "groupMutate" was null or undefined when calling groupsUpdateGroup().'
             );
         }
 
@@ -234,8 +234,8 @@ export class GroupsApi extends runtime.BaseAPI {
      * Updates a group
      * Update Group
      */
-    async accountsGroupsUpdateGroup(requestParameters: AccountsGroupsUpdateGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Group> {
-        const response = await this.accountsGroupsUpdateGroupRaw(requestParameters, initOverrides);
+    async groupsUpdateGroup(requestParameters: GroupsUpdateGroupRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Group> {
+        const response = await this.groupsUpdateGroupRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

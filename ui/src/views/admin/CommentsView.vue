@@ -138,12 +138,12 @@ const loadComments = async () => {
     // If we want all comments, fetch both reviewed and unreviewed comments
     if (reviewFilter.value === null) {
       // First fetch reviewed comments
-      const reviewedResponse = await moderationApi.blogApiModQueueList({
+      const reviewedResponse = await moderationApi.apiModQueueList({
         reviewed: true
       });
       
       // Then fetch unreviewed comments
-      const unreviewedResponse = await moderationApi.blogApiModQueueList({
+      const unreviewedResponse = await moderationApi.apiModQueueList({
         reviewed: false
       });
       
@@ -156,7 +156,7 @@ const loadComments = async () => {
       comments.value = allComments;
     } else {
       // Just fetch the filtered comments
-      const response = await moderationApi.blogApiModQueueList({
+      const response = await moderationApi.apiModQueueList({
         reviewed: reviewFilter.value
       });
       comments.value = response.items || [];
@@ -193,7 +193,7 @@ const approveComment = async (id: number) => {
       note: 'Approved by moderator'
     };
     
-    await moderationApi.blogApiModUpdateComment({
+    await moderationApi.apiModUpdateComment({
       id,
       adminCommentUpdate: update
     });
@@ -224,7 +224,7 @@ const rejectComment = async (id: number) => {
       note: 'Rejected by moderator'
     };
     
-    await moderationApi.blogApiModUpdateComment({
+    await moderationApi.apiModUpdateComment({
       id,
       adminCommentUpdate: update
     });
@@ -258,7 +258,7 @@ const confirmDelete = (comment: { id: number }) => {
 
 const deleteComment = async (id: number) => {
   try {
-    await commentsApi.blogApiDeleteComment({ id });
+    await commentsApi.apiDeleteComment({ id });
     toast.add({
       severity: 'success',
       summary: 'Success',

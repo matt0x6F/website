@@ -34,36 +34,36 @@ import {
     ValidationErrorResponseToJSON,
 } from '../models/index';
 
-export interface BlogApiCreatePostRequest {
+export interface ApiCreatePostRequest {
     postMutate: PostMutate;
 }
 
-export interface BlogApiDeletePostRequest {
+export interface ApiDeletePostRequest {
     id: number;
 }
 
-export interface BlogApiGetPostByIdRequest {
+export interface ApiGetPostByIdRequest {
     id: number;
 }
 
-export interface BlogApiGetPostBySlugRequest {
+export interface ApiGetPostBySlugRequest {
     slug: string;
     year?: number;
     draft?: boolean;
 }
 
-export interface BlogApiGetPostFilesByIdRequest {
+export interface ApiGetPostFilesByIdRequest {
     id: number;
 }
 
-export interface BlogApiListPostsRequest {
+export interface ApiListPostsRequest {
     all?: boolean;
     drafts?: boolean;
     limit?: number;
     offset?: number;
 }
 
-export interface BlogApiUpdatePostRequest {
+export interface ApiUpdatePostRequest {
     id: number;
     postMutate: PostMutate;
 }
@@ -76,11 +76,11 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Create Post
      */
-    async blogApiCreatePostRaw(requestParameters: BlogApiCreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
+    async apiCreatePostRaw(requestParameters: ApiCreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
         if (requestParameters['postMutate'] == null) {
             throw new runtime.RequiredError(
                 'postMutate',
-                'Required parameter "postMutate" was null or undefined when calling blogApiCreatePost().'
+                'Required parameter "postMutate" was null or undefined when calling apiCreatePost().'
             );
         }
 
@@ -112,19 +112,19 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Create Post
      */
-    async blogApiCreatePost(requestParameters: BlogApiCreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
-        const response = await this.blogApiCreatePostRaw(requestParameters, initOverrides);
+    async apiCreatePost(requestParameters: ApiCreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
+        const response = await this.apiCreatePostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Delete Post
      */
-    async blogApiDeletePostRaw(requestParameters: BlogApiDeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiDeletePostRaw(requestParameters: ApiDeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling blogApiDeletePost().'
+                'Required parameter "id" was null or undefined when calling apiDeletePost().'
             );
         }
 
@@ -153,18 +153,18 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Delete Post
      */
-    async blogApiDeletePost(requestParameters: BlogApiDeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.blogApiDeletePostRaw(requestParameters, initOverrides);
+    async apiDeletePost(requestParameters: ApiDeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiDeletePostRaw(requestParameters, initOverrides);
     }
 
     /**
      * Get Post By Id
      */
-    async blogApiGetPostByIdRaw(requestParameters: BlogApiGetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
+    async apiGetPostByIdRaw(requestParameters: ApiGetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling blogApiGetPostById().'
+                'Required parameter "id" was null or undefined when calling apiGetPostById().'
             );
         }
 
@@ -193,19 +193,19 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Get Post By Id
      */
-    async blogApiGetPostById(requestParameters: BlogApiGetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
-        const response = await this.blogApiGetPostByIdRaw(requestParameters, initOverrides);
+    async apiGetPostById(requestParameters: ApiGetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
+        const response = await this.apiGetPostByIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Get Post By Slug
      */
-    async blogApiGetPostBySlugRaw(requestParameters: BlogApiGetPostBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
+    async apiGetPostBySlugRaw(requestParameters: ApiGetPostBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
         if (requestParameters['slug'] == null) {
             throw new runtime.RequiredError(
                 'slug',
-                'Required parameter "slug" was null or undefined when calling blogApiGetPostBySlug().'
+                'Required parameter "slug" was null or undefined when calling apiGetPostBySlug().'
             );
         }
 
@@ -242,19 +242,19 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Get Post By Slug
      */
-    async blogApiGetPostBySlug(requestParameters: BlogApiGetPostBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
-        const response = await this.blogApiGetPostBySlugRaw(requestParameters, initOverrides);
+    async apiGetPostBySlug(requestParameters: ApiGetPostBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
+        const response = await this.apiGetPostBySlugRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Get Post Files By Id
      */
-    async blogApiGetPostFilesByIdRaw(requestParameters: BlogApiGetPostFilesByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<FileDetails>>> {
+    async apiGetPostFilesByIdRaw(requestParameters: ApiGetPostFilesByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<FileDetails>>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling blogApiGetPostFilesById().'
+                'Required parameter "id" was null or undefined when calling apiGetPostFilesById().'
             );
         }
 
@@ -283,15 +283,15 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Get Post Files By Id
      */
-    async blogApiGetPostFilesById(requestParameters: BlogApiGetPostFilesByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<FileDetails>> {
-        const response = await this.blogApiGetPostFilesByIdRaw(requestParameters, initOverrides);
+    async apiGetPostFilesById(requestParameters: ApiGetPostFilesByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<FileDetails>> {
+        const response = await this.apiGetPostFilesByIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * List Posts
      */
-    async blogApiListPostsRaw(requestParameters: BlogApiListPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPostDetails>> {
+    async apiListPostsRaw(requestParameters: ApiListPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPostDetails>> {
         const queryParameters: any = {};
 
         if (requestParameters['all'] != null) {
@@ -333,26 +333,26 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * List Posts
      */
-    async blogApiListPosts(requestParameters: BlogApiListPostsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPostDetails> {
-        const response = await this.blogApiListPostsRaw(requestParameters, initOverrides);
+    async apiListPosts(requestParameters: ApiListPostsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPostDetails> {
+        const response = await this.apiListPostsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Update Post
      */
-    async blogApiUpdatePostRaw(requestParameters: BlogApiUpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
+    async apiUpdatePostRaw(requestParameters: ApiUpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling blogApiUpdatePost().'
+                'Required parameter "id" was null or undefined when calling apiUpdatePost().'
             );
         }
 
         if (requestParameters['postMutate'] == null) {
             throw new runtime.RequiredError(
                 'postMutate',
-                'Required parameter "postMutate" was null or undefined when calling blogApiUpdatePost().'
+                'Required parameter "postMutate" was null or undefined when calling apiUpdatePost().'
             );
         }
 
@@ -384,8 +384,8 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Update Post
      */
-    async blogApiUpdatePost(requestParameters: BlogApiUpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
-        const response = await this.blogApiUpdatePostRaw(requestParameters, initOverrides);
+    async apiUpdatePost(requestParameters: ApiUpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
+        const response = await this.apiUpdatePostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

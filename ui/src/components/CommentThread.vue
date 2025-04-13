@@ -92,7 +92,7 @@ async function submitReply() {
   try {
     console.log('Submitting reply with postId:', props.postId);
     
-    await api.blogApiCreateComment({
+    await api.apiCreateComment({
       commentCreate: {
         content: replyContent.value,
         parentId: props.comment.id,

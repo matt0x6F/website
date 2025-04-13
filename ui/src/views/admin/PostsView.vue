@@ -67,7 +67,7 @@ const loadPosts = async () => {
   const client = useApiClient(PostsApi)
   try {
     loading.value = true
-    const response = await client.blogApiListPosts({ all: true })
+    const response = await client.apiListPosts({ all: true })
     posts.value = response.items
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'An error occurred'
