@@ -95,7 +95,6 @@ import { useApiClient } from '@/composables/useApiClient'
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
-const postsApi = useApiClient(PostsApi)
 
 const isEditing = computed(() => route.params.id !== undefined)
 const postId = ref<number | null>(null)
@@ -164,6 +163,7 @@ config(editorConfig)
 onMounted(async () => {
   if (isEditing.value) {
     try {
+      const postsApi = useApiClient(PostsApi)
       const response = await postsApi.apiGetPostById({
         id: parseInt(route.params.id as string)
       })
@@ -197,6 +197,7 @@ const startAutoSave = () => {
     // Only auto-save if we have an ID (existing post) and it's not published
     if (postId.value && !post.value.published) {
       try {
+        const postsApi = useApiClient(PostsApi)
         await postsApi.apiUpdatePost({
           id: postId.value,
           postMutate: post.value
@@ -239,6 +240,7 @@ onUnmounted(() => {
 const handleSave = async (shouldRedirect: boolean) => {
   try {
     if (isEditing.value) {
+      const postsApi = useApiClient(PostsApi)
       await postsApi.apiUpdatePost({
         id: parseInt(route.params.id as string),
         postMutate: post.value
@@ -253,6 +255,7 @@ const handleSave = async (shouldRedirect: boolean) => {
         router.push({ name: 'admin-posts' })
       }
     } else {
+      const postsApi = useApiClient(PostsApi)
       const response = await postsApi.apiCreatePost({
         postMutate: post.value
       })

@@ -3,6 +3,29 @@ import { useAuthStore } from '@/stores/auth'
 
 type ApiConstructor<T> = new (config: Configuration) => T
 
+/**
+ * Creates an API client instance with the current authentication token.
+ * 
+ * @warning Do not call this function at the top level of a page or component.
+ * It should be called close to where the API client is actually used (e.g., within
+ * a method or effect) to ensure the auth token is current. Calling it at the top
+ * level can lead to token invalidation issues as the function does not handle token
+ * refresh automatically.
+ * 
+ * @example Good usage:
+ * ```ts
+ * function fetchData() {
+ *   const api = useApiClient(MyApi)
+ *   return api.getData()
+ * }
+ * ```
+ * 
+ * @example Bad usage:
+ * ```ts
+ * // DON'T do this at the top level
+ * const api = useApiClient(MyApi)
+ * ```
+ */
 export function useApiClient<T>(ApiClass: ApiConstructor<T>): T
 export function useApiClient<T extends Record<string, ApiConstructor<any>>>(apiClasses: T): {
   [K in keyof T]: InstanceType<T[K]>

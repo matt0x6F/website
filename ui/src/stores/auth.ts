@@ -158,6 +158,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function refreshToken() {
+    console.log('Attempting to refresh token...')
     const params: ConfigurationParameters = {
       basePath: import.meta.env.VITE_API_URL,
     }
@@ -176,8 +177,10 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.setItem("accessToken", storedAccessToken.value)
       localStorage.setItem("refreshToken", storedRefreshToken.value)
 
+      console.log('Token refresh successful - new access token received (', storedAccessToken.value.length, ')')
       startRefreshTokenTimer()
     } catch (error) {
+      console.error('Token refresh failed:', error)
       clearTokens()
       throw error
     }
