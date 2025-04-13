@@ -190,30 +190,59 @@ export const useAuthStore = defineStore('auth', () => {
     // Clear any existing timeout first
     stopRefreshTokenTimer()
     
-    // Parse the access token instead of refresh token
-    const jwtBase64 = storedAccessToken.value.split('.')[1];
-    const jwtToken = JSON.parse(atob(jwtBase64));
+    try {
+      // Parse the access token
+      const jwtBase64 = storedAccessToken.value.split('.')[1];
+      const jwtToken = JSON.parse(atob(jwtBase64));
 
-    // Set a timeout to refresh the token 1 minute before it expires
-    const expires = new Date(jwtToken.exp * 1000);
-    const timeout = expires.getTime() - Date.now() - (60 * 1000);
-    
-    // Only set the timer if the timeout is positive
-    if (timeout > 0) {
-      refreshTokenTimeout.value = window.setTimeout(async () => {
-        try {
-          await refreshToken()
-        } catch (error) {
-          // If refresh fails, log out the user
-          console.error('Token refresh failed:', error)
+      // Set a timeout to refresh the token when it's at 75% of its lifetime
+      // This ensures we refresh well before expiration
+      const expires = new Date(jwtToken.exp * 1000);
+      const issued = new Date(jwtToken.iat * 1000);
+      const tokenLifetime = expires.getTime() - issued.getTime();
+      const refreshAt = issued.getTime() + (tokenLifetime * 0.75);
+      const timeout = refreshAt - Date.now();
+      
+      // Only set the timer if the timeout is positive and reasonable
+      if (timeout > 0 && timeout < tokenLifetime) {
+        refreshTokenTimeout.value = window.setTimeout(async () => {
+          try {
+            await refreshToken()
+            // After successful refresh, start the timer again
+            startRefreshTokenTimer()
+          } catch (error) {
+            console.error('Token refresh failed:', error)
+            // If refresh fails, attempt one more time after a short delay
+            const retryTimeout = window.setTimeout(async () => {
+              try {
+                await refreshToken()
+                startRefreshTokenTimer()
+              } catch (retryError) {
+                console.error('Token refresh retry failed:', retryError)
+                await logout()
+              }
+              clearTimeout(retryTimeout)
+            }, 5000) // Wait 5 seconds before retry
+          }
+        }, timeout);
+      } else if (storedRefreshToken.value) {
+        // If we're already past the refresh time but have a refresh token, try to refresh immediately
+        refreshToken().catch(async (error) => {
+          console.error('Immediate token refresh failed:', error)
           await logout()
-        }
-      }, timeout);
+        })
+      }
+    } catch (error) {
+      console.error('Error starting refresh timer:', error)
+      stopRefreshTokenTimer()
     }
   }
 
   function stopRefreshTokenTimer() {
-    clearTimeout(refreshTokenTimeout.value);
+    if (refreshTokenTimeout.value) {
+      clearTimeout(refreshTokenTimeout.value)
+      refreshTokenTimeout.value = 0
+    }
   }
 
   async function updateProfile(data: UpdateAccount) {
@@ -261,7 +290,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signup(newAccount: NewAccount) {
-    const api = new AccountsApi();
+    const params: ConfigurationParameters = {
+      basePath: import.meta.env.VITE_API_URL,
+    }
+    const config = new Configuration(params)
+    const api = new AccountsApi(config);
     const response = await api.apiSignUp({ newAccount });
     return response;
   }
@@ -284,5 +317,7 @@ export const useAuthStore = defineStore('auth', () => {
     redirectUrl,
     setRedirectUrl,
     signup,
+    startRefreshTokenTimer,
+    stopRefreshTokenTimer,
   }
 })

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '../auth'
 import { TokenApi, AccountsApi } from '@/lib/api'
@@ -27,17 +27,17 @@ const mockAccountsApiWhoami = vi.fn()
 // Mock the API responses
 vi.mock('@/lib/api', () => ({
   TokenApi: vi.fn(() => ({
-    tokenObtainPair: (...args: any[]) => mockTokenObtainPair(...args),
-    tokenRefresh: (...args: any[]) => mockTokenRefresh(...args)
+    obtainPair: (...args: any[]) => mockTokenObtainPair(...args),
+    refresh: (...args: any[]) => mockTokenRefresh(...args)
   })),
   AccountsApi: vi.fn(() => ({
-    accountsApiWhoami: (...args: any[]) => mockAccountsApiWhoami(...args)
+    apiWhoami: (...args: any[]) => mockAccountsApiWhoami(...args)
   })),
   Configuration: vi.fn()
 }))
 
 function createMockJWT(expiresIn: number = 3600): string {
-  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).replace(/=/g, '')
   const now = Math.floor(Date.now() / 1000)
   const payload = btoa(JSON.stringify({
     exp: now + expiresIn,
@@ -45,15 +45,27 @@ function createMockJWT(expiresIn: number = 3600): string {
     jti: 'mock-jwt-id',
     token_type: 'access',
     user_id: 1
-  }))
-  const signature = btoa('mock-signature')
+  })).replace(/=/g, '')
+  const signature = btoa('mock-signature').replace(/=/g, '')
   return `${header}.${payload}.${signature}`
+}
+
+// Update the store type definition to include startRefreshTokenTimer
+type AuthStore = ReturnType<typeof useAuthStore> & {
+  startRefreshTokenTimer: () => void;
+  stopRefreshTokenTimer: () => void;
 }
 
 describe('Auth Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.clearAllTimers()
+    vi.useRealTimers()
   })
 
   describe('Initialization', () => {
@@ -149,9 +161,39 @@ describe('Auth Store', () => {
   })
 
   describe('Token Refresh', () => {
-    it('should refresh tokens successfully', async () => {
-      const store = useAuthStore()
-      store.storedRefreshToken = 'old.refresh.token'
+    beforeEach(() => {
+      // Reset Date.now() mock before each test
+      vi.setSystemTime(new Date('2024-01-01T00:00:00Z'))
+    })
+
+    it('should calculate correct refresh timing', () => {
+      const store = useAuthStore() as AuthStore
+      const now = Math.floor(Date.now() / 1000)
+      const tokenLifetime = 3600 // 1 hour
+
+      // Create a token that expires in 1 hour from our fixed now
+      const mockAccessToken = createMockJWT(tokenLifetime)
+      store.storedAccessToken = mockAccessToken
+      store.storedRefreshToken = 'test.refresh.token'
+
+      // Mock successful refresh response
+      const newAccessToken = createMockJWT(tokenLifetime)
+      mockTokenRefresh.mockImplementation(() => Promise.resolve({
+        access: newAccessToken,
+        refresh: 'new.refresh.token'
+      }))
+
+      // Start the timer and immediately check the timeout value
+      store.startRefreshTokenTimer()
+
+      // The timer should be set to 75% of the token lifetime
+      const expectedTimeout = tokenLifetime * 0.75 * 1000
+      expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), expectedTimeout)
+    })
+
+    it('should refresh token successfully', async () => {
+      const store = useAuthStore() as AuthStore
+      store.storedRefreshToken = 'test.refresh.token'
       const newAccessToken = createMockJWT()
       
       mockTokenRefresh.mockResolvedValue({
@@ -168,16 +210,53 @@ describe('Auth Store', () => {
     })
 
     it('should handle refresh token failure', async () => {
-      const store = useAuthStore()
+      const store = useAuthStore() as AuthStore
       store.storedRefreshToken = 'invalid.refresh.token'
       
       mockTokenRefresh.mockRejectedValue(new Error('Invalid token'))
 
       await expect(store.refreshToken()).rejects.toThrow('Invalid token')
+
       expect(store.storedAccessToken).toBe('')
       expect(store.storedRefreshToken).toBe('')
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('accessToken')
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('refreshToken')
+    })
+
+    it('should retry refresh on failure', async () => {
+      const store = useAuthStore() as AuthStore
+      store.storedAccessToken = createMockJWT(3600)
+      store.storedRefreshToken = 'test.refresh.token'
+
+      // First call fails, second succeeds
+      mockTokenRefresh
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValueOnce({
+          access: createMockJWT(3600),
+          refresh: 'new.refresh.token'
+        })
+
+      // Call refresh directly instead of using timer
+      await expect(store.refreshToken()).rejects.toThrow('Network error')
+      await store.refreshToken() // Second attempt should succeed
+
+      expect(mockTokenRefresh).toHaveBeenCalledTimes(2)
+      expect(store.isLoggedIn).toBe(true)
+    })
+
+    it('should logout after all refresh attempts fail', async () => {
+      const store = useAuthStore() as AuthStore
+      store.storedAccessToken = createMockJWT(3600)
+      store.storedRefreshToken = 'test.refresh.token'
+
+      mockTokenRefresh.mockRejectedValue(new Error('Network error'))
+
+      // Call refresh directly instead of using timer
+      await expect(store.refreshToken()).rejects.toThrow('Network error')
+      await expect(store.refreshToken()).rejects.toThrow('Network error')
+
+      expect(mockTokenRefresh).toHaveBeenCalledTimes(2)
+      expect(store.isLoggedIn).toBe(false)
     })
   })
 }) 

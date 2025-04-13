@@ -2,7 +2,7 @@
   <div class="p-6">
     <h1 class="text-2xl font-bold mb-6">{{ isEditing ? 'Edit Post' : 'Create New Post' }}</h1>
     
-    <form @submit.prevent="handleSubmit">
+    <form @submit.prevent>
       <div class="grid grid-cols-3 gap-4 mb-4">
         <div class="col-span-2">
           <label for="title" class="block mb-2 font-medium">Title</label>
@@ -56,10 +56,18 @@
 
       <div class="flex gap-4">
         <Button
-          type="submit"
+          type="button"
           severity="success"
           size="small"
-          :label="isEditing ? 'Update Post' : 'Create Post'"
+          label="Save"
+          @click="handleSave(false)"
+        />
+        <Button
+          type="button"
+          severity="success"
+          size="small"
+          label="Save & Back"
+          @click="handleSave(true)"
         />
         <Button
           type="button"
@@ -74,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { MdEditor, config } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
@@ -90,6 +98,7 @@ const toast = useToast()
 const postsApi = useApiClient(PostsApi)
 
 const isEditing = computed(() => route.params.id !== undefined)
+const postId = ref<number | null>(null)
 const post = ref<PostMutate>({
   title: '',
   slug: '',
@@ -158,6 +167,7 @@ onMounted(async () => {
       const response = await postsApi.apiGetPostById({
         id: parseInt(route.params.id as string)
       })
+      postId.value = response.id
       post.value = {
         title: response.title,
         slug: response.slug,
@@ -177,7 +187,56 @@ onMounted(async () => {
   }
 })
 
-const handleSubmit = async () => {
+// Add auto-save functionality for unpublished posts
+let autoSaveInterval: number | null = null
+
+const startAutoSave = () => {
+  if (autoSaveInterval) return // Don't start if already running
+  
+  autoSaveInterval = window.setInterval(async () => {
+    // Only auto-save if we have an ID (existing post) and it's not published
+    if (postId.value && !post.value.published) {
+      try {
+        await postsApi.apiUpdatePost({
+          id: postId.value,
+          postMutate: post.value
+        })
+        toast.add({
+          severity: 'info',
+          summary: 'Auto-saved',
+          detail: 'Draft saved automatically',
+          life: 2000
+        })
+      } catch (error) {
+        console.error('Auto-save failed:', error)
+        // Don't show error toast for auto-save failures to avoid spam
+      }
+    }
+  }, 60000) // Run every minute
+}
+
+const stopAutoSave = () => {
+  if (autoSaveInterval) {
+    window.clearInterval(autoSaveInterval)
+    autoSaveInterval = null
+  }
+}
+
+// Start auto-save when conditions are met
+watch(() => [postId.value, post.value.published], ([newId, isPublished]) => {
+  if (newId && !isPublished) {
+    startAutoSave()
+  } else {
+    stopAutoSave()
+  }
+}, { immediate: true })
+
+// Clean up on component unmount
+onUnmounted(() => {
+  stopAutoSave()
+})
+
+const handleSave = async (shouldRedirect: boolean) => {
   try {
     if (isEditing.value) {
       await postsApi.apiUpdatePost({
@@ -190,21 +249,28 @@ const handleSubmit = async () => {
         detail: 'Post updated successfully',
         life: 3000
       })
-      router.push({ name: 'admin-posts' })
+      if (shouldRedirect) {
+        router.push({ name: 'admin-posts' })
+      }
     } else {
       const response = await postsApi.apiCreatePost({
         postMutate: post.value
       })
+      postId.value = response.id // Set the post ID after creation
       toast.add({
         severity: 'success',
         summary: 'Success',
         detail: 'Post created successfully',
         life: 3000
       })
-      router.push({ 
-        name: 'admin-posts-edit',
-        params: { id: response.id.toString() }
-      })
+      if (shouldRedirect) {
+        router.push({ name: 'admin-posts' })
+      } else {
+        router.replace({ 
+          name: 'admin-posts-edit',
+          params: { id: response.id.toString() }
+        })
+      }
     }
   } catch (error) {
     console.error('Error saving post:', error)
