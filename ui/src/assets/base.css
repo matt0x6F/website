@@ -102,9 +102,20 @@ body {
 }
 
 .md-editor {
-  background-color: inherit !important;
+  background-color: color-mix(in srgb, var(--p-surface-800) 95%, transparent) !important;
   word-break: normal !important;
   overflow-wrap: break-word !important;
+  z-index: 100 !important;
+  position: relative !important;
+}
+
+.md-editor-fullscreen {
+  z-index: 100 !important;
+  background-color: color-mix(in srgb, var(--p-surface-800) 95%, transparent) !important;
+}
+
+.md-editor-fullscreen .md-editor-preview-wrapper {
+  background-color: color-mix(in srgb, var(--p-surface-800) 95%, transparent) !important;
 }
 
 @media (prefers-color-scheme: dark) {
