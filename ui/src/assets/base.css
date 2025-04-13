@@ -102,23 +102,35 @@ body {
 }
 
 .md-editor {
-  background-color: color-mix(in srgb, var(--p-surface-800) 95%, transparent) !important;
   word-break: normal !important;
   overflow-wrap: break-word !important;
   z-index: 100 !important;
   position: relative !important;
+  background-color: var(--p-surface-100) !important;
 }
 
 .md-editor-fullscreen {
-  z-index: 100 !important;
-  background-color: color-mix(in srgb, var(--p-surface-800) 95%, transparent) !important;
+  z-index: 1150 !important;
+  background-color: var(--p-surface-100) !important;
 }
 
-.md-editor-fullscreen .md-editor-preview-wrapper {
-  background-color: color-mix(in srgb, var(--p-surface-800) 95%, transparent) !important;
+.md-editor-preview-wrapper {
+  background-color: var(--p-surface-100) !important;
 }
 
 @media (prefers-color-scheme: dark) {
+  .md-editor {
+    background-color: inherit !important;
+  }
+
+  .md-editor-fullscreen {
+    background-color: var(--p-surface-700) !important;
+  }
+
+  .md-editor-preview-wrapper {
+    background-color: inherit !important;
+  }
+
   .md-editor p {
     color: white !important;
     word-break: normal !important;
@@ -176,6 +188,10 @@ body {
 }
 
 @media (prefers-color-scheme: light) {
+  .md-editor,
+  .md-editor-fullscreen {
+    background-color: var(--p-surface-50) !important;
+  }
   .md-editor p {
     color: black !important;
   }
