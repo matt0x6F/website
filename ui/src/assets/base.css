@@ -121,22 +121,22 @@ body {
 
   .md-editor h1 {
     color: white !important;
-    border-bottom-color: var(--p-surface-700) !important;
+    border-bottom-color: var(--p-surface-600) !important;
   }
 
   .md-editor h2 {
     color: white !important;
-    border-bottom-color: var(--p-surface-700) !important;
+    border-bottom-color: var(--p-surface-600) !important;
   }
 
   .md-editor h3 {
     color: white !important;
-    border-bottom-color: var(--p-surface-700) !important;
+    border-bottom-color: var(--p-surface-600) !important;
   }
 
   .md-editor h4 {
     color: white !important;
-    border-bottom-color: var(--p-surface-700) !important;
+    border-bottom-color: var(--p-surface-600) !important;
   }
 
   .md-editor ul {
@@ -146,8 +146,17 @@ body {
   .md-editor ol {
     color: white !important;
   }
-  
-  
+
+  .md-editor em {
+    color: white !important;
+  }
+
+  .md-editor hr {
+    border: none;
+    height: 1px;
+    border-top: 1px dashed var(--p-surface-600) !important;
+    margin: 1.5em 0;
+  }
 }
 
 @media (prefers-color-scheme: light) {
@@ -162,9 +171,20 @@ body {
   .md-editor a:hover {
     color: var(--p-primary-color) !important;
   }
+
+  .md-editor em {
+    color: black !important;
+  }
+
+  .md-editor hr {
+    border: none;
+    height: 1px;
+    border-top: 1px dashed var(--p-surface-300) !important;
+    margin: 1.5em 0;
+  }
 }
 
-.md-editor ol {
+.md-editor ul {
   list-style-type: disc !important;
 }
 
