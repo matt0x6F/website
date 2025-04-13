@@ -18,7 +18,7 @@ class StaffOnlyModify:
     def check(request: HttpRequest, user: AbstractUser):
         if request.method == "GET":
             return
-        if not user.is_staff:
+        if not request.user.is_staff:
             logger.info(
                 "User attempted to access restricted endpoint and was rejected",
                 user=user,
