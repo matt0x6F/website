@@ -103,11 +103,16 @@ body {
 
 .md-editor {
   background-color: inherit !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
 }
 
 @media (prefers-color-scheme: dark) {
   .md-editor p {
     color: white !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    text-align: justify !important;
   }
 
   // use tailwinds emerald-600 for links
