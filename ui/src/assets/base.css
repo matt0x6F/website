@@ -126,6 +126,12 @@ body {
   z-index: -1 !important;
 }
 
+.md-editor p {
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  text-align: justify !important;
+}
+
 @media (prefers-color-scheme: dark) {
   .md-editor {
     background-color: inherit !important;
@@ -141,9 +147,6 @@ body {
 
   .md-editor p {
     color: white !important;
-    word-break: normal !important;
-    overflow-wrap: break-word !important;
-    text-align: justify !important;
   }
 
   // use tailwinds emerald-600 for links
@@ -196,10 +199,20 @@ body {
 }
 
 @media (prefers-color-scheme: light) {
-  .md-editor,
+  .md-editor {
+    background-color: inherit !important;
+  }
+
   .md-editor-fullscreen {
     background-color: var(--p-surface-50) !important;
   }
+
+
+
+  .md-editor-preview-wrapper {
+    background-color: inherit !important;
+  }
+
   .md-editor p {
     color: black !important;
   }
