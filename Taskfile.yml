@@ -36,8 +36,8 @@ tasks:
   migrate:
     desc: "Run migrations"
     cmds:
-      - python api/manage.py makemigrations
-      - python api/manage.py migrate
+      - docker compose exec django poetry run python manage.py makemigrations
+      - docker compose exec django poetry run python manage.py migrate
     env:
       DATABASE__HOST: "localhost"
   
@@ -46,7 +46,7 @@ tasks:
     env:
       DATABASE__HOST: "localhost"
     cmds:
-      - python api/manage.py createsuperuser
+      - docker compose exec django poetry run python manage.py createsuperuser
 
   export-schema:
     desc: "Export OpenAPI v3.1 schema"
