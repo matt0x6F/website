@@ -1,15 +1,22 @@
 <template>
   <div>
-    <div class="p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Blog Posts</h1>
-        <router-link 
-          :to="{ name: 'admin-posts-new' }"
-          class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
-        >
-          Create New Post
-        </router-link>
-      </div>
+    <div class="">
+      <h1 class="text-2xl font-bold">Blog Posts</h1>
+      <Toolbar class="mb-6">
+        <template #start>
+          <router-link :to="{ name: 'admin-posts-new' }">
+            <Button v-tooltip.bottom="{ value: 'Create New Post', showDelay: 1000 }" icon="pi pi-plus" aria-label="Create New Post" class="mr-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600" text />
+          </router-link>
+        </template>
+        <template #center>
+          <div class="flex items-center gap-4">
+            <SelectButton v-model="filterStatus" optionLabel="label" :options="filterOptions" aria-label="Post Status" />
+          </div>
+        </template>
+        <template #end>
+          
+        </template>
+      </Toolbar>
 
       <div class="space-y-4">
         <div v-if="loading" class="text-gray-600">Loading posts...</div>
@@ -19,7 +26,7 @@
         </div>
 
         <div v-else-if="!posts.length" class="text-gray-600">
-          No posts yet
+          No posts found
         </div>
 
         <div v-else class="divide-y">
@@ -53,21 +60,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useApiClient } from '@/composables/useApiClient'
-import { PostsApi } from '@/lib/api/apis/PostsApi'
+import { PostsApi, type ApiListPostsRequest } from '@/lib/api/apis/PostsApi'
 import type { PostDetails } from '@/lib/api/models'
 import Badge from 'primevue/badge'
+import Toolbar from 'primevue/toolbar'
+import SelectButton from 'primevue/selectbutton'
+import Button from 'primevue/button'
 
 const posts = ref<PostDetails[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 
+const filterOptions = [
+  { label: 'Published', value: 'published' },
+  { label: 'Drafts', value: 'drafts' },
+  { label: 'All Posts', value: 'all' }
+]
+
+const filterStatus = ref({ label: 'Published', value: 'published' })
+
 const loadPosts = async () => {
   const client = useApiClient(PostsApi)
   try {
     loading.value = true
-    const response = await client.apiListPosts({ all: true })
+    error.value = null
+
+    console.log("Filter status: ", filterStatus.value)
+    
+    const queryParams: ApiListPostsRequest = {}
+    if (filterStatus.value.value === 'all') {
+      queryParams.all = true
+      queryParams.drafts = true
+    } else {
+      queryParams.drafts = filterStatus.value.value !== 'published'
+    }
+    
+    const response = await client.apiListPosts(queryParams)
     posts.value = response.items
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'An error occurred'
@@ -75,6 +105,11 @@ const loadPosts = async () => {
     loading.value = false
   }
 }
+
+// Watch for filter changes and reload posts
+watch(filterStatus, () => {
+  loadPosts()
+})
 
 onMounted(() => {
   loadPosts()

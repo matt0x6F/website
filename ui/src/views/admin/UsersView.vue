@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="p-6">
-      <div class="space-y-4">
+    <div class="">
+      <div class="space-y-2">
         <div v-if="loading" class="text-gray-600">Loading users...</div>
         
         <div v-else-if="error" class="text-red-600">
@@ -12,7 +12,7 @@
           No users found
         </div>
 
-        <div v-else class="-mx-12">
+        <div v-else class="-mx-4">
           <DataView
             :value="users"
             dataKey="id"
@@ -24,7 +24,7 @@
             class="border-none !bg-transparent"
           >
             <template #header>
-              <div class="flex justify-between items-center p-2">
+              <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-bold">Users</h1>
                 <div class="flex items-center gap-2">
                   <span class="text-gray-600 dark:text-gray-400">Sort by:</span>
@@ -60,7 +60,7 @@
                       <template #header>
                         <div class="flex items-center justify-between">
                           <div class="flex items-center gap-2">
-                            <h2 class="text-xl font-semibold">{{ item.email }}</h2>
+                            <h2 class="text-xl font-semibold ml-2">{{ item.email }}</h2>
                             <div class="flex gap-1">
                               <Badge v-if="item.isStaff" value="Staff" severity="info" />
                               <Badge v-if="item.isSuperuser" value="Admin" severity="warning" />
