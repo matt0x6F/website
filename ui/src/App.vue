@@ -13,8 +13,6 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e)
     isDarkMode.value = e.matches;
 });
 
-const currentLogo = computed(() => isDarkMode.value ? logoDark : logoLight);
-
 const items = ref([
     {
         label: 'Home',
