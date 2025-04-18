@@ -1,8 +1,18 @@
 <template>
-  <div class="py-4 flex items-center">
+  <div class="py-4">
+    <div class="flex flex-col md:flex-row items-center gap-8 mb-10">
+      <img src="/avatar_resized.png" alt="Matt" class="w-32 h-32 md:w-40 md:h-40 rounded-3xl object-cover shadow-lg flex-shrink-0">
+      <div class="text-center md:text-left">
+        <h1 class="text-4xl md:text-5xl mb-4">Hey, I'm Matt 👋</h1>
+        <p>
+          I'm a software engineer with a passion for platform engineering and developer tools.
+          Throughout my career, I've worked on diverse platform and internal product teams,
+          focusing on everything from compute scheduling to security and reliability products.
+        </p>
+      </div>
+    </div>
+
     <div class="text-left">
-      <h1 class="text-4xl md:text-5xl mb-8">Hey, I'm Matt 👋</h1>
-      
       <section class="mb-10">
         <p>
           I'm a software engineer with a passion for platform engineering and developer tools.
