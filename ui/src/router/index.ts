@@ -4,6 +4,7 @@ import AboutView from '@/views/AboutView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import BlogListView from '@/views/BlogListView.vue'
 import BlogPostView from '@/views/BlogPostView.vue'
+import ResumeView from '@/views/ResumeView.vue'
 import AdminTemplate from '@/views/admin/AdminTemplate.vue'
 import DashboardView from '@/views/admin/DashboardView.vue'
 import PostsView from '@/views/admin/PostsView.vue'
@@ -27,6 +28,11 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: AboutView,
+    },
+    {
+      path: '/resume',
+      name: 'resume',
+      component: ResumeView,
     },
     {
       path: '/profile',

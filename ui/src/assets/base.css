@@ -235,8 +235,9 @@ body {
   }
 }
 
-.md-editor ul {
+#content ul {
   list-style-type: disc !important;
+  margin-left: 1em !important;
 }
 
 .md-editor a {

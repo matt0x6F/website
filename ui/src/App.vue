@@ -30,6 +30,11 @@ const items = ref([
         route: '/blog'
     },
     {
+        label: 'Resume',
+        icon: 'pi pi-id-card',
+        route: '/resume'
+    },
+    {
         label: 'Admin',
         icon: 'pi pi-lock',
         visible: () => userStore.isLoggedIn,
@@ -100,7 +105,7 @@ const handleLoginClick = () => {
       </template>
     </MenuBar>
 
-    <div class="min-h-64">
+    <div id="content" class="min-h-64">
       <RouterView />
     </div>
     <div>
