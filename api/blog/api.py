@@ -9,8 +9,10 @@ from ninja import File as NinjaFile
 from ninja import Router, UploadedFile
 from ninja.errors import HttpError, ValidationError
 from ninja.pagination import paginate
+from ninja.responses import Response
 
 from auth.middleware import JWTAuth, StaffOnly, StaffOnlyModify
+from blog.feed_builder import FeedBuilder
 from blog.models import Comment, File, Post
 from blog.schema import (
     AdminCommentList,
@@ -25,6 +27,7 @@ from blog.schema import (
     PostMutate,
     ValidationErrorResponse,
 )
+from blog.schemas import Author, FeedItem, JSONFeed
 from files.storage import PrivateStorage, PublicStorage
 
 logger = structlog.get_logger(__name__)
@@ -32,6 +35,58 @@ logger = structlog.get_logger(__name__)
 posts_router = Router()
 files_router = Router()
 comments_router = Router()
+feed_router = Router()
+
+
+#
+# Feed
+#
+
+
+@feed_router.get(
+    "/",
+    auth=JWTAuth(None, True),
+    response={200: JSONFeed},
+    tags=["feed"],
+)
+def feed(request: HttpRequest, limit: int = 10, offset: int = 0):
+    builder = (
+        FeedBuilder(title="ooo-yay feed")
+        .with_authors([Author(name="Matt Ouille", url="https://ooo-yay.com")])
+        .with_description("Latest posts from @ooo-yay")
+        .with_icon("https://ooo-yay.com/logo.svg")
+        .with_favicon("https://ooo-yay.com/logo.svg")
+        .with_feed_url("https://ooo-yay.com/api/feed/")
+        .with_home_page_url("https://ooo-yay.com")
+    )
+
+    posts = Post.objects.filter(published__lte=timezone.now()).order_by("-published")[
+        offset : offset + limit
+    ]
+    for post in posts:
+        builder.add_item(
+            FeedItem(
+                id=f"{post.id}",
+                title=post.title,
+                content_html=post.content,
+                date_published=post.published,
+                date_modified=post.updated_at,
+                language="en",
+                author=Author(name="Matt Ouille", url="https://ooo-yay.com"),
+                url=f"https://ooo-yay.com/posts/{post.published.year}/{post.slug}",
+            )
+        )
+
+    count = Post.objects.filter(published__lte=timezone.now()).count()
+    if offset + limit < count:
+        builder.with_next_url(f"https://ooo-yay.com/feed.json?limit={limit}&offset={offset+limit}")
+
+    return Response(builder.build(), content_type="application/feed+json")
+
+
+#
+# Posts
+#
 
 
 @posts_router.get("/", auth=JWTAuth(None, True), response={200: List[PostDetails]}, tags=["posts"])
@@ -156,6 +211,11 @@ def delete_post(request, id: int):
     post = Post.objects.get(id=id)
     post.delete()
     return None
+
+
+#
+# Files
+#
 
 
 @files_router.get(
@@ -291,6 +351,11 @@ def delete_file(request: HttpRequest, id: int):
         raise err
 
     return None
+
+
+#
+# Comments
+#
 
 
 @comments_router.get(

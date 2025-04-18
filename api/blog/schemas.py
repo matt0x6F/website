@@ -85,7 +85,7 @@ class FeedItem(Schema):
     )
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "id": "2347259",
                 "url": "https://example.org/2347259",
@@ -147,7 +147,7 @@ class JSONFeed(Schema):
     )
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "version": "https://jsonfeed.org/version/1.1",
                 "title": "My Blog Feed",

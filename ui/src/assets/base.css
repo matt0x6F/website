@@ -246,3 +246,12 @@ body {
 .md-editor a:hover {
   text-decoration: underline !important;
 }
+
+a {
+  @apply text-primary;
+}
+
+a:hover {
+  @apply underline;
+}
+
