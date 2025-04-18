@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useAuthStore } from './stores/auth';
 import LoginDialog from './components/LoginDialog.vue';
 
 const userStore = useAuthStore();
 const showLoginDialog = ref(false);
+const isDarkMode = ref(window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+// Update dark mode when system preference changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    isDarkMode.value = e.matches;
+});
+
+const currentLogo = computed(() => isDarkMode.value ? logoDark : logoLight);
 
 const items = ref([
     {
@@ -61,6 +69,11 @@ const handleLoginClick = () => {
   <Toast />
   <div class="max-w-screen-lg mx-auto space-y-4">
     <MenuBar :model="items">
+      <template #start>
+        <span class="font-bold text-lg">m</span>
+        <span class="font-semibold text-lg text-emerald-500">@</span>
+        <span class="font-bold text-lg">ooo-yay</span>
+      </template>
       <template #item="{ item, props, hasSubmenu }">
         <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
             <a v-ripple :href="href" v-bind="props.action" @click="navigate">

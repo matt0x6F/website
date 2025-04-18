@@ -3,6 +3,7 @@
   <rect width="226.024" height="226.024" rx="51.557" ry="51.557" style="fill: rgb(0, 188, 125); stroke-miterlimit: 18.4; transform-box: fill-box; transform-origin: 50% 50%;"/>
   <g transform="matrix(1, 0, 0, 1, 9.332314, -0.227382)">
     <text style="fill: rgb(51, 51, 51); font-family: &quot;Open Sans&quot;; font-size: 105px; font-weight: 800; white-space: pre;" x="0" y="144.362">m</text>
-    <text style="fill: rgb(255, 255, 255); font-family: &quot;Open Sans&quot;; font-size: 105px; font-weight: 600; white-space: pre;" x="109.315" y="149.488">@</text>
+    <text style="fill: rgb(51, 51, 51); font-family: &quot;Open Sans&quot;; font-size: 105px; font-weight: 800; white-space: pre;" x="109.315" y="149.488">@</text>
+    <text style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 28px;" x="279.514" y="60.546">Enter your text here</text>
   </g>
 </svg>
