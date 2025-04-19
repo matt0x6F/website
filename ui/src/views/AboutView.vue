@@ -13,14 +13,6 @@
     </div>
 
     <div class="text-left">
-      <section class="mb-10">
-        <p>
-          I'm a software engineer with a passion for platform engineering and developer tools.
-          Throughout my career, I've worked on diverse platform and internal product teams,
-          focusing on everything from compute scheduling to security and reliability products.
-        </p>
-      </section>
-
       <section class="my-10">
         <h2 class="text-2xl md:text-3xl mb-4">What I'm Into</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
