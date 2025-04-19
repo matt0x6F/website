@@ -71,7 +71,7 @@ const handleLoginClick = () => {
 <template>
   <Toast />
   <div class="max-w-screen-lg mx-auto space-y-4">
-    <MenuBar :model="items">
+    <MenuBar :model="items" class="no-print">
       <template #start>
         <span class="font-bold text-lg">m</span>
         <span class="font-semibold text-lg text-emerald-500">@</span>
@@ -108,11 +108,11 @@ const handleLoginClick = () => {
     <div id="content" class="min-h-64">
       <RouterView />
     </div>
-    <div>
-        <p class="m-0 text-xs text-center">
-            Copyright &copy; 2022-2025 Matt Ouille. All rights reserved.
-        </p>
-        <p class="m-0 text-xs text-center"><a href="/api/feed" target="_blank">JSON Feed</a></p>
+    <div class="no-print">
+      <p class="m-0 text-xs text-center">
+        Copyright &copy; 2022-2025 Matt Ouille. All rights reserved.
+      </p>
+      <p class="m-0 text-xs text-center"><a href="/api/feed" target="_blank">JSON Feed</a></p>
     </div>
   </div>
 
@@ -120,5 +120,9 @@ const handleLoginClick = () => {
 </template>
 
 <style scoped>
-
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
 </style>
