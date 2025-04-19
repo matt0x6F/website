@@ -132,6 +132,12 @@ body {
   text-align: justify !important;
 }
 
+.md-editor li {
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  text-align: justify !important;
+}
+
 @media (prefers-color-scheme: dark) {
   .md-editor {
     background-color: inherit !important;
@@ -248,11 +254,11 @@ body {
   text-decoration: underline !important;
 }
 
-a {
+#content a {
   @apply text-primary;
 }
 
-a:hover {
+#content a:hover {
   @apply underline;
 }
 
