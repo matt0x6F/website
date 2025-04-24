@@ -123,3 +123,17 @@ class CommentCreate(Schema):
     content: str
     parent_id: Optional[int] = None
     post_id: int
+
+
+class OrphanedFileDetails(Schema):
+    name: str
+    size: int
+    content_type: str
+    location: str
+    last_modified: Optional[datetime]
+    visibility: str
+
+
+class OrphanedFiles(Schema):
+    public: List[OrphanedFileDetails]
+    private: List[OrphanedFileDetails]

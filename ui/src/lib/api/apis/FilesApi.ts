@@ -18,6 +18,7 @@ import type {
   FileDetails,
   FileMetadata,
   FileMutateMetadata,
+  OrphanedFiles,
   PagedFileDetails,
 } from '../models/index';
 import {
@@ -27,6 +28,8 @@ import {
     FileMetadataToJSON,
     FileMutateMetadataFromJSON,
     FileMutateMetadataToJSON,
+    OrphanedFilesFromJSON,
+    OrphanedFilesToJSON,
     PagedFileDetailsFromJSON,
     PagedFileDetailsToJSON,
 } from '../models/index';
@@ -265,6 +268,42 @@ export class FilesApi extends runtime.BaseAPI {
      */
     async apiListFiles(requestParameters: ApiListFilesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedFileDetails> {
         const response = await this.apiListFilesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Find files that exist in storage but not in the database. If a file exists in both public and private storage, it will be considered public. Returns detailed metadata about each orphaned file.
+     * List Orphaned Files
+     */
+    async apiListOrphanedFilesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OrphanedFiles>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/files/orphaned`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => OrphanedFilesFromJSON(jsonValue));
+    }
+
+    /**
+     * Find files that exist in storage but not in the database. If a file exists in both public and private storage, it will be considered public. Returns detailed metadata about each orphaned file.
+     * List Orphaned Files
+     */
+    async apiListOrphanedFiles(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OrphanedFiles> {
+        const response = await this.apiListOrphanedFilesRaw(initOverrides);
         return await response.value();
     }
 

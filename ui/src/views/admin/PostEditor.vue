@@ -50,6 +50,8 @@
             height="800px"
             preview-theme="vuepress"
             :theme="isDarkMode ? 'dark' : 'light'"
+            :onUploadImg="handleImageUpload"
+            @onDrop="handleDrop"
           />
         </div>
       </div>
@@ -86,11 +88,12 @@ import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { MdEditor, config } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
-import { PostsApi, type PostMutate } from '@/lib/api'
+import { PostsApi, type PostMutate, FilesApi, type FileMetadata } from '@/lib/api'
 import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
 import { useApiClient } from '@/composables/useApiClient'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const route = useRoute()
@@ -138,6 +141,81 @@ onMounted(() => {
     isDarkMode.value = e.matches
   })
 })
+
+const handleImageUpload = async (files: File[], callback: (urls: string[]) => void) => {
+  const uploadedUrls: string[] = []
+  const auth = useAuthStore()
+
+  try {
+    for (const file of files) {
+      const formData = new FormData()
+      formData.append('upload', file)
+
+      const metadata = {
+        visibility: 'public',
+        posts: postId.value ? [postId.value] : []
+      }
+
+      formData.append('metadata', JSON.stringify(metadata))
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/files/`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${auth.storedAccessToken}`
+        },
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`)
+      }
+
+      const fileMetadata = await response.json()
+      uploadedUrls.push(fileMetadata.location)
+
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: `Uploaded ${fileMetadata.name} successfully`,
+        life: 3000
+      })
+    }
+
+    callback(uploadedUrls)
+  } catch (error) {
+    console.error('Error uploading images:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to upload images',
+      life: 3000
+    })
+    callback([])
+  }
+}
+
+const handleDrop = async (e: DragEvent) => {
+  e.preventDefault()
+  
+  if (!postId.value) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Warning',
+      detail: 'Please save the post first before adding files',
+      life: 3000
+    })
+    return
+  }
+
+  const files = Array.from(e.dataTransfer?.files || [])
+  if (files.length > 0) {
+    await handleImageUpload(files, (urls) => {
+      // Insert the URLs into the editor at cursor position
+      const urlsMarkdown = urls.map(url => `![](${url})`).join('\n')
+      post.value.content += '\n' + urlsMarkdown
+    })
+  }
+}
 
 let editorConfig = {
   editorExtensions: {

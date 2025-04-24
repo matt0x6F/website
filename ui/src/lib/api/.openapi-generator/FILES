@@ -1,6 +1,7 @@
 apis/AccountsApi.ts
 apis/CommentsApi.ts
 apis/DefaultApi.ts
+apis/FeedApi.ts
 apis/FilesApi.ts
 apis/GroupsApi.ts
 apis/ModerationApi.ts
@@ -15,12 +16,15 @@ models/AdminCommentUpdate.ts
 models/AdminParentCommentList.ts
 models/AdminUserDetails.ts
 models/AdminUserModify.ts
+models/Attachment.ts
 models/AuthError.ts
+models/Author.ts
 models/AuthorSummary.ts
 models/CommentCreate.ts
 models/CommentList.ts
 models/CommentMutate.ts
 models/ContentType.ts
+models/FeedItem.ts
 models/FileDetails.ts
 models/FileMetadata.ts
 models/FileMutateMetadata.ts
@@ -28,8 +32,12 @@ models/Group.ts
 models/GroupMutate.ts
 models/HealthResponse.ts
 models/HealthStatus.ts
+models/Hub.ts
 models/Input.ts
+models/JSONFeed.ts
 models/NewAccount.ts
+models/OrphanedFileDetails.ts
+models/OrphanedFiles.ts
 models/PagedAdminCommentList.ts
 models/PagedAdminUserDetails.ts
 models/PagedCommentList.ts

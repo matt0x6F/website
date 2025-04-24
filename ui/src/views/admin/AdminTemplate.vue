@@ -28,5 +28,6 @@ const navLinks = [
   { to: '/admin/posts', text: 'Posts' },
   { to: '/admin/users', text: 'Users' },
   { to: '/admin/comments', text: 'Comments' },
+  { to: '/admin/files', text: 'Files' },
 ]
 </script> 

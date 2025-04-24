@@ -3,6 +3,7 @@
 export * from './AccountsApi';
 export * from './CommentsApi';
 export * from './DefaultApi';
+export * from './FeedApi';
 export * from './FilesApi';
 export * from './GroupsApi';
 export * from './ModerationApi';

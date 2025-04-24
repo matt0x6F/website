@@ -12,6 +12,7 @@ import PostEditor from '@/views/admin/PostEditor.vue'
 import UsersView from '@/views/admin/UsersView.vue'
 import UserEditor from '@/views/admin/UserEditor.vue'
 import CommentsView from '@/views/admin/CommentsView.vue'
+import FilesPage from '@/views/admin/FilesPage.vue'
 import PageNotFoundView from '@/views/PageNotFoundView.vue'
 import CommentDetailView from '@/views/admin/CommentDetailView.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -105,6 +106,11 @@ const router = createRouter({
           path: 'comments/:id',
           name: 'admin-comment-detail',
           component: CommentDetailView,
+        },
+        {
+          path: 'files',
+          name: 'admin-files',
+          component: FilesPage,
         }
       ]
     },

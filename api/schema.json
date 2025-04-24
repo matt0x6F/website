@@ -1334,6 +1334,34 @@
         ]
       }
     },
+    "/api/files/orphaned": {
+      "get": {
+        "operationId": "blog_api_list_orphaned_files",
+        "summary": "List Orphaned Files",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrphanedFiles"
+                }
+              }
+            }
+          }
+        },
+        "description": "Find files that exist in storage but not in the database.\nIf a file exists in both public and private storage, it will be considered public.\nReturns detailed metadata about each orphaned file.",
+        "tags": [
+          "files"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
     "/api/files/{id}": {
       "get": {
         "operationId": "blog_api_get_file",
@@ -1777,6 +1805,54 @@
         },
         "tags": [
           "comments"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/feed/": {
+      "get": {
+        "operationId": "blog_api_feed",
+        "summary": "Feed",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 10,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "title": "Offset",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JSONFeed"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "feed"
         ],
         "security": [
           {
@@ -2853,6 +2929,76 @@
         "title": "FileMetadata",
         "type": "object"
       },
+      "OrphanedFileDetails": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "content_type": {
+            "title": "Content Type",
+            "type": "string"
+          },
+          "location": {
+            "title": "Location",
+            "type": "string"
+          },
+          "last_modified": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Modified"
+          },
+          "visibility": {
+            "title": "Visibility",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "size",
+          "content_type",
+          "location",
+          "last_modified",
+          "visibility"
+        ],
+        "title": "OrphanedFileDetails",
+        "type": "object"
+      },
+      "OrphanedFiles": {
+        "properties": {
+          "public": {
+            "items": {
+              "$ref": "#/components/schemas/OrphanedFileDetails"
+            },
+            "title": "Public",
+            "type": "array"
+          },
+          "private": {
+            "items": {
+              "$ref": "#/components/schemas/OrphanedFileDetails"
+            },
+            "title": "Private",
+            "type": "array"
+          }
+        },
+        "required": [
+          "public",
+          "private"
+        ],
+        "title": "OrphanedFiles",
+        "type": "object"
+      },
       "FileMutateMetadata": {
         "properties": {
           "posts": {
@@ -3279,6 +3425,498 @@
           "content"
         ],
         "title": "CommentMutate",
+        "type": "object"
+      },
+      "Attachment": {
+        "properties": {
+          "url": {
+            "description": "The URL of the attachment",
+            "title": "Url",
+            "type": "string"
+          },
+          "mime_type": {
+            "description": "The MIME type of the attachment",
+            "title": "Mime Type",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A name for the attachment",
+            "title": "Title"
+          },
+          "size_in_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The size of the attachment in bytes",
+            "title": "Size In Bytes"
+          },
+          "duration_in_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The duration of the attachment in seconds, if it's audio or video",
+            "title": "Duration In Seconds"
+          }
+        },
+        "required": [
+          "url",
+          "mime_type"
+        ],
+        "title": "Attachment",
+        "type": "object"
+      },
+      "Author": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The author's name",
+            "title": "Name"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL of a site owned by the author. It could be a blog, micro-blog, Twitter account, etc.",
+            "title": "Url"
+          },
+          "avatar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL for an image for the author. Should be square and relatively large \u2014 such as 512 x 512 pixels.",
+            "title": "Avatar"
+          }
+        },
+        "title": "Author",
+        "type": "object"
+      },
+      "FeedItem": {
+        "example": {
+          "content_text": "Hello World!",
+          "date_published": "2023-04-20T14:22:00-07:00",
+          "id": "2347259",
+          "url": "https://example.org/2347259"
+        },
+        "properties": {
+          "id": {
+            "description": "Unique for that item for that feed over time. If an item is ever updated, the id should be unchanged. New items should never use a previously-used id.",
+            "title": "Id",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL of the resource described by the item. It's the permalink.",
+            "title": "Url"
+          },
+          "external_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL of a page elsewhere. This is especially useful for linkblogs.",
+            "title": "External Url"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Plain text title of the item. Microblog items in particular may omit titles.",
+            "title": "Title"
+          },
+          "content_html": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The HTML content of the item. If content_html includes any HTML, it MUST be encoded as valid HTML.",
+            "title": "Content Html"
+          },
+          "content_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plain text content of the item. Microblog items in particular may omit titles.",
+            "title": "Content Text"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A plain text sentence or two describing the item. This might be presented in a timeline, for instance.",
+            "title": "Summary"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL of the main image for the item. This image may also appear in the content_html.",
+            "title": "Image"
+          },
+          "banner_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL of an image to use as a banner. Some feed readers may choose to display this banner image at the top of the feed.",
+            "title": "Banner Image"
+          },
+          "date_published": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The date the item was published in RFC 3339 format.",
+            "title": "Date Published"
+          },
+          "date_modified": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The date the item was modified in RFC 3339 format.",
+            "title": "Date Modified"
+          },
+          "authors": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Author"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The authors of the item.",
+            "title": "Authors"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "An array of tags or categories. These can be used to categorize items across feeds.",
+            "title": "Tags"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The primary language for the item in the format specified in RFC 5646.",
+            "title": "Language"
+          },
+          "attachments": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Attachment"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "An array of attachments, such as audio or video files.",
+            "title": "Attachments"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "FeedItem",
+        "type": "object"
+      },
+      "Hub": {
+        "properties": {
+          "type": {
+            "description": "The type of the hub.",
+            "title": "Type",
+            "type": "string"
+          },
+          "url": {
+            "description": "The URL of the hub.",
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "url"
+        ],
+        "title": "Hub",
+        "type": "object"
+      },
+      "JSONFeed": {
+        "example": {
+          "description": "The latest posts from my blog",
+          "feed_url": "https://example.org/feed.json",
+          "home_page_url": "https://example.org/",
+          "items": [],
+          "title": "My Blog Feed",
+          "version": "https://jsonfeed.org/version/1.1"
+        },
+        "properties": {
+          "version": {
+            "default": "https://jsonfeed.org/version/1.1",
+            "description": "The URL of the version of the format the feed uses. Must be https://jsonfeed.org/version/1.1",
+            "title": "Version",
+            "type": "string"
+          },
+          "title": {
+            "description": "The name of the feed, which will often correspond to the name of the website.",
+            "title": "Title",
+            "type": "string"
+          },
+          "home_page_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL of the resource that the feed describes. This should be an HTML page that corresponds to the feed.",
+            "title": "Home Page Url"
+          },
+          "feed_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL of the feed, and serves as the unique identifier for the feed.",
+            "title": "Feed Url"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Provides more detail, beyond the title, on what the feed is about.",
+            "title": "Description"
+          },
+          "user_comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A description of the purpose of the feed. This is for the use of people looking at the raw JSON, and should be ignored by feed readers.",
+            "title": "User Comment"
+          },
+          "next_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL of a feed that provides the next n items, where n is determined by the publisher.",
+            "title": "Next Url"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL of an image for the feed suitable to be used in a timeline, much the way an avatar might be used. Should be square and relatively large \u2014 such as 512 x 512 pixels.",
+            "title": "Icon"
+          },
+          "favicon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL of an image for the feed suitable to be used in a source list. Should be square and relatively small, but not smaller than 64 x 64 pixels.",
+            "title": "Favicon"
+          },
+          "authors": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Author"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The authors of the feed.",
+            "title": "Authors"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The primary language for the feed in the format specified in RFC 5646.",
+            "title": "Language"
+          },
+          "expired": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Says whether or not the feed is finished \u2014 that is, whether or not it will ever update again.",
+            "title": "Expired"
+          },
+          "hubs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Hub"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Endpoints that can be used to subscribe to real-time notifications from the publisher of this feed.",
+            "title": "Hubs"
+          },
+          "items": {
+            "description": "An array of items, in reverse-chronological order (newest first).",
+            "items": {
+              "$ref": "#/components/schemas/FeedItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "title",
+          "items"
+        ],
+        "title": "JSONFeed",
         "type": "object"
       }
     },

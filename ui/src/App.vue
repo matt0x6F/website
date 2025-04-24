@@ -50,6 +50,11 @@ const items = ref([
                 route: '/admin/posts'
             },
             {
+                label: 'Files',
+                icon: 'pi pi-folder',
+                route: '/admin/files'
+            },
+            {
                 label: 'Users',
                 icon: 'pi pi-users',
                 route: '/admin/users'
