@@ -2,103 +2,100 @@
   <div id="content" class="p-6">
     <h1 class="text-2xl font-bold mb-6">{{ isEditing ? 'Edit Post' : 'Create New Post' }}</h1>
     
-    <form @submit.prevent>
-      <div class="grid grid-cols-3 gap-4 mb-4">
-        <div class="col-span-2">
-          <label for="title" class="block mb-2 font-medium">Title</label>
-          <input
-            id="title"
-            v-model="post.title"
-            type="text"
-            class="w-full p-2 border rounded-lg"
-            required
-          >
+    <form @submit.prevent class="h-full">
+      <div class="editor-container-wrapper">
+        <div class="grid grid-cols-3 gap-4 mb-4" :class="{ 'hidden': isExpanded }">
+          <div class="col-span-2">
+            <label for="title" class="block mb-2 font-medium">Title</label>
+            <input
+              id="title"
+              v-model="post.title"
+              type="text"
+              class="w-full p-2 border rounded-lg"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="publishedAt" class="block mb-2 font-medium">Published Date</label>
+            <DatePicker
+              v-model="post.published"
+              showTime
+              hourFormat="24"
+              showIcon
+              size="small"
+              fluid
+            />
+          </div>
+
+          <div class="col-span-2">
+            <label for="slug" class="block mb-2 font-medium">Slug</label>
+            <input
+              id="slug"
+              v-model="post.slug"
+              type="text"
+              class="w-full p-2 border rounded-lg"
+              required
+              @input="handleSlugInput"
+            >
+          </div>
         </div>
 
-        <div>
-          <label for="publishedAt" class="block mb-2 font-medium">Published Date</label>
-          <DatePicker
-            v-model="post.published"
-            showTime
-            hourFormat="24"
-            showIcon
-            size="small"
-            fluid
-          />
-        </div>
-
-        <div class="col-span-2">
-          <label for="slug" class="block mb-2 font-medium">Slug</label>
-          <input
-            id="slug"
-            v-model="post.slug"
-            type="text"
-            class="w-full p-2 border rounded-lg"
-            required
-            @input="handleSlugInput"
-          >
-        </div>
-      </div>
-
-      <div class="mb-4">
-        <label class="block mb-2 font-medium">Content</label>
-        <div class="relative -mx-32">
-          <MdEditor 
+        <div class="mb-4 editor-wrapper" :class="{ 'expanded': isExpanded }">
+          <MarkdownEditor
             v-model="post.content"
-            class="w-full"
-            language="en-US"
-            height="800px"
-            preview-theme="vuepress"
-            :theme="isDarkMode ? 'dark' : 'light'"
-            :onUploadImg="handleImageUpload"
-            @onDrop="handleDrop"
+            label="Content"
+            :post-id="postId"
+            @file-upload="handleImageUpload"
           />
         </div>
-      </div>
 
-      <div class="flex gap-4">
-        <Button
-          type="button"
-          size="small"
-          label="Save"
-          @click="handleSave(false)"
-        />
-        <Button
-          type="button"
-          size="small"
-          label="Save & Back"
-          @click="handleSave(true)"
-        />
-        <Button
-          type="button"
-          severity="secondary"
-          size="small"
-          label="Cancel"
-          @click="$router.push({ name: 'admin-posts' })"
-        />
+        <div class="button-container" :class="{ 'hidden': isExpanded }">
+          <div class="flex gap-4">
+            <Button
+              type="button"
+              size="small"
+              label="Save"
+              @click="handleSave(false)"
+            />
+            <Button
+              type="button"
+              size="small"
+              label="Save & Back"
+              @click="handleSave(true)"
+            />
+            <Button
+              type="button"
+              severity="secondary"
+              size="small"
+              label="Cancel"
+              @click="$router.push({ name: 'admin-posts' })"
+            />
+          </div>
+        </div>
       </div>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
+import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { MdEditor, config } from 'md-editor-v3'
-import 'md-editor-v3/lib/style.css'
-import { PostsApi, type PostMutate, FilesApi, type FileMetadata } from '@/lib/api'
+import { PostsApi, type PostMutate } from '@/lib/api'
 import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
 import DatePicker from 'primevue/datepicker'
 import { useApiClient } from '@/composables/useApiClient'
 import { useAuthStore } from '@/stores/auth'
+import MarkdownEditor from '@/components/MarkdownEditor.vue'
 
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
 
+const isExpanded = ref(false)
 const isEditing = computed(() => route.params.id !== undefined)
-const postId = ref<number | null>(null)
+const postId = ref<number | undefined>(undefined)
 const post = ref<PostMutate>({
   title: '',
   slug: '',
@@ -130,17 +127,7 @@ const handleSlugInput = () => {
   slugManuallyEdited.value = true
 }
 
-const isDarkMode = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
-
-// Listen for system theme changes
-onMounted(() => {
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  mediaQuery.addEventListener('change', (e) => {
-    isDarkMode.value = e.matches
-  })
-})
-
-const handleImageUpload = async (files: File[], callback: (urls: string[]) => void) => {
+const handleImageUpload = async (files: File[]) => {
   const uploadedUrls: string[] = []
   const auth = useAuthStore()
 
@@ -179,7 +166,9 @@ const handleImageUpload = async (files: File[], callback: (urls: string[]) => vo
       })
     }
 
-    callback(uploadedUrls)
+    // Insert the URLs into the editor at cursor position
+    const urlsMarkdown = uploadedUrls.map(url => `![](${url})`).join('\n')
+    post.value.content += '\n' + urlsMarkdown
   } catch (error) {
     console.error('Error uploading images:', error)
     toast.add({
@@ -188,53 +177,8 @@ const handleImageUpload = async (files: File[], callback: (urls: string[]) => vo
       detail: 'Failed to upload images',
       life: 3000
     })
-    callback([])
   }
 }
-
-const handleDrop = async (e: DragEvent) => {
-  e.preventDefault()
-  
-  if (!postId.value) {
-    toast.add({
-      severity: 'warn',
-      summary: 'Warning',
-      detail: 'Please save the post first before adding files',
-      life: 3000
-    })
-    return
-  }
-
-  const files = Array.from(e.dataTransfer?.files || [])
-  if (files.length > 0) {
-    await handleImageUpload(files, (urls) => {
-      // Insert the URLs into the editor at cursor position
-      const urlsMarkdown = urls.map(url => `![](${url})`).join('\n')
-      post.value.content += '\n' + urlsMarkdown
-    })
-  }
-}
-
-let editorConfig = {
-  editorExtensions: {
-    highlight: {
-      css: {
-        atom: {
-          light:
-            'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/atom-one-light.min.css',
-          dark: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css',
-        },
-        xxx: {
-          light:
-            'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/xxx-light.css',
-          dark: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/xxx-dark.css',
-        },
-      },
-    },
-  },
-}
-
-config(editorConfig)
 
 onMounted(async () => {
   if (isEditing.value) {
@@ -243,6 +187,7 @@ onMounted(async () => {
       const response = await postsApi.apiGetPostById({
         id: parseInt(route.params.id as string)
       })
+      console.log('Post loaded:', response)
       postId.value = response.id
       post.value = {
         title: response.title,
@@ -250,6 +195,7 @@ onMounted(async () => {
         content: response.content,
         published: response.published
       }
+      console.log('Post content set:', post.value.content)
     } catch (error) {
       console.error('Error fetching post:', error)
       toast.add({
@@ -362,3 +308,11 @@ const handleSave = async (shouldRedirect: boolean) => {
   }
 }
 </script>
+
+<style>
+.button-container {
+  margin-top: 1rem;
+  position: relative;
+  z-index: 1;
+}
+</style>

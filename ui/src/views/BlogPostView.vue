@@ -17,8 +17,7 @@
           </div>
         </header>
         
-        <!-- Use MdPreview to render markdown content -->
-        <MdPreview :id="id" :modelValue="post.content" preview-theme="vuepress" />
+        <MarkdownPreview :content="post?.content || ''" />
       </article>
       
       <!-- Comments section -->
@@ -67,8 +66,7 @@ import { useAuthStore } from '@/stores/auth'
 import Comments from '@/components/Comments.vue'
 import LoginDialog from '@/components/LoginDialog.vue'
 import SignupDialog from '@/components/SignupDialog.vue'
-import { MdPreview, MdCatalog } from 'md-editor-v3'
-import 'md-editor-v3/lib/preview.css'
+import MarkdownPreview from '@/components/MarkdownPreview.vue'
 
 const route = useRoute()
 const posts = useApiClient(PostsApi)
@@ -83,9 +81,6 @@ const showLoginDialog = ref(false)
 const showSignupDialog = ref(false)
 
 const isLoggedIn = computed(() => authStore.isLoggedIn)
-
-const id = 'preview-only'
-const scrollElement = document.documentElement
 
 onMounted(async () => {
   try {
@@ -116,4 +111,321 @@ async function loadComments() {
     comments.value = commentsResult.items || []
   }
 }
-</script> 
+</script>
+
+<style>
+/* Add some basic prose styles */
+.prose {
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.prose h1 {
+  font-size: 2.25rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.prose h2 {
+  font-size: 1.875rem;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.prose h3 {
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.prose p {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.prose a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.prose ul {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  list-style-type: disc;
+  padding-left: 1.625rem;
+}
+
+.prose ol {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  list-style-type: decimal;
+  padding-left: 1.625rem;
+}
+
+.prose blockquote {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+  border-left: 4px solid #e5e7eb;
+  font-style: italic;
+}
+
+.dark .prose a {
+  color: #60a5fa;
+}
+
+.dark .prose blockquote {
+  border-left-color: #374151;
+}
+
+.prose pre {
+  padding: 1em;
+  border-radius: 0.5em;
+  margin: 1em 0;
+  background-color: #1e1e1e;
+  overflow-x: auto;
+}
+
+.prose code {
+  color: #e06c75;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25em;
+  font-size: 0.9em;
+}
+
+.prose pre code {
+  color: inherit;
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+/* Add styles for collapsible code blocks */
+.hljs {
+  position: relative;
+}
+
+.hljs::before {
+  content: attr(class);
+  position: absolute;
+  top: 0;
+  right: 1em;
+  color: #999;
+  font-size: 0.8em;
+  font-family: monospace;
+  text-transform: uppercase;
+  /* Remove 'language-' prefix */
+  content: attr(class);
+  content: attr(class) !important;
+  content: attr(class) !important;
+  content: attr(class) !important;
+}
+
+/* Code block styles */
+.code-block-wrapper {
+  position: relative;
+  margin: 1em 0;
+  background: var(--p-surface-50);
+  border-radius: 0.5em;
+  border: 1px solid var(--p-content-border-color);
+}
+
+.code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5em 1em;
+  background: var(--p-surface-100);
+  border-top-left-radius: 0.5em;
+  border-top-right-radius: 0.5em;
+  border-bottom: 1px solid var(--p-content-border-color);
+  font-family: monospace;
+  font-size: 0.8em;
+  color: var(--p-text-muted-color);
+}
+
+.code-block-lang {
+  text-transform: uppercase;
+  color: var(--p-text-muted-color);
+}
+
+.code-block-actions {
+  display: flex;
+  gap: 0.5em;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2em;
+  height: 2em;
+  padding: 0.25em;
+  background: transparent;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 0.25em;
+  color: var(--p-text-muted-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  background: var(--p-surface-200);
+  border-color: var(--p-text-muted-color);
+  color: var(--p-text-color);
+}
+
+.action-button.success {
+  background: var(--p-primary-600);
+  border-color: var(--p-primary-500);
+  color: white;
+}
+
+.action-button.error {
+  background: #dc2626;
+  border-color: #ef4444;
+  color: white;
+}
+
+.copy-icon, .collapse-icon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.prose pre {
+  margin: 0;
+  padding: 1em;
+  background: var(--p-surface-50);
+  border-bottom-left-radius: 0.5em;
+  border-bottom-right-radius: 0.5em;
+  overflow: hidden;
+  transition: height 0.3s ease-in-out;
+  height: auto;
+  color: var(--p-text-color);
+}
+
+.prose code {
+  color: var(--p-primary-600);
+  background-color: var(--p-surface-100);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25em;
+  font-size: 0.9em;
+}
+
+.prose pre code {
+  color: var(--p-text-color);
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  .code-block-wrapper {
+    background: var(--p-surface-800);
+  }
+
+  .code-block-header {
+    background: var(--p-surface-900);
+  }
+
+  .action-button:hover {
+    background: var(--p-surface-700);
+  }
+
+  .prose pre {
+    background: var(--p-surface-800);
+  }
+
+  .prose code {
+    color: var(--p-primary-300);
+    background-color: var(--p-surface-700);
+  }
+}
+
+/* Collapsed state */
+.code-block-wrapper.collapsed .collapse-icon {
+  transform: rotate(180deg);
+}
+
+.code-block-wrapper.collapsed pre {
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Remove the language indicator since we now have it in the header */
+.hljs::before {
+  display: none;
+}
+
+/* Highlight.js theme overrides for better visibility */
+.hljs-section {
+  color: var(--p-primary-700);
+  font-weight: bold;
+}
+
+.hljs-bullet {
+  color: var(--p-primary-600);
+}
+
+.hljs-link {
+  color: var(--p-primary-700);
+  text-decoration: underline;
+}
+
+.hljs-quote {
+  color: var(--p-surface-700);
+  font-style: italic;
+}
+
+.hljs-strong {
+  color: var(--p-primary-700);
+  font-weight: bold;
+}
+
+.hljs-emphasis {
+  color: var(--p-primary-700);
+  font-style: italic;
+}
+
+.hljs-code {
+  color: var(--p-primary-800);
+}
+
+@media (prefers-color-scheme: dark) {
+  .hljs-section {
+    color: var(--p-primary-400);
+  }
+
+  .hljs-bullet {
+    color: var(--p-primary-300);
+  }
+
+  .hljs-link {
+    color: var(--p-primary-300);
+  }
+
+  .hljs-quote {
+    color: var(--p-surface-400);
+  }
+
+  .hljs-strong {
+    color: var(--p-primary-300);
+  }
+
+  .hljs-emphasis {
+    color: var(--p-primary-300);
+  }
+
+  .hljs-code {
+    color: var(--p-primary-400);
+  }
+}
+</style> 

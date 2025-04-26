@@ -138,23 +138,19 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout() {
-    try {
-      clearTokens()
-      // Reset user data
-      userData.id = -1
-      userData.username = ""
-      userData.email = ""
-      userData.firstName = ""
-      userData.lastName = ""
-      userData.isStaff = false
-      userData.isActive = false
-      userData.dateJoined = new Date()
+    clearTokens()
+    // Reset user data
+    userData.id = -1
+    userData.username = ""
+    userData.email = ""
+    userData.firstName = ""
+    userData.lastName = ""
+    userData.isStaff = false
+    userData.isActive = false
+    userData.dateJoined = new Date()
 
-      stopRefreshTokenTimer()
-      router.push('/')
-    } catch (error) {
-      throw error
-    }
+    stopRefreshTokenTimer()
+    router.push('/')
   }
 
   async function refreshToken() {

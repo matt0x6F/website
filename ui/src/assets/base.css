@@ -19,7 +19,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-
 /* Primary and Surface Palettes */
 :root {
   --p-primary-50: #ecfdf5;
@@ -67,191 +66,30 @@ body {
   --p-text-hover-muted-color: var(--p-surface-600);
 }
 
-/*
-* Dark Mode
-* Defaults to system, change the dark variant selector to match the CSS variable configuration.
-* For example;
-* @custom-variant dark (&:where(.app-dark, .app-dark *));
-* should match to;
-* :root[class="app-dark"]
-*/
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
   :root {
-      --p-primary-color: var(--p-primary-400);
-      --p-primary-contrast-color: var(--p-surface-900);
-      --p-primary-hover-color: var(--p-primary-300);
-      --p-primary-active-color: var(--p-primary-200);
-      --p-content-border-color: var(--p-surface-700);
-      --p-content-hover-background: var(--p-surface-800);
-      --p-content-hover-color: var(--p-surface-0);
-      --p-highlight-background: color-mix(in srgb, var(--p-primary-400), transparent 84%);
-      --p-highlight-color: rgba(255, 255, 255, 0.87);
-      --p-highlight-focus-background: color-mix(in srgb, var(--p-primary-400), transparent 76%);
-      --p-highlight-focus-color: rgba(255, 255, 255, 0.87);
-      --p-text-color: var(--p-surface-0);
-      --p-text-hover-color: var(--p-surface-0);
-      --p-text-muted-color: var(--p-surface-400);
-      --p-text-hover-muted-color: var(--p-surface-300);
-  }
-}
-
-/* Markdown Editor Icons */
-.md-editor-icon {
-  height: 24px!important;
-  width: 24px!important;
-}
-
-.md-editor {
-  word-break: normal !important;
-  overflow-wrap: break-word !important;
-  z-index: 100 !important;
-  position: relative !important;
-  background-color: var(--p-surface-100) !important;
-}
-
-.md-editor-fullscreen {
-  z-index: 1150 !important;
-  background-color: var(--p-surface-100) !important;
-}
-
-.md-editor-preview-wrapper {
-  background-color: var(--p-surface-100) !important;
-}
-
-.preview-only-preview-wrapper {
-  z-index: -1 !important;
-}
-
-.md-editor-previewOnly {
-  z-index: -1 !important;
-}
-
-.md-editor p {
-  word-break: normal !important;
-  overflow-wrap: break-word !important;
-  text-align: justify !important;
-}
-
-.md-editor li {
-  word-break: normal !important;
-  overflow-wrap: break-word !important;
-  text-align: justify !important;
-}
-
-@media (prefers-color-scheme: dark) {
-  .md-editor {
-    background-color: inherit !important;
-  }
-
-  .md-editor-fullscreen {
-    background-color: var(--p-surface-700) !important;
-  }
-
-  .md-editor-preview-wrapper {
-    background-color: inherit !important;
-  }
-
-  .md-editor p {
-    color: white !important;
-  }
-
-  // use tailwinds emerald-600 for links
-  .md-editor a {
-    color: var(--p-primary-color) !important;
-  }
-
-  .md-editor a:hover {
-    color: var(--p-primary-color) !important;
-  }
-
-  .md-editor h1 {
-    color: white !important;
-    border-bottom-color: var(--p-surface-600) !important;
-  }
-
-  .md-editor h2 {
-    color: white !important;
-    border-bottom-color: var(--p-surface-600) !important;
-  }
-
-  .md-editor h3 {
-    color: white !important;
-    border-bottom-color: var(--p-surface-600) !important;
-  }
-
-  .md-editor h4 {
-    color: white !important;
-    border-bottom-color: var(--p-surface-600) !important;
-  }
-
-  .md-editor ul {
-    color: white !important;
-  }
-
-  .md-editor ol {
-    color: white !important;
-  }
-
-  .md-editor em {
-    color: white !important;
-  }
-
-  .md-editor hr {
-    border: none;
-    height: 1px;
-    border-top: 1px dashed var(--p-surface-600) !important;
-    margin: 1.5em 0;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  .md-editor {
-    background-color: inherit !important;
-  }
-
-  .md-editor-fullscreen {
-    background-color: var(--p-surface-50) !important;
-  }
-
-  .md-editor-preview-wrapper {
-    background-color: inherit !important;
-  }
-
-  .md-editor p {
-    color: black !important;
-  }
-
-  .md-editor a {
-    color: var(--p-primary-color) !important;
-  }
-
-  .md-editor a:hover {
-    color: var(--p-primary-color) !important;
-  }
-
-  .md-editor em {
-    color: black !important;
-  }
-
-  .md-editor hr {
-    border: none;
-    height: 1px;
-    border-top: 1px dashed var(--p-surface-300) !important;
-    margin: 1.5em 0;
+    --p-primary-color: var(--p-primary-400);
+    --p-primary-contrast-color: var(--p-surface-900);
+    --p-primary-hover-color: var(--p-primary-300);
+    --p-primary-active-color: var(--p-primary-200);
+    --p-content-border-color: var(--p-surface-700);
+    --p-content-hover-background: var(--p-surface-800);
+    --p-content-hover-color: var(--p-surface-0);
+    --p-highlight-background: color-mix(in srgb, var(--p-primary-400), transparent 84%);
+    --p-highlight-color: rgba(255, 255, 255, 0.87);
+    --p-highlight-focus-background: color-mix(in srgb, var(--p-primary-400), transparent 76%);
+    --p-highlight-focus-color: rgba(255, 255, 255, 0.87);
+    --p-text-color: var(--p-surface-0);
+    --p-text-hover-color: var(--p-surface-0);
+    --p-text-muted-color: var(--p-surface-400);
+    --p-text-hover-muted-color: var(--p-surface-300);
   }
 }
 
 #content ul {
   list-style-type: disc !important;
   margin-left: 1em !important;
-}
-
-.md-editor a {
-  font-weight: 400 !important;
-}
-
-.md-editor a:hover {
-  text-decoration: underline !important;
 }
 
 #content a {

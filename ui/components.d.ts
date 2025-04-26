@@ -22,6 +22,8 @@ declare module 'vue' {
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     InputText: typeof import('primevue/inputtext')['default']
     LoginDialog: typeof import('./src/components/LoginDialog.vue')['default']
+    MarkdownEditor: typeof import('./src/components/MarkdownEditor.vue')['default']
+    MarkdownPreview: typeof import('./src/components/MarkdownPreview.vue')['default']
     MenuBar: typeof import('primevue/menubar')['default']
     Password: typeof import('primevue/password')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
