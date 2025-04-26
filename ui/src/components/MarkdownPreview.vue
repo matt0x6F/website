@@ -1,5 +1,9 @@
 <template>
-  <div ref="previewEl" class="preview-content prose dark:prose-invert" v-html="renderedHtml"></div>
+  <div
+    ref="previewEl"
+    class="preview-content prose dark:prose-invert"
+    v-html="renderedHtml"
+  ></div>
 </template>
 
 <script setup lang="ts">
@@ -147,6 +151,18 @@ onUnmounted(() => {
   window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', loadTheme)
 })
 </script>
+
+<style>
+.preview-content {
+  /* Remove padding here */
+  overflow-y: auto;
+  height: 100%;
+}
+.no-prose-padding.prose {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+</style>
 
 <!--
   Styles for code blocks, prose, and code block header/actions should be provided globally or in the parent.

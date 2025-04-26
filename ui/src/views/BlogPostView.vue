@@ -17,7 +17,7 @@
           </div>
         </header>
         
-        <MarkdownPreview :content="post?.content || ''" />
+        <MarkdownPreview class="no-prose-padding" :content="post?.content || ''" />
       </article>
       
       <!-- Comments section -->

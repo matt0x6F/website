@@ -46,7 +46,7 @@
           v-else
           ref="previewRef"
           :content="editorContent"
-          class="editor-preview-absolute"
+          class="editor-preview-absolute editor-preview-padded"
         />
       </div>
     </div>
@@ -506,6 +506,10 @@ const highlightedContent = computed(() => {
   .editor-preview-absolute {
     background: var(--p-surface-800);
   }
+}
+
+.editor-preview-padded {
+  padding: 1.5rem;
 }
 </style>
 
