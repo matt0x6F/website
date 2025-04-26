@@ -59,14 +59,12 @@
       <div class="flex gap-4">
         <Button
           type="button"
-          severity="success"
           size="small"
           label="Save"
           @click="handleSave(false)"
         />
         <Button
           type="button"
-          severity="success"
           size="small"
           label="Save & Back"
           @click="handleSave(true)"
