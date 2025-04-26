@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6">
+  <div id="content" class="p-6">
     <h1 class="text-2xl font-bold mb-6">{{ isEditing ? 'Edit Post' : 'Create New Post' }}</h1>
     
     <form @submit.prevent>

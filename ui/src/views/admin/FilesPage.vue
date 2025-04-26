@@ -32,13 +32,12 @@
             </div>
             <div class="flex items-center space-x-4">
               <div class="flex gap-2">
-                <a
-                  :href="getSpacesUrl(file.name)"
-                  target="_blank"
-                  class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm"
-                >
-                  View in DO Spaces
-                </a>
+                <Button
+                  @click="() => openInNewTab(getSpacesUrl(file.name))"
+                  size="small"
+                  icon="pi pi-cloud"
+                  label="View in DO Spaces"
+                />
                 <Button
                   @click="downloadFile(file)"
                   size="small"
@@ -103,12 +102,18 @@
                   <span class="text-sm text-gray-500 dark:text-gray-400">{{ file.contentType }}</span>
                 </div>
                 <div class="flex items-center gap-4">
-                  <a :href="getSpacesUrl(file.name)" target="_blank" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                    View in DO Spaces
-                  </a>
-                  <a :href="file.location" target="_blank" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                    View File
-                  </a>
+                  <Button
+                    @click="() => openInNewTab(getSpacesUrl(file.name))"
+                    size="small"
+                    icon="pi pi-cloud"
+                    label="View in DO Spaces"
+                  />
+                  <Button
+                    @click="() => openInNewTab(file.location)"
+                    size="small"
+                    icon="pi pi-eye"
+                    label="View File"
+                  />
                 </div>
               </li>
             </ul>
@@ -123,12 +128,18 @@
                   <span class="text-sm text-gray-500 dark:text-gray-400">{{ file.contentType }}</span>
                 </div>
                 <div class="flex items-center gap-4">
-                  <a :href="getSpacesUrl(file.name)" target="_blank" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                    View in DO Spaces
-                  </a>
-                  <a :href="file.location" target="_blank" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                    View File
-                  </a>
+                  <Button
+                    @click="() => openInNewTab(getSpacesUrl(file.name))"
+                    size="small"
+                    icon="pi pi-cloud"
+                    label="View in DO Spaces"
+                  />
+                  <Button
+                    @click="() => openInNewTab(file.location)"
+                    size="small"
+                    icon="pi pi-eye"
+                    label="View File"
+                  />
                 </div>
               </li>
             </ul>
@@ -177,6 +188,11 @@ function getSpacesUrl(filename: string): string {
   const pathPrefix = isDev.value ? 'dev/' : ''
   const encodedPath = encodeURIComponent(`${pathPrefix}${filename}`)
   return `${DO_SPACES_BASE_URL}?${DO_SPACES_PARAMS}&path=${encodedPath}`
+}
+
+// Add method to handle opening URLs
+function openInNewTab(url: string): void {
+  window.open(url, '_blank')
 }
 
 // Orphaned files state

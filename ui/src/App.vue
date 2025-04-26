@@ -110,7 +110,7 @@ const handleLoginClick = () => {
       </template>
     </MenuBar>
 
-    <div id="content" class="min-h-64">
+    <div class="min-h-64">
       <RouterView />
     </div>
     <div class="no-print">

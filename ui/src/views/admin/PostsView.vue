@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="">
+    <div id="content" class="">
       <h1 class="text-2xl font-bold">Blog Posts</h1>
       <Toolbar class="mb-6">
         <template #start>
