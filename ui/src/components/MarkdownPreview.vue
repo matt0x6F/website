@@ -139,7 +139,8 @@ function parseBlocks(content: string) {
           const match = content.match(/^\[( |x|X)\]\s+(.*)$/)
           if (match) {
             checked = match[1].toLowerCase() === 'x'
-            label = match[2]
+            // Render the remaining content as markdown to handle links and other formatting
+            label = md.renderInline(match[2])
             blocks.push({ type: 'task', checked, label })
             // Skip to list_item_close
             while (i < tokens.length && tokens[i].type !== 'list_item_close') i++
