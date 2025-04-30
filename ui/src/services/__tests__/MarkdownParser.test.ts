@@ -125,5 +125,14 @@ describe('MarkdownParser', () => {
       const result = parser.parse(null as any)
       expect(result).toHaveLength(0)
     })
+
+    it('should parse image markdown', () => {
+      const result = parser.parse('![alt text](https://example.com/image.png)')
+      expect(result).toHaveLength(1)
+      expect(result[0].type).toBe('html')
+      expect(result[0].html).toContain('<img')
+      expect(result[0].html).toContain('src="https://example.com/image.png"')
+      expect(result[0].html).toContain('alt="alt text"')
+    })
   })
 }) 

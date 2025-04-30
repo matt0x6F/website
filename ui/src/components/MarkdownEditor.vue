@@ -66,6 +66,14 @@
               text
             />
             <Button
+              v-tooltip.bottom="'Image'"
+              type="button"
+              icon="pi pi-image"
+              @click="applyFormat('image')"
+              size="small"
+              text
+            />
+            <Button
               v-tooltip.bottom="'Code Block'"
               type="button"
               icon="pi pi-code"
@@ -112,19 +120,23 @@
         </template>
       </Toolbar>
       
-      <div class="editor-content split-view">
+      <div class="editor-content split-view"
+           @dragover="handleDragOver"
+           @dragleave="handleDragLeave"
+           @drop="handleDrop"
+           >
         <div class="editor-container-inner split-editor">
           <textarea
             ref="textarea"
             v-model="editorContent"
             class="editor-textarea"
-            @drop="handleDrop"
             @dragover.prevent
             @scroll="handleEditorScroll"
             @keydown="handleEditorKeydown"
             @input="handleEditorInput"
           ></textarea>
           <pre class="editor-highlight"><code v-html="highlightedContent"></code></pre>
+          <div v-if="isDragging && dragCursorPos !== null" class="drag-cursor-indicator" :style="dragCursorStyle"></div>
         </div>
         
         <MarkdownPreview
@@ -145,6 +157,8 @@ import Toolbar from 'primevue/toolbar'
 import MarkdownPreview from './MarkdownPreview.vue'
 import hljs from 'highlight.js/lib/core'
 import markdown from 'highlight.js/lib/languages/markdown'
+import { useAuthStore } from '@/stores/auth'
+import type { CSSProperties } from 'vue'
 
 hljs.registerLanguage('markdown', markdown)
 
@@ -157,6 +171,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'file-upload', files: File[]): void
+  (e: 'file-upload-error', message: string): void
 }>()
 
 // Editor state
@@ -178,6 +193,10 @@ const isScrollingPreview = ref(false)
 // Add these refs at the top of the script
 let isSyncingEditorScroll = false
 let isSyncingPreviewScroll = false
+
+// Drag-and-drop state
+const isDragging = ref(false)
+const dragCursorPos = ref<number | null>(null)
 
 // Initialize editor content when props change
 watch(() => props.modelValue, (newValue) => {
@@ -299,18 +318,117 @@ const handleEditorInput = (e: Event) => {
   }
 }
 
-const handleDrop = async (e: DragEvent) => {
+// Helper to get cursor position from mouse event
+function getCursorPositionFromMouse(e: DragEvent) {
+  if (!textarea.value) return 0
+  const { top, left } = textarea.value.getBoundingClientRect()
+  const y = e.clientY - top
+  // Estimate line height
+  const lineHeight = parseFloat(getComputedStyle(textarea.value).lineHeight || '20')
+  const approxLine = Math.floor(y / lineHeight)
+  // Find the character index at the start of that line
+  const lines = editorContent.value.split('\n')
+  let pos = 0
+  for (let i = 0; i < approxLine && i < lines.length; i++) {
+    pos += lines[i].length + 1 // +1 for newline
+  }
+  return Math.min(pos, editorContent.value.length)
+}
+
+function handleDragOver(e: DragEvent) {
   e.preventDefault()
-  
-  if (!props.postId) {
-    emit('file-upload', [])
+  isDragging.value = true
+  dragCursorPos.value = getCursorPositionFromMouse(e)
+}
+
+function handleDragLeave(e: DragEvent) {
+  isDragging.value = false
+  dragCursorPos.value = null
+}
+
+async function handleDrop(e: DragEvent) {
+  e.preventDefault()
+  isDragging.value = false
+  const files = Array.from(e.dataTransfer?.files || [])
+  if (!props.postId || files.length === 0) {
+    emit('file-upload', files)
+    if (!props.postId) {
+      emit('file-upload-error', 'Please save the file before uploading attachments.')
+    }
     return
   }
-
-  const files = Array.from(e.dataTransfer?.files || [])
-  if (files.length > 0) {
-    emit('file-upload', files)
+  const auth = useAuthStore()
+  const uploadedUrls: string[] = []
+  for (const file of files) {
+    const formData = new FormData()
+    formData.append('upload', file)
+    const metadata = {
+      visibility: 'public',
+      posts: [props.postId]
+    }
+    formData.append('metadata', JSON.stringify(metadata))
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/files/`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${auth.storedAccessToken}`
+        },
+        body: formData
+      })
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`)
+      }
+      const fileMetadata = await response.json()
+      uploadedUrls.push(fileMetadata.location)
+    } catch (error) {
+      console.error('Error uploading file:', error)
+      emit('file-upload-error', 'Failed to upload file(s).')
+    }
   }
+  // Insert at dragCursorPos or current cursor
+  let insertPos = dragCursorPos.value ?? (textarea.value ? textarea.value.selectionStart : editorContent.value.length)
+  const urlsMarkdown = uploadedUrls.map(url => `![](${url})`).join('\n')
+  let before = editorContent.value.slice(0, insertPos)
+  let after = editorContent.value.slice(insertPos)
+  const beforeChar = before.length > 0 ? before[before.length - 1] : ''
+  const afterChar = after.length > 0 ? after[0] : ''
+
+  // Find the start and end of the current line
+  const lineStart = before.lastIndexOf('\n') + 1
+  const isBlankLine = editorContent.value.slice(lineStart, insertPos + (after.indexOf('\n') === -1 ? 0 : after.indexOf('\n'))).trim() === '' && (after.indexOf('\n') !== -1 || insertPos === editorContent.value.length)
+
+  if (isBlankLine) {
+    // Find the start of the previous line (above the blank line)
+    const prevLineStart = editorContent.value.lastIndexOf('\n', lineStart - 2) + 1
+    const beforeLines = editorContent.value.slice(0, prevLineStart)
+    // Find the end of the current line (either next newline or end of content)
+    const afterLines = after.indexOf('\n') !== -1 ? editorContent.value.slice(insertPos + after.indexOf('\n')) : ''
+    // Insert image, remove blank line above, add two blank lines below
+    editorContent.value = beforeLines + urlsMarkdown + '\n\n' + afterLines.replace(/^\n+/, '')
+    nextTick(() => {
+      if (textarea.value) {
+        textarea.value.selectionStart = textarea.value.selectionEnd = (beforeLines + urlsMarkdown + '\n\n').length
+        textarea.value.focus()
+      }
+    })
+  } else {
+    // Previous logic for non-blank lines
+    let insertText = urlsMarkdown
+    if (beforeChar && beforeChar !== '\n') {
+      insertText = '\n' + insertText
+    }
+    if (afterChar && afterChar !== '\n') {
+      insertText = insertText + '\n'
+    }
+    editorContent.value = before + insertText + after
+    nextTick(() => {
+      if (textarea.value) {
+        textarea.value.selectionStart = textarea.value.selectionEnd = (before + insertText).length
+        textarea.value.focus()
+      }
+    })
+  }
+  dragCursorPos.value = null
 }
 
 // Function to get scroll position as a percentage
@@ -378,6 +496,10 @@ function applyFormat(format: string) {
         cursorOffset = 1
       }
       break
+    case 'image':
+      replacement = '![](url)'
+      cursorOffset = 5 // place cursor inside url
+      break
     case 'codeblock':
       const language = 'language'
       if (selectedText) {
@@ -400,8 +522,12 @@ function applyFormat(format: string) {
         // If there was selected text, place cursor at the end of the replacement
         textarea.value.selectionStart = textarea.value.selectionEnd = start + replacement.length
       } else {
-        // If no text was selected, place cursor after the opening markdown
-        textarea.value.selectionStart = textarea.value.selectionEnd = start + cursorOffset
+        // If no text was selected, place cursor at the url part for image
+        if (format === 'image') {
+          textarea.value.selectionStart = textarea.value.selectionEnd = start + 4 // after '![]('
+        } else {
+          textarea.value.selectionStart = textarea.value.selectionEnd = start + cursorOffset
+        }
       }
       textarea.value.focus()
     }
@@ -519,6 +645,24 @@ const handlePreviewScroll = (e: Event) => {
     }
   }
 }
+
+const dragCursorStyle = computed((): CSSProperties => {
+  if (!textarea.value || dragCursorPos.value === null) return {}
+  // Calculate line number and top offset
+  const value = editorContent.value
+  const before = value.slice(0, dragCursorPos.value)
+  const line = before.split('\n').length - 1
+  const lineHeight = parseFloat(getComputedStyle(textarea.value).lineHeight || '20')
+  return {
+    position: 'absolute',
+    left: '0',
+    right: '0',
+    top: `${line * lineHeight}px`,
+    height: '2px',
+    background: 'var(--p-primary-500)',
+    zIndex: 10
+  }
+})
 </script>
 
 <style>
@@ -848,6 +992,13 @@ const handlePreviewScroll = (e: Event) => {
   .split-preview {
     background: var(--p-surface-800);
   }
+}
+
+.drag-cursor-indicator {
+  pointer-events: none;
+  width: 100%;
+  background: var(--p-primary-500);
+  opacity: 0.7;
 }
 </style>
 
