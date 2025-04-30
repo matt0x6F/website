@@ -24,6 +24,7 @@ declare module 'vue' {
     InputText: typeof import('primevue/inputtext')['default']
     LoginDialog: typeof import('./src/components/LoginDialog.vue')['default']
     MarkdownEditor: typeof import('./src/components/MarkdownEditor.vue')['default']
+    MarkdownListRenderer: typeof import('./src/components/MarkdownListRenderer.vue')['default']
     MarkdownPreview: typeof import('./src/components/MarkdownPreview.vue')['default']
     MarkdownTable: typeof import('./src/components/MarkdownTable.vue')['default']
     MenuBar: typeof import('primevue/menubar')['default']

@@ -73,6 +73,30 @@
               size="small"
               text
             />
+            <Button
+              v-tooltip.bottom="'Unordered List'"
+              type="button"
+              icon="pi pi-list"
+              @click="applyListFormat('unordered')"
+              size="small"
+              text
+            />
+            <Button
+              v-tooltip.bottom="'Ordered List'"
+              type="button"
+              label="1."
+              @click="applyListFormat('ordered')"
+              size="small"
+              text
+            />
+            <Button
+              v-tooltip.bottom="'Checklist'"
+              type="button"
+              icon="pi pi-list-check"
+              @click="applyListFormat('check')"
+              size="small"
+              text
+            />
           </div>
         </template>
         <template #end>
@@ -382,6 +406,58 @@ function applyFormat(format: string) {
       textarea.value.focus()
     }
   })
+}
+
+function applyListFormat(type: 'ordered' | 'unordered' | 'check') {
+  if (!textarea.value) return;
+
+  const start = textarea.value.selectionStart;
+  const end = textarea.value.selectionEnd;
+  const value = editorContent.value;
+
+  // Find the start and end of the selection in terms of lines
+  const before = value.slice(0, start);
+  const selection = value.slice(start, end);
+  const after = value.slice(end);
+
+  // Get the start index of the first selected line
+  const lineStart = before.lastIndexOf('\n') + 1;
+  // Get the end index of the last selected line
+  const lineEnd = end + (value.slice(end).indexOf('\n') === -1 ? value.length - end : value.slice(end).indexOf('\n'));
+
+  // Get all lines in the selection
+  const selectedText = value.slice(lineStart, end);
+  const lines = selectedText.split('\n');
+
+  // Helper to detect and replace list markers
+  function formatLine(line: string, idx: number): string {
+    // Remove existing list markers
+    let newLine = line.replace(/^\s*([0-9]+\. |- \[.\] |- |\* )/, '');
+    switch (type) {
+      case 'unordered':
+        return `- ${newLine}`;
+      case 'ordered':
+        return `${idx + 1}. ${newLine}`;
+      case 'check':
+        return `- [ ] ${newLine}`;
+      default:
+        return newLine;
+    }
+  }
+
+  const formattedLines = lines.map(formatLine);
+  const newText = value.slice(0, lineStart) + formattedLines.join('\n') + value.slice(end);
+
+  editorContent.value = newText;
+
+  // Restore selection
+  nextTick(() => {
+    if (textarea.value) {
+      textarea.value.selectionStart = lineStart;
+      textarea.value.selectionEnd = lineStart + formattedLines.join('\n').length;
+      textarea.value.focus();
+    }
+  });
 }
 
 // Add function to handle view mode changes
