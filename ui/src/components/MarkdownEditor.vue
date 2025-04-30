@@ -6,16 +6,6 @@
         <template #start>
           <div class="flex gap-1">
             <Button
-              type="button"
-              :icon="!showPreview ? 'pi pi-pencil' : 'pi pi-eye'"
-              :label="!showPreview ? 'Edit' : 'Preview'"
-              @click="showPreview = !showPreview"
-              size="small"
-              :outlined="true"
-              :class="{ 'p-button-secondary': !showPreview }"
-            />
-            <span class="border-r border-gray-300 dark:border-gray-600 mx-2"></span>
-            <Button
               v-tooltip.bottom="'Bold'"
               type="button"
               label="B"
@@ -23,7 +13,6 @@
               @click="applyFormat('bold')"
               size="small"
               text
-              :disabled="showPreview"
             />
             <Button
               v-tooltip.bottom="'Italic'"
@@ -33,7 +22,6 @@
               @click="applyFormat('italic')"
               size="small"
               text
-              :disabled="showPreview"
             />
             <Button
               v-tooltip.bottom="'Code'"
@@ -42,7 +30,6 @@
               @click="applyFormat('code')"
               size="small"
               text
-              :disabled="showPreview"
             />
             <span class="border-r border-gray-300 dark:border-gray-600 mx-2"></span>
             <Button
@@ -52,7 +39,6 @@
               @click="applyFormat('h1')"
               size="small"
               text
-              :disabled="showPreview"
             />
             <Button
               v-tooltip.bottom="'Heading 2'"
@@ -61,7 +47,6 @@
               @click="applyFormat('h2')"
               size="small"
               text
-              :disabled="showPreview"
             />
             <Button
               v-tooltip.bottom="'Heading 3'"
@@ -70,7 +55,6 @@
               @click="applyFormat('h3')"
               size="small"
               text
-              :disabled="showPreview"
             />
             <span class="border-r border-gray-300 dark:border-gray-600 mx-2"></span>
             <Button
@@ -80,7 +64,6 @@
               @click="applyFormat('link')"
               size="small"
               text
-              :disabled="showPreview"
             />
             <Button
               v-tooltip.bottom="'Code Block'"
@@ -89,7 +72,6 @@
               @click="applyFormat('codeblock')"
               size="small"
               text
-              :disabled="showPreview"
             />
           </div>
         </template>
@@ -106,8 +88,8 @@
         </template>
       </Toolbar>
       
-      <div class="editor-content">
-        <div v-if="!showPreview" class="editor-container-inner">
+      <div class="editor-content split-view">
+        <div class="editor-container-inner split-editor">
           <textarea
             ref="textarea"
             v-model="editorContent"
@@ -122,10 +104,10 @@
         </div>
         
         <MarkdownPreview
-          v-else
           ref="previewRef"
           :content="editorContent"
-          class="editor-preview-absolute editor-preview-padded"
+          class="editor-preview-absolute editor-preview-padded split-preview"
+          @scroll.native="handlePreviewScroll"
         />
       </div>
     </div>
@@ -162,6 +144,17 @@ const isExpanded = ref(false)
 const lastEditorScrollPosition = ref(0)
 const lastPreviewScrollPosition = ref(0)
 
+// View mode can be 'edit', 'preview', or 'split'
+const viewMode = ref('split')
+
+// Add these refs and variables in the script section after other refs
+const isScrollingEditor = ref(false)
+const isScrollingPreview = ref(false)
+
+// Add these refs at the top of the script
+let isSyncingEditorScroll = false
+let isSyncingPreviewScroll = false
+
 // Initialize editor content when props change
 watch(() => props.modelValue, (newValue) => {
   console.log('MarkdownEditor received new content:', newValue)
@@ -182,20 +175,23 @@ watch(editorContent, (newContent) => {
 
 function toggleExpanded() {
   isExpanded.value = !isExpanded.value
+  if (!isExpanded.value && viewMode.value === 'split') {
+    viewMode.value = 'edit'
+  }
 }
 
 const previewRef = ref<any>(null)
 const textarea = ref<HTMLTextAreaElement | null>(null)
 let lastScrollPercent = 0
 
-watch(showPreview, (isPreview, wasPreview) => {
+watch(viewMode, (newMode, oldMode) => {
   // Store scroll percent before toggling
-  if (isPreview) {
-    // Going to preview: store textarea scroll percent
+  if (oldMode === 'edit') {
+    // Going from edit to preview or split: store textarea scroll percent
     if (textarea.value) {
       lastScrollPercent = getScrollPercentage(textarea.value)
     }
-  } else {
+  } else if (oldMode === 'preview' || oldMode === 'split') {
     // Going to edit: store preview scroll percent
     const previewEl = previewRef.value?.previewEl as HTMLElement | null
     if (previewEl) {
@@ -206,13 +202,14 @@ watch(showPreview, (isPreview, wasPreview) => {
   // After new view is rendered, set scroll position
   nextTick(() => {
     setTimeout(() => {
-      if (isPreview) {
+      if (newMode === 'preview' || newMode === 'split') {
         // Set preview scroll
         const previewEl = previewRef.value?.previewEl as HTMLElement | null
         if (previewEl) {
           setScrollFromPercentage(previewEl, lastScrollPercent)
         }
-      } else {
+      }
+      if (newMode === 'edit' || newMode === 'split') {
         // Set textarea scroll
         if (textarea.value) {
           setScrollFromPercentage(textarea.value, lastScrollPercent)
@@ -222,13 +219,35 @@ watch(showPreview, (isPreview, wasPreview) => {
   })
 })
 
+// Modify the handleEditorScroll function
 const handleEditorScroll = (e: Event) => {
+  if (isSyncingEditorScroll) {
+    // Ignore scroll events triggered by sync
+    isSyncingEditorScroll = false
+    return
+  }
+  console.log('Editor scroll event triggered')
   const target = e.target as HTMLTextAreaElement
   const highlight = target.nextElementSibling as HTMLElement
   if (highlight) {
     highlight.scrollTop = target.scrollTop
   }
-  lastEditorScrollPosition.value = getScrollPercentage(target)
+  
+  const scrollPercentage = getScrollPercentage(target)
+  console.log('Editor scroll percentage:', scrollPercentage)
+  
+  let previewEl = previewRef.value?.previewEl
+  if (!previewEl && previewRef.value && previewRef.value.$el) {
+    previewEl = previewRef.value.$el
+    console.log('Using previewRef.value.$el as fallback:', previewEl)
+  }
+  if (previewEl) {
+    console.log('Setting preview scroll on element:', previewEl)
+    isSyncingPreviewScroll = true
+    previewEl.scrollTop = scrollPercentage * (previewEl.scrollHeight - previewEl.clientHeight)
+  } else {
+    console.log('No preview element found!')
+  }
 }
 
 const handleEditorKeydown = (e: KeyboardEvent) => {
@@ -363,6 +382,66 @@ function applyFormat(format: string) {
       textarea.value.focus()
     }
   })
+}
+
+// Add function to handle view mode changes
+function setViewMode(mode: 'edit' | 'preview' | 'split') {
+  viewMode.value = mode
+}
+
+// Add this function after other function declarations
+function syncScroll(source: 'editor' | 'preview', event: Event) {
+  if (viewMode.value !== 'split') return
+
+  const target = event.target as HTMLElement
+  const scrollPercentage = getScrollPercentage(target)
+
+  if (source === 'editor' && !isScrollingPreview.value) {
+    isScrollingEditor.value = true
+    const previewEl = previewRef.value?.previewEl as HTMLElement
+    if (previewEl) {
+      setScrollFromPercentage(previewEl, scrollPercentage)
+    }
+    setTimeout(() => {
+      isScrollingEditor.value = false
+    }, 50)
+  } else if (source === 'preview' && !isScrollingEditor.value) {
+    isScrollingPreview.value = true
+    if (textarea.value) {
+      setScrollFromPercentage(textarea.value, scrollPercentage)
+      // Also sync the highlight element
+      const highlight = textarea.value.nextElementSibling as HTMLElement
+      if (highlight) {
+        highlight.scrollTop = textarea.value.scrollTop
+      }
+    }
+    setTimeout(() => {
+      isScrollingPreview.value = false
+    }, 50)
+  }
+}
+
+const handlePreviewScroll = (e: Event) => {
+  if (isSyncingPreviewScroll) {
+    // Ignore scroll events triggered by sync
+    isSyncingPreviewScroll = false
+    return
+  }
+  console.log('Preview scroll event triggered')
+  const previewEl = e.target as HTMLElement
+  const scrollPercentage = getScrollPercentage(previewEl)
+  console.log('Preview scroll percentage:', scrollPercentage)
+  
+  if (textarea.value) {
+    const maxScroll = textarea.value.scrollHeight - textarea.value.clientHeight
+    isSyncingEditorScroll = true
+    textarea.value.scrollTop = scrollPercentage * maxScroll
+    // Sync highlight
+    const highlight = textarea.value.nextElementSibling as HTMLElement
+    if (highlight) {
+      highlight.scrollTop = textarea.value.scrollTop
+    }
+  }
 }
 </script>
 
@@ -662,6 +741,37 @@ function applyFormat(format: string) {
 
 .editor-preview-padded {
   padding: 1.5rem;
+}
+
+.split-view {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.split-editor {
+  position: relative !important;
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 0.5rem;
+  background: var(--p-surface-50);
+}
+
+.split-preview {
+  position: relative !important;
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 0.5rem;
+  background: var(--p-surface-50);
+}
+
+@media (prefers-color-scheme: dark) {
+  .split-editor,
+  .split-preview {
+    background: var(--p-surface-800);
+  }
 }
 </style>
 
