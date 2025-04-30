@@ -3,7 +3,8 @@
     <template v-for="(block, i) in blocks" :key="i">
       <CodeBlock v-if="block.type === 'code'" :lang="block.lang" :code="block.content" />
       <MarkdownTable v-else-if="block.type === 'table'" :columns="block.columns" :rows="block.rows" />
-      <TaskListItem v-else-if="block.type === 'task'" :modelValue="block.checked" :label="block.label" />
+      <TaskListItem v-else-if="block.type === 'task'" :modelValue="block.modelValue" :label="block.label" />
+      <OrderedList v-else-if="block.type === 'ordered_list'" :items="block.items" :start="block.start" />
       <div v-else v-html="block.html"></div>
     </template>
   </div>
@@ -30,6 +31,7 @@ import githubDarkDimmed from 'highlight.js/styles/github-dark-dimmed.css?raw'
 import CodeBlock from './CodeBlock.vue'
 import MarkdownTable from './MarkdownTable.vue'
 import TaskListItem from './TaskListItem.vue'
+import OrderedList from './OrderedList.vue'
 
 const props = defineProps<{ content: string }>()
 const blocks = ref<any[]>([])
@@ -63,109 +65,157 @@ const md = new MarkdownIt({
     }
     return md.utils.escapeHtml(str)
   }
-})
+}).enable(['list']) // Ensure list plugin is enabled
 
-function parseBlocks(content: string) {
-  const tokens = md.parse(content || '', {})
-  const blocks: any[] = []
-  let i = 0
-  while (i < tokens.length) {
-    const token = tokens[i]
-    if (token.type === 'fence') {
-      // Code block
-      const lang = token.info ? md.utils.unescapeAll(token.info).trim().split(/\s+/g)[0] : ''
-      blocks.push({
-        type: 'code',
-        lang,
-        content: encodeURIComponent(token.content)
-      })
+interface Block {
+  type: 'code' | 'table' | 'html' | 'task';
+  [key: string]: any;
+}
+
+interface TableData {
+  columns: { field: string; header: string }[];
+  rows: Record<string, any>[];
+}
+
+// Helper functions for parsing specific block types
+function parseCodeBlock(token: any): Block {
+  const lang = token.info ? md.utils.unescapeAll(token.info).trim().split(/\s+/g)[0] : ''
+  return {
+    type: 'code',
+    lang,
+    content: encodeURIComponent(token.content)
+  }
+}
+
+function parseTableData(tokens: any[], startIndex: number): { tableData: TableData; endIndex: number } {
+  const columns: { field: string; header: string }[] = []
+  const rows: Record<string, any>[] = []
+  let i = startIndex + 1
+  let headerCells: string[] = []
+
+  // Parse header
+  while (i < tokens.length && tokens[i].type !== 'thead_close') {
+    if (tokens[i].type === 'th_open') {
       i++
-    } else if (token.type === 'table_open') {
-      // Extract table data
-      const columns: { field: string, header: string }[] = []
-      const rows: Record<string, any>[] = []
-      let headerCells: string[] = []
-      let rowCells: string[] = []
-      let fieldPrefix = 0
-      i++
-      while (i < tokens.length && tokens[i].type !== 'table_close') {
-        if (tokens[i].type === 'thead_open') {
-          i++
-          while (i < tokens.length && tokens[i].type !== 'thead_close') {
-            if (tokens[i].type === 'th_open') {
-              i++
-              if (tokens[i].type === 'inline') {
-                headerCells.push(tokens[i].content)
-              }
-            }
-            i++
-          }
-          // Set up columns
-          columns.push(...headerCells.map((header, idx) => ({ field: `col${idx}`, header })))
-        } else if (tokens[i].type === 'tr_open') {
-          rowCells = []
-          i++
-          while (i < tokens.length && tokens[i].type !== 'tr_close') {
-            if (tokens[i].type === 'td_open') {
-              i++
-              if (tokens[i].type === 'inline') {
-                rowCells.push(tokens[i].content)
-              }
-            }
-            i++
-          }
-          if (rowCells.length) {
-            const row: Record<string, any> = {}
-            rowCells.forEach((cell, idx) => {
-              row[`col${idx}`] = cell
-            })
-            rows.push(row)
-          }
-        } else {
-          i++
-        }
+      if (tokens[i].type === 'inline') {
+        headerCells.push(tokens[i].content)
       }
-      blocks.push({ type: 'table', columns, rows })
-      i++ // skip table_close
-    } else if (token.type === 'list_item_open') {
-      // Check for task list item
-      let label = ''
-      let checked = false
+    }
+    i++
+  }
+  columns.push(...headerCells.map((header, idx) => ({ field: `col${idx}`, header })))
+
+  // Parse rows
+  while (i < tokens.length && tokens[i].type !== 'table_close') {
+    if (tokens[i].type === 'tr_open') {
+      const rowCells: string[] = []
+      i++
+      while (i < tokens.length && tokens[i].type !== 'tr_close') {
+        if (tokens[i].type === 'td_open') {
+          i++
+          if (tokens[i].type === 'inline') {
+            rowCells.push(tokens[i].content)
+          }
+        }
+        i++
+      }
+      if (rowCells.length) {
+        const row: Record<string, any> = {}
+        rowCells.forEach((cell, idx) => {
+          row[`col${idx}`] = cell
+        })
+        rows.push(row)
+      }
+    }
+    i++
+  }
+
+  return {
+    tableData: { columns, rows },
+    endIndex: i
+  }
+}
+
+function parseListContent(tokens: any[], startIndex: number, depth: number = 0): { html: string; endIndex: number; taskBlocks: Block[] } {
+  const token = tokens[startIndex]
+  const isOrdered = token.type === 'ordered_list_open'
+  const start = isOrdered ? parseInt(token.info || '1', 10) : null
+  let html = `<${isOrdered ? 'ol' : 'ul'} class="${isOrdered ? 'list-decimal unpadded-ol' : 'list-disc unpadded-ul'} ${depth === 0 ? 'list-outside' : ''}"${start ? ` start="${start}"` : ''}>`;
+  let i = startIndex + 1
+  const taskBlocks: Block[] = []
+
+  while (i < tokens.length && tokens[i].type !== (isOrdered ? 'ordered_list_close' : 'bullet_list_close')) {
+    if (tokens[i].type === 'list_item_open') {
+      // Process list item content
       let j = i + 1
-      // Find the inline token inside the list item
+      let hasNestedList = false
+      let isTask = false
+      
       while (j < tokens.length && tokens[j].type !== 'list_item_close') {
-        if (tokens[j].type === 'inline') {
-          const content = tokens[j].content.trim()
-          const match = content.match(/^\[( |x|X)\]\s+(.*)$/)
+        if (tokens[j].type === 'ordered_list_open' || tokens[j].type === 'bullet_list_open') {
+          hasNestedList = true
+          const { html: nestedHtml, endIndex, taskBlocks: nestedTasks } = parseListContent(tokens, j, depth + 1)
+          html += nestedHtml
+          taskBlocks.push(...nestedTasks)
+          j = endIndex
+        } else if (tokens[j].type === 'inline') {
+          const match = tokens[j].content.trim().match(/^\[( |x|X)\]\s+(.*)$/)
           if (match) {
-            checked = match[1].toLowerCase() === 'x'
-            // Render the remaining content as markdown to handle links and other formatting
-            label = md.renderInline(match[2])
-            blocks.push({ type: 'task', checked, label })
-            // Skip to list_item_close
-            while (i < tokens.length && tokens[i].type !== 'list_item_close') i++
-            i++
-            break
+            isTask = true
+            taskBlocks.push({
+              type: 'task',
+              modelValue: match[1].toLowerCase() === 'x',
+              label: md.renderInline(match[2])
+            })
+          } else {
+            html += '<li class="my-2">' + md.renderInline(tokens[j].content)
+            if (!hasNestedList) {
+              html += '</li>'
+            }
           }
         }
         j++
       }
-      if (label === '') {
-        // Not a task list item, fallback to HTML
-        let html = ''
-        while (i < tokens.length && tokens[i].type !== 'list_item_close') {
-          html += md.renderer.render([tokens[i]], md.options, {})
-          i++
-        }
-        if (html.trim()) {
-          blocks.push({ type: 'html', html })
-        }
-        i++
+      
+      if (hasNestedList && !isTask) {
+        html += '</li>'
       }
+      i = j
+    }
+    i++
+  }
+
+  html += `</${isOrdered ? 'ol' : 'ul'}>`
+  return { html, endIndex: i, taskBlocks }
+}
+
+function parseBlocks(content: string): Block[] {
+  const tokens = md.parse(content || '', {})
+  const blocks: Block[] = []
+  let i = 0
+
+  while (i < tokens.length) {
+    const token = tokens[i]
+
+    if (token.type === 'fence') {
+      blocks.push(parseCodeBlock(token))
+      i++
+    } else if (token.type === 'table_open') {
+      const { tableData, endIndex } = parseTableData(tokens, i)
+      blocks.push({ type: 'table', ...tableData })
+      i = endIndex + 1
+    } else if (token.type === 'ordered_list_open' || token.type === 'bullet_list_open') {
+      const { html, endIndex, taskBlocks } = parseListContent(tokens, i, 0)
+      if (html.includes('<li')) { // Only add the list if it has items
+        blocks.push({ type: 'html', html })
+      }
+      blocks.push(...taskBlocks)
+      i = endIndex + 1
     } else {
-      // Collect consecutive non-code tokens into a single HTML block
+      // Collect consecutive non-special tokens into a single HTML block
       let html = ''
-      while (i < tokens.length && tokens[i].type !== 'fence' && tokens[i].type !== 'table_open' && tokens[i].type !== 'list_item_open') {
+      while (i < tokens.length && 
+             !['fence', 'table_open', 'ordered_list_open', 'bullet_list_open'].includes(tokens[i].type)) {
         html += md.renderer.render([tokens[i]], md.options, {})
         i++
       }
@@ -174,6 +224,7 @@ function parseBlocks(content: string) {
       }
     }
   }
+
   return blocks
 }
 
@@ -201,7 +252,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style>
+<style scoped>
 .preview-content {
   /* Remove padding here */
   overflow-y: auto;
@@ -210,6 +261,18 @@ onUnmounted(() => {
 .no-prose-padding.prose {
   padding: 0 !important;
   margin: 0 !important;
+}
+
+.preview-content.prose :deep(ol.unpadded-ol) {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Use higher specificity to override Tailwind prose styles */
+.preview-content.prose :deep(ul.unpadded-ul) {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-left: 0 !important;
 }
 </style>
 

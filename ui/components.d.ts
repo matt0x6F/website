@@ -27,6 +27,7 @@ declare module 'vue' {
     MarkdownPreview: typeof import('./src/components/MarkdownPreview.vue')['default']
     MarkdownTable: typeof import('./src/components/MarkdownTable.vue')['default']
     MenuBar: typeof import('primevue/menubar')['default']
+    OrderedList: typeof import('./src/components/OrderedList.vue')['default']
     Password: typeof import('primevue/password')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
