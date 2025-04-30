@@ -4,15 +4,94 @@
     <div class="editor-container">
       <Toolbar class="editor-toolbar">
         <template #start>
-          <Button
-            type="button"
-            :icon="!showPreview ? 'pi pi-pencil' : 'pi pi-eye'"
-            :label="!showPreview ? 'Edit' : 'Preview'"
-            @click="showPreview = !showPreview"
-            size="small"
-            :outlined="true"
-            :class="{ 'p-button-secondary': !showPreview }"
-          />
+          <div class="flex gap-1">
+            <Button
+              type="button"
+              :icon="!showPreview ? 'pi pi-pencil' : 'pi pi-eye'"
+              :label="!showPreview ? 'Edit' : 'Preview'"
+              @click="showPreview = !showPreview"
+              size="small"
+              :outlined="true"
+              :class="{ 'p-button-secondary': !showPreview }"
+            />
+            <span class="border-r border-gray-300 dark:border-gray-600 mx-2"></span>
+            <Button
+              v-tooltip.bottom="'Bold'"
+              type="button"
+              label="B"
+              class="font-bold"
+              @click="applyFormat('bold')"
+              size="small"
+              text
+              :disabled="showPreview"
+            />
+            <Button
+              v-tooltip.bottom="'Italic'"
+              type="button"
+              label="I"
+              class="italic"
+              @click="applyFormat('italic')"
+              size="small"
+              text
+              :disabled="showPreview"
+            />
+            <Button
+              v-tooltip.bottom="'Code'"
+              type="button"
+              icon="pi pi-code"
+              @click="applyFormat('code')"
+              size="small"
+              text
+              :disabled="showPreview"
+            />
+            <span class="border-r border-gray-300 dark:border-gray-600 mx-2"></span>
+            <Button
+              v-tooltip.bottom="'Heading 1'"
+              type="button"
+              label="H1"
+              @click="applyFormat('h1')"
+              size="small"
+              text
+              :disabled="showPreview"
+            />
+            <Button
+              v-tooltip.bottom="'Heading 2'"
+              type="button"
+              label="H2"
+              @click="applyFormat('h2')"
+              size="small"
+              text
+              :disabled="showPreview"
+            />
+            <Button
+              v-tooltip.bottom="'Heading 3'"
+              type="button"
+              label="H3"
+              @click="applyFormat('h3')"
+              size="small"
+              text
+              :disabled="showPreview"
+            />
+            <span class="border-r border-gray-300 dark:border-gray-600 mx-2"></span>
+            <Button
+              v-tooltip.bottom="'Link'"
+              type="button"
+              icon="pi pi-link"
+              @click="applyFormat('link')"
+              size="small"
+              text
+              :disabled="showPreview"
+            />
+            <Button
+              v-tooltip.bottom="'Code Block'"
+              type="button"
+              icon="pi pi-code"
+              @click="applyFormat('codeblock')"
+              size="small"
+              text
+              :disabled="showPreview"
+            />
+          </div>
         </template>
         <template #end>
           <Button
@@ -212,6 +291,79 @@ const highlightedContent = computed(() => {
     return editorContent.value // fallback to plain text
   }
 })
+
+function applyFormat(format: string) {
+  if (!textarea.value) return
+
+  const start = textarea.value.selectionStart
+  const end = textarea.value.selectionEnd
+  const selectedText = editorContent.value.substring(start, end)
+  let replacement = ''
+  let cursorOffset = 0
+
+  switch (format) {
+    case 'bold':
+      replacement = selectedText ? `**${selectedText}**` : '**bold text**'
+      cursorOffset = selectedText ? 2 : 2
+      break
+    case 'italic':
+      replacement = selectedText ? `*${selectedText}*` : '*italic text*'
+      cursorOffset = selectedText ? 1 : 1
+      break
+    case 'code':
+      replacement = selectedText ? '`' + selectedText + '`' : '`code`'
+      cursorOffset = selectedText ? 1 : 1
+      break
+    case 'h1':
+      replacement = `# ${selectedText || 'Heading 1'}`
+      cursorOffset = 2
+      break
+    case 'h2':
+      replacement = `## ${selectedText || 'Heading 2'}`
+      cursorOffset = 3
+      break
+    case 'h3':
+      replacement = `### ${selectedText || 'Heading 3'}`
+      cursorOffset = 4
+      break
+    case 'link':
+      if (selectedText) {
+        replacement = `[${selectedText}](url)`
+        cursorOffset = 1
+      } else {
+        replacement = '[link text](url)'
+        cursorOffset = 1
+      }
+      break
+    case 'codeblock':
+      const language = 'language'
+      if (selectedText) {
+        replacement = `\`\`\`${language}\n${selectedText}\n\`\`\``
+        cursorOffset = language.length + 4
+      } else {
+        replacement = `\`\`\`${language}\ncode here\n\`\`\``
+        cursorOffset = language.length + 4
+      }
+      break
+  }
+
+  // Insert the replacement text
+  editorContent.value = editorContent.value.substring(0, start) + replacement + editorContent.value.substring(end)
+
+  // Set cursor position after the operation
+  nextTick(() => {
+    if (textarea.value) {
+      if (selectedText) {
+        // If there was selected text, place cursor at the end of the replacement
+        textarea.value.selectionStart = textarea.value.selectionEnd = start + replacement.length
+      } else {
+        // If no text was selected, place cursor after the opening markdown
+        textarea.value.selectionStart = textarea.value.selectionEnd = start + cursorOffset
+      }
+      textarea.value.focus()
+    }
+  })
+}
 </script>
 
 <style>
@@ -720,5 +872,47 @@ const highlightedContent = computed(() => {
     color: #ffdcd7;
     background-color: #67060c;
   }
+}
+
+.editor-toolbar {
+  border-bottom: 1px solid var(--p-content-border-color);
+  background: var(--p-surface-50);
+  border-radius: 0.5rem 0.5rem 0 0;
+  padding: 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .editor-toolbar {
+    background: var(--p-surface-800);
+  }
+}
+
+.editor-toolbar :deep(.p-toolbar-group-start),
+.editor-toolbar :deep(.p-toolbar-group-end) {
+  gap: 0.25rem;
+}
+
+.editor-toolbar :deep(.p-button.p-button-text) {
+  padding: 0.5rem;
+  color: var(--p-text-color);
+}
+
+.editor-toolbar :deep(.p-button.p-button-text:hover) {
+  background: var(--p-surface-200);
+}
+
+@media (prefers-color-scheme: dark) {
+  .editor-toolbar :deep(.p-button.p-button-text) {
+    color: var(--p-surface-100);
+  }
+  
+  .editor-toolbar :deep(.p-button.p-button-text:hover) {
+    background: var(--p-surface-700);
+  }
+}
+
+.editor-toolbar :deep(.p-button.p-button-text:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style> 
