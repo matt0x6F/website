@@ -116,6 +116,7 @@ function beforeEnter(el: Element) {
   htmlEl.style.height = '0'
   htmlEl.style.transition = ''
 }
+
 function enter(el: Element, done: () => void) {
   const htmlEl = el as HTMLElement
   htmlEl.style.transition = 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -128,16 +129,19 @@ function enter(el: Element, done: () => void) {
     }
   })
 }
+
 function afterEnter(el: Element) {
   const htmlEl = el as HTMLElement
   htmlEl.style.height = ''
   htmlEl.style.transition = ''
 }
+
 function beforeLeave(el: Element) {
   const htmlEl = el as HTMLElement
   htmlEl.style.height = htmlEl.scrollHeight + 'px'
   htmlEl.style.transition = ''
 }
+
 function leave(el: Element, done: () => void) {
   const htmlEl = el as HTMLElement
   htmlEl.style.transition = 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -150,6 +154,7 @@ function leave(el: Element, done: () => void) {
     }
   })
 }
+
 function afterLeave(el: Element) {
   const htmlEl = el as HTMLElement
   htmlEl.style.height = ''

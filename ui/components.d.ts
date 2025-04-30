@@ -25,11 +25,13 @@ declare module 'vue' {
     LoginDialog: typeof import('./src/components/LoginDialog.vue')['default']
     MarkdownEditor: typeof import('./src/components/MarkdownEditor.vue')['default']
     MarkdownPreview: typeof import('./src/components/MarkdownPreview.vue')['default']
+    MarkdownTable: typeof import('./src/components/MarkdownTable.vue')['default']
     MenuBar: typeof import('primevue/menubar')['default']
     Password: typeof import('primevue/password')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SignupDialog: typeof import('./src/components/SignupDialog.vue')['default']
+    TaskListItem: typeof import('./src/components/TaskListItem.vue')['default']
     TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
     Toast: typeof import('primevue/toast')['default']
   }
