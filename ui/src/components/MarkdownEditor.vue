@@ -346,89 +346,103 @@ function handleDragLeave(e: DragEvent) {
   dragCursorPos.value = null
 }
 
-async function handleDrop(e: DragEvent) {
-  e.preventDefault()
-  isDragging.value = false
-  const files = Array.from(e.dataTransfer?.files || [])
-  if (!props.postId || files.length === 0) {
-    emit('file-upload', files)
-    if (!props.postId) {
-      emit('file-upload-error', 'Please save the file before uploading attachments.')
-    }
-    return
-  }
-  const auth = useAuthStore()
-  const uploadedUrls: string[] = []
+async function uploadFiles(files: File[], postId: number, auth: ReturnType<typeof useAuthStore>): Promise<string[]> {
+  const uploadedUrls: string[] = [];
   for (const file of files) {
-    const formData = new FormData()
-    formData.append('upload', file)
+    const formData = new FormData();
+    formData.append('upload', file);
     const metadata = {
       visibility: 'public',
-      posts: [props.postId]
-    }
-    formData.append('metadata', JSON.stringify(metadata))
+      posts: [postId],
+    };
+    formData.append('metadata', JSON.stringify(metadata));
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/files/`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${auth.storedAccessToken}`
+          Authorization: `Bearer ${auth.storedAccessToken}`,
         },
-        body: formData
-      })
+        body: formData,
+      });
       if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`)
+        throw new Error(`Upload failed: ${response.statusText}`);
       }
-      const fileMetadata = await response.json()
-      uploadedUrls.push(fileMetadata.location)
+      const fileMetadata = await response.json();
+      uploadedUrls.push(fileMetadata.location);
     } catch (error) {
-      console.error('Error uploading file:', error)
-      emit('file-upload-error', 'Failed to upload file(s).')
+      console.error('Error uploading file:', error);
+      emit('file-upload-error', 'Failed to upload file(s).');
     }
   }
-  // Insert at dragCursorPos or current cursor
-  let insertPos = dragCursorPos.value ?? (textarea.value ? textarea.value.selectionStart : editorContent.value.length)
-  const urlsMarkdown = uploadedUrls.map(url => `![](${url})`).join('\n')
-  let before = editorContent.value.slice(0, insertPos)
-  let after = editorContent.value.slice(insertPos)
-  const beforeChar = before.length > 0 ? before[before.length - 1] : ''
-  const afterChar = after.length > 0 ? after[0] : ''
+  return uploadedUrls;
+}
+
+function insertMarkdownAtCursor(urlsMarkdown: string, insertPos: number) {
+  let before = editorContent.value.slice(0, insertPos);
+  let after = editorContent.value.slice(insertPos);
+  const beforeChar = before.length > 0 ? before[before.length - 1] : '';
+  const afterChar = after.length > 0 ? after[0] : '';
 
   // Find the start and end of the current line
-  const lineStart = before.lastIndexOf('\n') + 1
-  const isBlankLine = editorContent.value.slice(lineStart, insertPos + (after.indexOf('\n') === -1 ? 0 : after.indexOf('\n'))).trim() === '' && (after.indexOf('\n') !== -1 || insertPos === editorContent.value.length)
+  const lineStart = before.lastIndexOf('\n') + 1;
+  const isBlankLine = editorContent.value.slice(lineStart, insertPos + (after.indexOf('\n') === -1 ? 0 : after.indexOf('\n'))).trim() === '' && (after.indexOf('\n') !== -1 || insertPos === editorContent.value.length);
 
   if (isBlankLine) {
     // Find the start of the previous line (above the blank line)
-    const prevLineStart = editorContent.value.lastIndexOf('\n', lineStart - 2) + 1
-    const beforeLines = editorContent.value.slice(0, prevLineStart)
+    const prevLineStart = editorContent.value.lastIndexOf('\n', lineStart - 2) + 1;
+    const beforeLines = editorContent.value.slice(0, prevLineStart);
     // Find the end of the current line (either next newline or end of content)
-    const afterLines = after.indexOf('\n') !== -1 ? editorContent.value.slice(insertPos + after.indexOf('\n')) : ''
+    const afterLines = after.indexOf('\n') !== -1 ? editorContent.value.slice(insertPos + after.indexOf('\n')) : '';
     // Insert image, remove blank line above, add two blank lines below
-    editorContent.value = beforeLines + urlsMarkdown + '\n\n' + afterLines.replace(/^\n+/, '')
+    editorContent.value = beforeLines + urlsMarkdown + '\n\n' + afterLines.replace(/^\n+/, '');
     nextTick(() => {
       if (textarea.value) {
-        textarea.value.selectionStart = textarea.value.selectionEnd = (beforeLines + urlsMarkdown + '\n\n').length
-        textarea.value.focus()
+        textarea.value.selectionStart = textarea.value.selectionEnd = (beforeLines + urlsMarkdown + '\n\n').length;
+        textarea.value.focus();
       }
-    })
+    });
   } else {
     // Previous logic for non-blank lines
-    let insertText = urlsMarkdown
+    let insertText = urlsMarkdown;
     if (beforeChar && beforeChar !== '\n') {
-      insertText = '\n' + insertText
+      insertText = '\n' + insertText;
     }
     if (afterChar && afterChar !== '\n') {
-      insertText = insertText + '\n'
+      insertText = insertText + '\n';
     }
-    editorContent.value = before + insertText + after
+    editorContent.value = before + insertText + after;
     nextTick(() => {
       if (textarea.value) {
-        textarea.value.selectionStart = textarea.value.selectionEnd = (before + insertText).length
-        textarea.value.focus()
+        textarea.value.selectionStart = textarea.value.selectionEnd = (before + insertText).length;
+        textarea.value.focus();
       }
-    })
+    });
   }
-  dragCursorPos.value = null
+}
+
+async function handleDrop(e: DragEvent) {
+  e.preventDefault();
+  isDragging.value = false;
+  const files = Array.from(e.dataTransfer?.files || []);
+
+  // Early return if no files or postId
+  if (!props.postId || files.length === 0) {
+    emit('file-upload', files);
+    if (!props.postId) {
+      emit('file-upload-error', 'Please save the file before uploading attachments.');
+    }
+    return;
+  }
+
+  const auth = useAuthStore();
+  const uploadedUrls = await uploadFiles(files, props.postId, auth);
+  if (!uploadedUrls.length) return;
+
+  // Insert at dragCursorPos or current cursor
+  const insertPos = dragCursorPos.value ?? (textarea.value ? textarea.value.selectionStart : editorContent.value.length);
+  const urlsMarkdown = uploadedUrls.map(url => `![](${url})`).join('\n');
+  insertMarkdownAtCursor(urlsMarkdown, insertPos);
+  dragCursorPos.value = null;
 }
 
 // Function to get scroll position as a percentage
