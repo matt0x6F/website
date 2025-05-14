@@ -17,18 +17,20 @@ from blog.models import Comment, File, Post
 from blog.schema import (
     AdminCommentList,
     AdminCommentUpdate,
+    AuthorSummary,
     CommentCreate,
     CommentList,
     CommentMutate,
+    FeedItem,
     FileDetails,
     FileMetadata,
     FileMutateMetadata,
+    JSONFeed,
     OrphanedFiles,
     PostDetails,
     PostMutate,
     ValidationErrorResponse,
 )
-from blog.schemas import Author, FeedItem, JSONFeed
 from files.storage import PrivateStorage, PublicStorage
 
 logger = structlog.get_logger(__name__)
@@ -53,7 +55,7 @@ feed_router = Router()
 def feed(request: HttpRequest, limit: int = 10, offset: int = 0):
     builder = (
         FeedBuilder(title="ooo-yay feed")
-        .with_authors([Author(name="Matt Ouille", url="https://ooo-yay.com")])
+        .with_authors([AuthorSummary(name="Matt Ouille", url="https://ooo-yay.com")])
         .with_description("Latest posts from @ooo-yay")
         .with_icon("https://ooo-yay.com/logo.svg")
         .with_favicon("https://ooo-yay.com/logo.svg")
@@ -73,7 +75,7 @@ def feed(request: HttpRequest, limit: int = 10, offset: int = 0):
                 date_published=post.published,
                 date_modified=post.updated_at,
                 language="en",
-                author=Author(name="Matt Ouille", url="https://ooo-yay.com"),
+                author=AuthorSummary(name="Matt Ouille", url="https://ooo-yay.com"),
                 url=f"https://ooo-yay.com/posts/{post.published.year}/{post.slug}",
             )
         )
