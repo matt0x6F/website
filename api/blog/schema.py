@@ -4,11 +4,17 @@ from typing import List, Optional
 from ninja import Field, Schema
 
 
+class SeriesSummary(Schema):
+    id: int
+    name: str
+
+
 class PostMutate(Schema):
     title: str
     content: str
     published: Optional[datetime] = None
     slug: str
+    series_id: Optional[int] = None
 
 
 class PostDetails(Schema):
@@ -20,6 +26,7 @@ class PostDetails(Schema):
     published: Optional[datetime] = None
     author_id: int
     slug: str
+    series: Optional[SeriesSummary] = None
 
 
 class PostSummary(Schema):

@@ -13,7 +13,7 @@ from ninja.responses import Response
 
 from auth.middleware import JWTAuth, StaffOnly, StaffOnlyModify
 from blog.feed_builder import FeedBuilder
-from blog.models import Comment, File, Post
+from blog.models import Comment, File, Post, Series
 from blog.schema import (
     AdminCommentList,
     AdminCommentUpdate,
@@ -178,7 +178,17 @@ def get_post_files_by_id(request: HttpRequest, id: int):
 )
 def create_post(request: HttpRequest, post: PostMutate):
     try:
-        post = Post.objects.create(**post.dict(), author=request.user)
+        data = post.dict()
+        series_id = data.pop("series_id", None)
+        if series_id:
+            try:
+                series_instance = Series.objects.get(id=series_id)
+                post = Post.objects.create(**data, author=request.user, series=series_instance)
+            except Series.DoesNotExist as exc:
+                raise ValidationError(f"Series with id {series_id} does not exist") from exc
+        else:
+            post = Post.objects.create(**data, author=request.user)
+
     except IntegrityError as err:
         logger.error("Error creating post", error=err)
 
@@ -194,16 +204,31 @@ def create_post(request: HttpRequest, post: PostMutate):
 )
 def update_post(request, id: int, post: PostMutate):
     try:
-        # only update fields that are present in the request
         original = Post.objects.get(id=id)
+        data = post.dict()
+        series_id = data.pop("series_id", None)
 
-        for attr, value in post.__dict__.items():
+        for attr, value in data.items():
             setattr(original, attr, value)
+
+        if series_id is not None:
+            try:
+                series_instance = Series.objects.get(id=series_id)
+                original.series = series_instance
+            except Series.DoesNotExist as exc:
+                raise ValidationError(f"Series with id {series_id} does not exist") from exc
+        else:
+            original.series = None  # Explicitly set to None if series_id is not provided or is null
+
         original.save()
     except IntegrityError as err:
-        logger.error("Error creating post", error=err)
-
-        raise ValidationError("Post with this slug already exists") from err
+        logger.error("Error updating post", error=err)
+        # It's better to provide a more specific error if possible, e.g. if slug uniqueness is violated.
+        raise ValidationError(
+            "Error updating post, possible duplicate slug or invalid data."
+        ) from err
+    except Post.DoesNotExist as exc:  # Catch if the post to update doesn't exist
+        raise HttpError(404, "Post not found") from exc
     return original
 
 

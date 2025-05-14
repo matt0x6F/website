@@ -10,9 +10,24 @@ class Post(models.Model):
     published = models.DateTimeField(null=True, default=None)
     author = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
     slug = models.SlugField(max_length=255, unique=True)
+    series = models.ForeignKey(
+        "Series", on_delete=models.SET_NULL, null=True, blank=True, default=None
+    )
 
     def __str__(self):
         return self.title
+
+
+class Series(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "series"
 
 
 class File(models.Model):
@@ -20,7 +35,7 @@ class File(models.Model):
     Tracks https://django-ninja.dev/guides/input/file-params/ which is based on Djangos class by the same name
     """
 
-    posts = models.ManyToManyField(Post)
+    posts = models.ManyToManyField(Post, related_name="files")
     name = models.CharField(max_length=255)
     content_type = models.CharField()
     charset = models.CharField(blank=True, null=True)
@@ -36,7 +51,7 @@ class File(models.Model):
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
     content = models.TextField()
     parent = models.ForeignKey(
