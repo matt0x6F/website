@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { SeriesSummary } from './SeriesSummary';
+import {
+    SeriesSummaryFromJSON,
+    SeriesSummaryFromJSONTyped,
+    SeriesSummaryToJSON,
+} from './SeriesSummary';
+
 /**
  * 
  * @export
@@ -67,6 +74,12 @@ export interface PostDetails {
      * @memberof PostDetails
      */
     slug: string;
+    /**
+     * 
+     * @type {SeriesSummary}
+     * @memberof PostDetails
+     */
+    series?: SeriesSummary | null;
 }
 
 /**
@@ -101,6 +114,7 @@ export function PostDetailsFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'published': json['published'] == null ? undefined : (new Date(json['published'])),
         'authorId': json['author_id'],
         'slug': json['slug'],
+        'series': json['series'] == null ? undefined : SeriesSummaryFromJSON(json['series']),
     };
 }
 
@@ -118,6 +132,7 @@ export function PostDetailsToJSON(value?: PostDetails | null): any {
         'published': value['published'] == null ? undefined : ((value['published'] as any).toISOString()),
         'author_id': value['authorId'],
         'slug': value['slug'],
+        'series': SeriesSummaryToJSON(value['series']),
     };
 }
 

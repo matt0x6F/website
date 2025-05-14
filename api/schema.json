@@ -2722,6 +2722,16 @@
           "slug": {
             "title": "Slug",
             "type": "string"
+          },
+          "series": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SeriesSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -2734,6 +2744,24 @@
           "slug"
         ],
         "title": "PostDetails",
+        "type": "object"
+      },
+      "SeriesSummary": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "SeriesSummary",
         "type": "object"
       },
       "ValidationErrorResponse": {
@@ -2774,6 +2802,17 @@
           "slug": {
             "title": "Slug",
             "type": "string"
+          },
+          "series_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series Id"
           }
         },
         "required": [
@@ -3028,6 +3067,42 @@
           "username": {
             "title": "Username",
             "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The author's name",
+            "title": "Name"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL of a site owned by the author. It could be a blog, micro-blog, Twitter account, etc.",
+            "title": "Url"
+          },
+          "avatar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL for an image for the author. Should be square and relatively large \u2014 such as 512 x 512 pixels.",
+            "title": "Avatar"
           }
         },
         "required": [
@@ -3483,48 +3558,6 @@
         "title": "Attachment",
         "type": "object"
       },
-      "Author": {
-        "properties": {
-          "name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "The author's name",
-            "title": "Name"
-          },
-          "url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "The URL of a site owned by the author. It could be a blog, micro-blog, Twitter account, etc.",
-            "title": "Url"
-          },
-          "avatar": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "description": "The URL for an image for the author. Should be square and relatively large \u2014 such as 512 x 512 pixels.",
-            "title": "Avatar"
-          }
-        },
-        "title": "Author",
-        "type": "object"
-      },
       "FeedItem": {
         "example": {
           "content_text": "Hello World!",
@@ -3664,7 +3697,7 @@
             "anyOf": [
               {
                 "items": {
-                  "$ref": "#/components/schemas/Author"
+                  "$ref": "#/components/schemas/AuthorSummary"
                 },
                 "type": "array"
               },
@@ -3853,7 +3886,7 @@
             "anyOf": [
               {
                 "items": {
-                  "$ref": "#/components/schemas/Author"
+                  "$ref": "#/components/schemas/AuthorSummary"
                 },
                 "type": "array"
               },

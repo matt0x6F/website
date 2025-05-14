@@ -43,6 +43,12 @@ export interface PostMutate {
      * @memberof PostMutate
      */
     slug: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PostMutate
+     */
+    seriesId?: number | null;
 }
 
 /**
@@ -69,6 +75,7 @@ export function PostMutateFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'content': json['content'],
         'published': json['published'] == null ? undefined : (new Date(json['published'])),
         'slug': json['slug'],
+        'seriesId': json['series_id'] == null ? undefined : json['series_id'],
     };
 }
 
@@ -82,6 +89,7 @@ export function PostMutateToJSON(value?: PostMutate | null): any {
         'content': value['content'],
         'published': value['published'] == null ? undefined : ((value['published'] as any).toISOString()),
         'slug': value['slug'],
+        'series_id': value['seriesId'],
     };
 }
 

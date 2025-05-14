@@ -18,7 +18,6 @@ models/AdminUserDetails.ts
 models/AdminUserModify.ts
 models/Attachment.ts
 models/AuthError.ts
-models/Author.ts
 models/AuthorSummary.ts
 models/CommentCreate.ts
 models/CommentList.ts
@@ -50,6 +49,7 @@ models/PermissionMutate.ts
 models/PostDetails.ts
 models/PostMutate.ts
 models/PostSummary.ts
+models/SeriesSummary.ts
 models/TokenObtainPairInputSchema.ts
 models/TokenObtainPairOutputSchema.ts
 models/TokenRefreshInputSchema.ts

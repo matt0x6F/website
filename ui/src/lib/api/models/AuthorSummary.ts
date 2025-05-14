@@ -31,6 +31,24 @@ export interface AuthorSummary {
      * @memberof AuthorSummary
      */
     username: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AuthorSummary
+     */
+    name?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof AuthorSummary
+     */
+    url?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof AuthorSummary
+     */
+    avatar?: string | null;
 }
 
 /**
@@ -54,6 +72,9 @@ export function AuthorSummaryFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'id': json['id'],
         'username': json['username'],
+        'name': json['name'] == null ? undefined : json['name'],
+        'url': json['url'] == null ? undefined : json['url'],
+        'avatar': json['avatar'] == null ? undefined : json['avatar'],
     };
 }
 
@@ -65,6 +86,9 @@ export function AuthorSummaryToJSON(value?: AuthorSummary | null): any {
         
         'id': value['id'],
         'username': value['username'],
+        'name': value['name'],
+        'url': value['url'],
+        'avatar': value['avatar'],
     };
 }
 

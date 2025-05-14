@@ -25,12 +25,12 @@ import {
     HubFromJSONTyped,
     HubToJSON,
 } from './Hub';
-import type { Author } from './Author';
+import type { AuthorSummary } from './AuthorSummary';
 import {
-    AuthorFromJSON,
-    AuthorFromJSONTyped,
-    AuthorToJSON,
-} from './Author';
+    AuthorSummaryFromJSON,
+    AuthorSummaryFromJSONTyped,
+    AuthorSummaryToJSON,
+} from './AuthorSummary';
 
 /**
  * 
@@ -94,10 +94,10 @@ export interface JSONFeed {
     favicon?: string | null;
     /**
      * 
-     * @type {Array<Author>}
+     * @type {Array<AuthorSummary>}
      * @memberof JSONFeed
      */
-    authors?: Array<Author> | null;
+    authors?: Array<AuthorSummary> | null;
     /**
      * 
      * @type {string}
@@ -152,7 +152,7 @@ export function JSONFeedFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'nextUrl': json['next_url'] == null ? undefined : json['next_url'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'favicon': json['favicon'] == null ? undefined : json['favicon'],
-        'authors': json['authors'] == null ? undefined : ((json['authors'] as Array<any>).map(AuthorFromJSON)),
+        'authors': json['authors'] == null ? undefined : ((json['authors'] as Array<any>).map(AuthorSummaryFromJSON)),
         'language': json['language'] == null ? undefined : json['language'],
         'expired': json['expired'] == null ? undefined : json['expired'],
         'hubs': json['hubs'] == null ? undefined : ((json['hubs'] as Array<any>).map(HubFromJSON)),
@@ -175,7 +175,7 @@ export function JSONFeedToJSON(value?: JSONFeed | null): any {
         'next_url': value['nextUrl'],
         'icon': value['icon'],
         'favicon': value['favicon'],
-        'authors': value['authors'] == null ? undefined : ((value['authors'] as Array<any>).map(AuthorToJSON)),
+        'authors': value['authors'] == null ? undefined : ((value['authors'] as Array<any>).map(AuthorSummaryToJSON)),
         'language': value['language'],
         'expired': value['expired'],
         'hubs': value['hubs'] == null ? undefined : ((value['hubs'] as Array<any>).map(HubToJSON)),

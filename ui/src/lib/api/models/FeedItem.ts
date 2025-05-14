@@ -13,12 +13,12 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Author } from './Author';
+import type { AuthorSummary } from './AuthorSummary';
 import {
-    AuthorFromJSON,
-    AuthorFromJSONTyped,
-    AuthorToJSON,
-} from './Author';
+    AuthorSummaryFromJSON,
+    AuthorSummaryFromJSONTyped,
+    AuthorSummaryToJSON,
+} from './AuthorSummary';
 import type { Attachment } from './Attachment';
 import {
     AttachmentFromJSON,
@@ -100,10 +100,10 @@ export interface FeedItem {
     dateModified?: Date | null;
     /**
      * 
-     * @type {Array<Author>}
+     * @type {Array<AuthorSummary>}
      * @memberof FeedItem
      */
-    authors?: Array<Author> | null;
+    authors?: Array<AuthorSummary> | null;
     /**
      * 
      * @type {Array<string>}
@@ -153,7 +153,7 @@ export function FeedItemFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'bannerImage': json['banner_image'] == null ? undefined : json['banner_image'],
         'datePublished': json['date_published'] == null ? undefined : (new Date(json['date_published'])),
         'dateModified': json['date_modified'] == null ? undefined : (new Date(json['date_modified'])),
-        'authors': json['authors'] == null ? undefined : ((json['authors'] as Array<any>).map(AuthorFromJSON)),
+        'authors': json['authors'] == null ? undefined : ((json['authors'] as Array<any>).map(AuthorSummaryFromJSON)),
         'tags': json['tags'] == null ? undefined : json['tags'],
         'language': json['language'] == null ? undefined : json['language'],
         'attachments': json['attachments'] == null ? undefined : ((json['attachments'] as Array<any>).map(AttachmentFromJSON)),
@@ -177,7 +177,7 @@ export function FeedItemToJSON(value?: FeedItem | null): any {
         'banner_image': value['bannerImage'],
         'date_published': value['datePublished'] == null ? undefined : ((value['datePublished'] as any).toISOString()),
         'date_modified': value['dateModified'] == null ? undefined : ((value['dateModified'] as any).toISOString()),
-        'authors': value['authors'] == null ? undefined : ((value['authors'] as Array<any>).map(AuthorToJSON)),
+        'authors': value['authors'] == null ? undefined : ((value['authors'] as Array<any>).map(AuthorSummaryToJSON)),
         'tags': value['tags'],
         'language': value['language'],
         'attachments': value['attachments'] == null ? undefined : ((value['attachments'] as Array<any>).map(AttachmentToJSON)),
