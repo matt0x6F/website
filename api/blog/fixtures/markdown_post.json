@@ -1,15 +1,80 @@
 [
-    {
-      "model": "blog.post",
-      "pk": 1,
-      "fields": {
-        "title": "Comprehensive Markdown Test Post",
-        "content": "# Heading 1\n\n## Heading 2\n\n### Heading 3\n\n#### Heading 4\n\n##### Heading 5\n\n###### Heading 6\n\n---\n\n**Bold text**\n\n*Italic text*\n\n~~Strikethrough~~\n\n`Inline code`\n\n> Blockquote\n> > Nested blockquote\n\n1. First ordered list item\n2. Second item\n   1. Nested ordered item\n   2. Another nested item\n\n- Unordered list item\n  - Nested unordered item\n- [x] Task list item (checked)\n- [ ] Task list item (unchecked)\n\n[Link to Django](https://www.djangoproject.com/)\n\n![Django Logo](https://static.djangoproject.com/img/logos/django-logo-negative.png)\n\n```python\n# Python code block\nprint('Hello, world!')\n```\n\n```javascript\n// JavaScript code block\nconsole.log('Hello, world!');\n```\n\n```\n# No language code block\nJust some code\n```\n\n| Table | Header |\n|-------|--------|\n| Cell  | Cell   |\n| Cell  | Cell   |\n\n---\n\nHTML passthrough: <span style=\"color: red;\">Red text</span>\n\nEscaped characters: \\*not italic\\*, \\# not a heading\n",
-        "created_at": "2024-06-01T12:00:00Z",
-        "updated_at": "2024-06-01T12:00:00Z",
-        "published": "2024-06-01T12:00:00Z",
-        "author": 1,
-        "slug": "comprehensive-markdown-test-post"
-      }
+  {
+    "model": "blog.series",
+    "pk": 1,
+    "fields": {
+      "title": "Markdown Mastery",
+      "slug": "markdown-mastery",
+      "description": "A series covering the basics and best practices of Markdown.",
+      "created_at": "2024-05-01T10:00:00Z",
+      "updated_at": "2024-05-01T10:00:00Z"
     }
-  ]
+  },
+  {
+    "model": "blog.series",
+    "pk": 2,
+    "fields": {
+      "title": "Advanced Formatting",
+      "slug": "advanced-formatting",
+      "description": "Deep dives into advanced Markdown and HTML passthrough techniques.",
+      "created_at": "2024-05-10T11:00:00Z",
+      "updated_at": "2024-05-10T11:00:00Z"
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 1,
+    "fields": {
+      "title": "Comprehensive Markdown Test Post",
+      "content": "# Heading 1\n\n## Heading 2\n\n### Heading 3\n\n#### Heading 4\n\n##### Heading 5\n\n###### Heading 6\n\n---\n\n**Bold text**\n\n*Italic text*\n\n~~Strikethrough~~\n\n`Inline code`\n\n> Blockquote\n> > Nested blockquote\n\n1. First ordered list item\n2. Second item\n   1. Nested ordered item\n   2. Another nested item\n\n- Unordered list item\n  - Nested unordered item\n- [x] Task list item (checked)\n- [ ] Task list item (unchecked)\n\n[Link to Django](https://www.djangoproject.com/)\n\n![Django Logo](https://static.djangoproject.com/img/logos/django-logo-negative.png)\n\n```python\n# Python code block\nprint('Hello, world!')\n```\n\n```javascript\n// JavaScript code block\nconsole.log('Hello, world!');\n```\n\n```\n# No language code block\nJust some code\n```\n\n| Table | Header |\n|-------|--------|\n| Cell  | Cell   |\n| Cell  | Cell   |\n\n---\n\nHTML passthrough: <span style=\"color: red;\">Red text</span>\n\nEscaped characters: \\*not italic\\*, \\# not a heading\n",
+      "created_at": "2024-06-01T12:00:00Z",
+      "updated_at": "2024-06-01T12:00:00Z",
+      "published_at": "2024-06-01T12:00:00Z",
+      "author": 1,
+      "slug": "comprehensive-markdown-test-post",
+      "series": 1
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 2,
+    "fields": {
+      "title": "Markdown Lists and Links",
+      "content": "# Lists and Links\n\n- Item 1\n- Item 2\n  - Subitem 2.1\n  - Subitem 2.2\n\n1. First\n2. Second\n3. Third\n\n[Google](https://www.google.com)\n\n[Relative Link](/relative/path)\n\n---\n\n> Blockquote with **bold** and *italic* text.\n",
+      "created_at": "2024-06-02T13:00:00Z",
+      "updated_at": "2024-06-02T13:00:00Z",
+      "published_at": "2024-06-02T13:00:00Z",
+      "author": 1,
+      "slug": "markdown-lists-and-links",
+      "series": 1
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 3,
+    "fields": {
+      "title": "Advanced Code Blocks",
+      "content": "# Advanced Code Blocks\n\n```python\ndef hello():\n    print(\"Hello from advanced code block!\")\n```\n\n```html\n<div>HTML code block</div>\n```\n\n```bash\necho 'Shell script'\n```\n\n---\n\nInline `code` and multi-line code blocks.\n",
+      "created_at": "2024-06-03T14:00:00Z",
+      "updated_at": "2024-06-03T14:00:00Z",
+      "published_at": "2024-06-03T14:00:00Z",
+      "author": 1,
+      "slug": "advanced-code-blocks",
+      "series": 2
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 4,
+    "fields": {
+      "title": "Standalone Markdown Post",
+      "content": "# Standalone Post\n\nThis post is not part of any series.\n\n- Simple list\n- No series reference\n\n> Just a blockquote.\n",
+      "created_at": "2024-06-04T15:00:00Z",
+      "updated_at": "2024-06-04T15:00:00Z",
+      "published_at": "2024-06-04T15:00:00Z",
+      "author": 1,
+      "slug": "standalone-markdown-post",
+      "series": null
+    }
+  }
+]

@@ -26,6 +26,7 @@
 <script setup lang="ts">
 const navLinks = [
   { to: '/admin/posts', text: 'Posts' },
+  { to: '/admin/series', text: 'Series' },
   { to: '/admin/users', text: 'Users' },
   { to: '/admin/comments', text: 'Comments' },
   { to: '/admin/files', text: 'Files' },

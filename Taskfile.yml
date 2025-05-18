@@ -74,3 +74,10 @@ tasks:
     cmds:
       - cd ui && npm run build
       - cd backend && python manage.py collectstatic --noinput
+
+  load-fixtures:
+    desc: "Load all fixtures"
+    cmds:
+      - docker compose exec django sh -c 'poetry run python manage.py loaddata blog/fixtures/*'
+    env:
+      DATABASE__HOST: "localhost"

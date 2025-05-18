@@ -185,6 +185,7 @@ DEBUG = config.debug
 ALLOWED_HOSTS = config.allowed_hosts
 
 CORS_ALLOWED_ORIGINS = config.cors.allowed_origins
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 
 DATABASES = {
     "default": {

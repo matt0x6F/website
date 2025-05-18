@@ -16,56 +16,55 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface PostMutate
+ * @interface PostCreate
  */
-export interface PostMutate {
+export interface PostCreate {
     /**
      * 
      * @type {string}
-     * @memberof PostMutate
+     * @memberof PostCreate
      */
     title: string;
     /**
      * 
      * @type {string}
-     * @memberof PostMutate
+     * @memberof PostCreate
      */
     content: string;
     /**
      * 
      * @type {Date}
-     * @memberof PostMutate
+     * @memberof PostCreate
      */
-    published?: Date | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof PostMutate
-     */
-    slug: string;
+    publishedAt?: Date | null;
     /**
      * 
      * @type {number}
-     * @memberof PostMutate
+     * @memberof PostCreate
      */
     seriesId?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PostCreate
+     */
+    slug?: string | null;
 }
 
 /**
- * Check if a given object implements the PostMutate interface.
+ * Check if a given object implements the PostCreate interface.
  */
-export function instanceOfPostMutate(value: object): value is PostMutate {
+export function instanceOfPostCreate(value: object): value is PostCreate {
     if (!('title' in value) || value['title'] === undefined) return false;
     if (!('content' in value) || value['content'] === undefined) return false;
-    if (!('slug' in value) || value['slug'] === undefined) return false;
     return true;
 }
 
-export function PostMutateFromJSON(json: any): PostMutate {
-    return PostMutateFromJSONTyped(json, false);
+export function PostCreateFromJSON(json: any): PostCreate {
+    return PostCreateFromJSONTyped(json, false);
 }
 
-export function PostMutateFromJSONTyped(json: any, ignoreDiscriminator: boolean): PostMutate {
+export function PostCreateFromJSONTyped(json: any, ignoreDiscriminator: boolean): PostCreate {
     if (json == null) {
         return json;
     }
@@ -73,13 +72,13 @@ export function PostMutateFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         
         'title': json['title'],
         'content': json['content'],
-        'published': json['published'] == null ? undefined : (new Date(json['published'])),
-        'slug': json['slug'],
+        'publishedAt': json['published_at'] == null ? undefined : (new Date(json['published_at'])),
         'seriesId': json['series_id'] == null ? undefined : json['series_id'],
+        'slug': json['slug'] == null ? undefined : json['slug'],
     };
 }
 
-export function PostMutateToJSON(value?: PostMutate | null): any {
+export function PostCreateToJSON(value?: PostCreate | null): any {
     if (value == null) {
         return value;
     }
@@ -87,9 +86,9 @@ export function PostMutateToJSON(value?: PostMutate | null): any {
         
         'title': value['title'],
         'content': value['content'],
-        'published': value['published'] == null ? undefined : ((value['published'] as any).toISOString()),
-        'slug': value['slug'],
+        'published_at': value['publishedAt'] == null ? undefined : ((value['publishedAt'] as any).toISOString()),
         'series_id': value['seriesId'],
+        'slug': value['slug'],
     };
 }
 

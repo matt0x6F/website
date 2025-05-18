@@ -40,10 +40,12 @@ api.add_router(
     "/permissions/", "accounts.groups.permissions_router", auth=JWTAuth(permissions=StaffOnly)
 )
 api.add_router("/contenttypes/", "accounts.contenttypes.contenttypes_router")
+api.add_router("/series/", "blog.api.series_router", auth=JWTAuth())
 api.add_router("/posts/", "blog.api.posts_router", auth=JWTAuth(permissions=StaffOnlyModify))
 api.add_router("/files/", "blog.api.files_router", auth=JWTAuth(permissions=StaffOnlyModify))
 api.add_router("/comments/", "blog.api.comments_router", auth=JWTAuth())
 api.add_router("/feed/", "blog.api.feed_router", auth=JWTAuth())
+
 
 urlpatterns = [
     path("api/", api.urls),

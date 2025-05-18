@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: blog
     volumes:
-      - ./dbdata:/var/lib/postgresql/data
+      - dbdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -46,3 +46,6 @@ services:
       - "3000:3000"
     depends_on:
       - django
+
+volumes:
+  dbdata:

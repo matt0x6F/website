@@ -16,56 +16,60 @@
 import * as runtime from '../runtime';
 import type {
   FileDetails,
-  PagedPostDetails,
-  PostDetails,
-  PostMutate,
+  PagedPostListPublic,
+  PostCreate,
+  PostPublic,
+  PostUpdate,
   ValidationErrorResponse,
 } from '../models/index';
 import {
     FileDetailsFromJSON,
     FileDetailsToJSON,
-    PagedPostDetailsFromJSON,
-    PagedPostDetailsToJSON,
-    PostDetailsFromJSON,
-    PostDetailsToJSON,
-    PostMutateFromJSON,
-    PostMutateToJSON,
+    PagedPostListPublicFromJSON,
+    PagedPostListPublicToJSON,
+    PostCreateFromJSON,
+    PostCreateToJSON,
+    PostPublicFromJSON,
+    PostPublicToJSON,
+    PostUpdateFromJSON,
+    PostUpdateToJSON,
     ValidationErrorResponseFromJSON,
     ValidationErrorResponseToJSON,
 } from '../models/index';
 
 export interface ApiCreatePostRequest {
-    postMutate: PostMutate;
+    postCreate: PostCreate;
 }
 
 export interface ApiDeletePostRequest {
-    id: number;
+    postId: number;
 }
 
 export interface ApiGetPostByIdRequest {
-    id: number;
+    postId: number;
 }
 
-export interface ApiGetPostBySlugRequest {
+export interface ApiGetPostBySlugAndYearRequest {
+    year: number;
     slug: string;
-    year?: number;
     draft?: boolean;
 }
 
 export interface ApiGetPostFilesByIdRequest {
-    id: number;
+    postId: number;
 }
 
 export interface ApiListPostsRequest {
-    all?: boolean;
+    seriesSlug?: string | null;
+    authorId?: number | null;
     drafts?: boolean;
-    limit?: number;
-    offset?: number;
+    allPosts?: boolean;
+    page?: number;
 }
 
 export interface ApiUpdatePostRequest {
-    id: number;
-    postMutate: PostMutate;
+    postId: number;
+    postUpdate: PostUpdate;
 }
 
 /**
@@ -74,13 +78,14 @@ export interface ApiUpdatePostRequest {
 export class PostsApi extends runtime.BaseAPI {
 
     /**
+     * Create a new blog post. If slug is not provided, it will be generated from the title. `series_id` can be provided to associate the post with a series.
      * Create Post
      */
-    async apiCreatePostRaw(requestParameters: ApiCreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
-        if (requestParameters['postMutate'] == null) {
+    async apiCreatePostRaw(requestParameters: ApiCreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
+        if (requestParameters['postCreate'] == null) {
             throw new runtime.RequiredError(
-                'postMutate',
-                'Required parameter "postMutate" was null or undefined when calling apiCreatePost().'
+                'postCreate',
+                'Required parameter "postCreate" was null or undefined when calling apiCreatePost().'
             );
         }
 
@@ -103,16 +108,17 @@ export class PostsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: PostMutateToJSON(requestParameters['postMutate']),
+            body: PostCreateToJSON(requestParameters['postCreate']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PostDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PostPublicFromJSON(jsonValue));
     }
 
     /**
+     * Create a new blog post. If slug is not provided, it will be generated from the title. `series_id` can be provided to associate the post with a series.
      * Create Post
      */
-    async apiCreatePost(requestParameters: ApiCreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
+    async apiCreatePost(requestParameters: ApiCreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
         const response = await this.apiCreatePostRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -121,10 +127,10 @@ export class PostsApi extends runtime.BaseAPI {
      * Delete Post
      */
     async apiDeletePostRaw(requestParameters: ApiDeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
+        if (requestParameters['postId'] == null) {
             throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiDeletePost().'
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiDeletePost().'
             );
         }
 
@@ -141,7 +147,7 @@ export class PostsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/api/posts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/api/posts/{post_id}`.replace(`{${"post_id"}}`, encodeURIComponent(String(requestParameters['postId']))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -160,11 +166,11 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Get Post By Id
      */
-    async apiGetPostByIdRaw(requestParameters: ApiGetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
-        if (requestParameters['id'] == null) {
+    async apiGetPostByIdRaw(requestParameters: ApiGetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
+        if (requestParameters['postId'] == null) {
             throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiGetPostById().'
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiGetPostById().'
             );
         }
 
@@ -181,39 +187,42 @@ export class PostsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/api/posts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/api/posts/{post_id}`.replace(`{${"post_id"}}`, encodeURIComponent(String(requestParameters['postId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PostDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PostPublicFromJSON(jsonValue));
     }
 
     /**
      * Get Post By Id
      */
-    async apiGetPostById(requestParameters: ApiGetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
+    async apiGetPostById(requestParameters: ApiGetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
         const response = await this.apiGetPostByIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Get Post By Slug
+     * Get Post By Slug And Year
      */
-    async apiGetPostBySlugRaw(requestParameters: ApiGetPostBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
+    async apiGetPostBySlugAndYearRaw(requestParameters: ApiGetPostBySlugAndYearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
+        if (requestParameters['year'] == null) {
+            throw new runtime.RequiredError(
+                'year',
+                'Required parameter "year" was null or undefined when calling apiGetPostBySlugAndYear().'
+            );
+        }
+
         if (requestParameters['slug'] == null) {
             throw new runtime.RequiredError(
                 'slug',
-                'Required parameter "slug" was null or undefined when calling apiGetPostBySlug().'
+                'Required parameter "slug" was null or undefined when calling apiGetPostBySlugAndYear().'
             );
         }
 
         const queryParameters: any = {};
-
-        if (requestParameters['year'] != null) {
-            queryParameters['year'] = requestParameters['year'];
-        }
 
         if (requestParameters['draft'] != null) {
             queryParameters['draft'] = requestParameters['draft'];
@@ -230,20 +239,20 @@ export class PostsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/api/posts/slug/{slug}`.replace(`{${"slug"}}`, encodeURIComponent(String(requestParameters['slug']))),
+            path: `/api/posts/slug/{year}/{slug}`.replace(`{${"year"}}`, encodeURIComponent(String(requestParameters['year']))).replace(`{${"slug"}}`, encodeURIComponent(String(requestParameters['slug']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PostDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PostPublicFromJSON(jsonValue));
     }
 
     /**
-     * Get Post By Slug
+     * Get Post By Slug And Year
      */
-    async apiGetPostBySlug(requestParameters: ApiGetPostBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
-        const response = await this.apiGetPostBySlugRaw(requestParameters, initOverrides);
+    async apiGetPostBySlugAndYear(requestParameters: ApiGetPostBySlugAndYearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
+        const response = await this.apiGetPostBySlugAndYearRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -251,10 +260,10 @@ export class PostsApi extends runtime.BaseAPI {
      * Get Post Files By Id
      */
     async apiGetPostFilesByIdRaw(requestParameters: ApiGetPostFilesByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<FileDetails>>> {
-        if (requestParameters['id'] == null) {
+        if (requestParameters['postId'] == null) {
             throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiGetPostFilesById().'
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiGetPostFilesById().'
             );
         }
 
@@ -271,7 +280,7 @@ export class PostsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/api/posts/{id}/files`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/api/posts/{post_id}/files`.replace(`{${"post_id"}}`, encodeURIComponent(String(requestParameters['postId']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -291,23 +300,27 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * List Posts
      */
-    async apiListPostsRaw(requestParameters: ApiListPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPostDetails>> {
+    async apiListPostsRaw(requestParameters: ApiListPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPostListPublic>> {
         const queryParameters: any = {};
 
-        if (requestParameters['all'] != null) {
-            queryParameters['all'] = requestParameters['all'];
+        if (requestParameters['seriesSlug'] != null) {
+            queryParameters['series_slug'] = requestParameters['seriesSlug'];
+        }
+
+        if (requestParameters['authorId'] != null) {
+            queryParameters['author_id'] = requestParameters['authorId'];
         }
 
         if (requestParameters['drafts'] != null) {
             queryParameters['drafts'] = requestParameters['drafts'];
         }
 
-        if (requestParameters['limit'] != null) {
-            queryParameters['limit'] = requestParameters['limit'];
+        if (requestParameters['allPosts'] != null) {
+            queryParameters['all_posts'] = requestParameters['allPosts'];
         }
 
-        if (requestParameters['offset'] != null) {
-            queryParameters['offset'] = requestParameters['offset'];
+        if (requestParameters['page'] != null) {
+            queryParameters['page'] = requestParameters['page'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -327,32 +340,33 @@ export class PostsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PagedPostDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PagedPostListPublicFromJSON(jsonValue));
     }
 
     /**
      * List Posts
      */
-    async apiListPosts(requestParameters: ApiListPostsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPostDetails> {
+    async apiListPosts(requestParameters: ApiListPostsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPostListPublic> {
         const response = await this.apiListPostsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
+     * Update an existing blog post. All fields in payload are optional. `series_id` can be provided or set to `null` to disassociate from a series.
      * Update Post
      */
-    async apiUpdatePostRaw(requestParameters: ApiUpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDetails>> {
-        if (requestParameters['id'] == null) {
+    async apiUpdatePostRaw(requestParameters: ApiUpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
+        if (requestParameters['postId'] == null) {
             throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling apiUpdatePost().'
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiUpdatePost().'
             );
         }
 
-        if (requestParameters['postMutate'] == null) {
+        if (requestParameters['postUpdate'] == null) {
             throw new runtime.RequiredError(
-                'postMutate',
-                'Required parameter "postMutate" was null or undefined when calling apiUpdatePost().'
+                'postUpdate',
+                'Required parameter "postUpdate" was null or undefined when calling apiUpdatePost().'
             );
         }
 
@@ -371,20 +385,21 @@ export class PostsApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/api/posts/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/api/posts/{post_id}`.replace(`{${"post_id"}}`, encodeURIComponent(String(requestParameters['postId']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: PostMutateToJSON(requestParameters['postMutate']),
+            body: PostUpdateToJSON(requestParameters['postUpdate']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PostDetailsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PostPublicFromJSON(jsonValue));
     }
 
     /**
+     * Update an existing blog post. All fields in payload are optional. `series_id` can be provided or set to `null` to disassociate from a series.
      * Update Post
      */
-    async apiUpdatePost(requestParameters: ApiUpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDetails> {
+    async apiUpdatePost(requestParameters: ApiUpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
         const response = await this.apiUpdatePostRaw(requestParameters, initOverrides);
         return await response.value();
     }

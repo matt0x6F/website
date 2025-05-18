@@ -885,18 +885,435 @@
         ]
       }
     },
+    "/api/series/{series_id}": {
+      "delete": {
+        "operationId": "blog_api_delete_series",
+        "summary": "Delete Series",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "schema": {
+              "title": "Series Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "description": "Delete a series. Posts belonging to this series will have their 'series' field set to NULL.\nPrevent deletion if any posts are still associated with the series.",
+        "tags": [
+          "series"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "blog_api_get_series_detail_by_id",
+        "summary": "Get Series Detail By Id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "schema": {
+              "title": "Series Id",
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "include_posts",
+            "schema": {
+              "default": true,
+              "title": "Include Posts",
+              "type": "boolean"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "posts_limit",
+            "schema": {
+              "default": 10,
+              "title": "Posts Limit",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesDetailPublic"
+                }
+              }
+            }
+          }
+        },
+        "description": "Retrieve a single series by its ID.\nIncludes a list of associated posts (summaries) by default.\nUse `include_posts=false` to omit posts.\nUse `posts_limit` to control the number of posts returned.",
+        "tags": [
+          "series"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "blog_api_update_series",
+        "summary": "Update Series",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id",
+            "schema": {
+              "title": "Series Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesPublic"
+                }
+              }
+            }
+          }
+        },
+        "description": "Update an existing series. All fields in payload are optional.\nIf slug is provided and changed, it will be updated.\nIf title is changed and slug is not provided (or empty), slug might be regenerated.",
+        "tags": [
+          "series"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/series/": {
+      "post": {
+        "operationId": "blog_api_create_series",
+        "summary": "Create Series",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesPublic"
+                }
+              }
+            }
+          }
+        },
+        "description": "Create a new series. Title and slug are required.\nSlug is auto-generated from title if not provided or if an empty string is passed.",
+        "tags": [
+          "series"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "blog_api_list_series",
+        "summary": "List Series",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "include_posts_count",
+            "schema": {
+              "default": false,
+              "title": "Include Posts Count",
+              "type": "boolean"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedSeriesPublic"
+                }
+              }
+            }
+          }
+        },
+        "description": "List all series. Use `include_posts_count=true` to get the number of posts in each series.",
+        "tags": [
+          "series"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/series/slug/{slug}": {
+      "get": {
+        "operationId": "blog_api_get_series_detail_by_slug",
+        "summary": "Get Series Detail By Slug",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "include_posts",
+            "schema": {
+              "default": true,
+              "title": "Include Posts",
+              "type": "boolean"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "posts_limit",
+            "schema": {
+              "default": 10,
+              "title": "Posts Limit",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesDetailPublic"
+                }
+              }
+            }
+          }
+        },
+        "description": "Retrieve a single series by its slug.\nIncludes a list of associated posts (summaries) by default.\nUse `include_posts=false` to omit posts.\nUse `posts_limit` to control the number of posts returned.",
+        "tags": [
+          "series"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/series/{series_id_or_slug}/posts": {
+      "get": {
+        "operationId": "blog_api_list_posts_in_series",
+        "summary": "List Posts In Series",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "series_id_or_slug",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "title": "Series Id Or Slug"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "exclude_post_id",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Exclude Post Id"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedPostSummaryForSeries"
+                }
+              }
+            }
+          }
+        },
+        "description": "List all published posts belonging to a specific series.\nOptionally exclude a specific post by its ID (e.g., the current post being viewed).",
+        "tags": [
+          "series"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
     "/api/posts/": {
+      "post": {
+        "operationId": "blog_api_create_post",
+        "summary": "Create Post",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostPublic"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "description": "Create a new blog post.\nIf slug is not provided, it will be generated from the title.\n`series_id` can be provided to associate the post with a series.",
+        "tags": [
+          "posts"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
       "get": {
         "operationId": "blog_api_list_posts",
         "summary": "List Posts",
         "parameters": [
           {
             "in": "query",
-            "name": "all",
+            "name": "series_slug",
             "schema": {
-              "default": false,
-              "title": "All",
-              "type": "boolean"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Series Slug"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "author_id",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Author Id"
             },
             "required": false
           },
@@ -912,126 +1329,24 @@
           },
           {
             "in": "query",
-            "name": "limit",
-            "schema": {
-              "default": 100,
-              "minimum": 1,
-              "title": "Limit",
-              "type": "integer"
-            },
-            "required": false
-          },
-          {
-            "in": "query",
-            "name": "offset",
-            "schema": {
-              "default": 0,
-              "minimum": 0,
-              "title": "Offset",
-              "type": "integer"
-            },
-            "required": false
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedPostDetails"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "posts"
-        ],
-        "security": [
-          {
-            "JWTAuth": []
-          }
-        ]
-      },
-      "post": {
-        "operationId": "blog_api_create_post",
-        "summary": "Create Post",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PostDetails"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "posts"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostMutate"
-              }
-            }
-          },
-          "required": true
-        },
-        "security": [
-          {
-            "JWTAuth": []
-          }
-        ]
-      }
-    },
-    "/api/posts/slug/{slug}": {
-      "get": {
-        "operationId": "blog_api_get_post_by_slug",
-        "summary": "Get Post By Slug",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "slug",
-            "schema": {
-              "title": "Slug",
-              "type": "string"
-            },
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "year",
-            "schema": {
-              "title": "Year",
-              "type": "integer"
-            },
-            "required": false
-          },
-          {
-            "in": "query",
-            "name": "draft",
+            "name": "all_posts",
             "schema": {
               "default": false,
-              "title": "Draft",
+              "title": "All Posts",
               "type": "boolean"
             },
             "required": false
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "required": false
           }
         ],
         "responses": {
@@ -1040,7 +1355,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostDetails"
+                  "$ref": "#/components/schemas/PagedPostListPublic"
                 }
               }
             }
@@ -1056,51 +1371,16 @@
         ]
       }
     },
-    "/api/posts/{id}": {
-      "get": {
-        "operationId": "blog_api_get_post_by_id",
-        "summary": "Get Post By Id",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "schema": {
-              "title": "Id",
-              "type": "integer"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PostDetails"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "posts"
-        ],
-        "security": [
-          {
-            "JWTAuth": []
-          }
-        ]
-      },
+    "/api/posts/{post_id}": {
       "put": {
         "operationId": "blog_api_update_post",
         "summary": "Update Post",
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "post_id",
             "schema": {
-              "title": "Id",
+              "title": "Post Id",
               "type": "integer"
             },
             "required": true
@@ -1112,17 +1392,66 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostDetails"
+                  "$ref": "#/components/schemas/PostPublic"
                 }
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "description": "Update an existing blog post. All fields in payload are optional.\n`series_id` can be provided or set to `null` to disassociate from a series.",
+        "tags": [
+          "posts"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "blog_api_get_post_by_id",
+        "summary": "Get Post By Id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "post_id",
+            "schema": {
+              "title": "Post Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostPublic"
                 }
               }
             }
@@ -1131,16 +1460,6 @@
         "tags": [
           "posts"
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PostMutate"
-              }
-            }
-          },
-          "required": true
-        },
         "security": [
           {
             "JWTAuth": []
@@ -1153,9 +1472,9 @@
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "post_id",
             "schema": {
-              "title": "Id",
+              "title": "Post Id",
               "type": "integer"
             },
             "required": true
@@ -1176,16 +1495,72 @@
         ]
       }
     },
-    "/api/posts/{id}/files": {
+    "/api/posts/slug/{year}/{slug}": {
+      "get": {
+        "operationId": "blog_api_get_post_by_slug_and_year",
+        "summary": "Get Post By Slug And Year",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "year",
+            "schema": {
+              "title": "Year",
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "slug",
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "draft",
+            "schema": {
+              "default": false,
+              "title": "Draft",
+              "type": "boolean"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostPublic"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "posts"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/posts/{post_id}/files": {
       "get": {
         "operationId": "blog_api_get_post_files_by_id",
         "summary": "Get Post Files By Id",
         "parameters": [
           {
             "in": "path",
-            "name": "id",
+            "name": "post_id",
             "schema": {
-              "title": "Id",
+              "title": "Post Id",
               "type": "integer"
             },
             "required": true
@@ -2658,11 +3033,250 @@
         "title": "PermissionMutate",
         "type": "object"
       },
-      "PagedPostDetails": {
+      "PostSummaryForSeries": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "slug"
+        ],
+        "title": "PostSummaryForSeries",
+        "type": "object"
+      },
+      "SeriesDetailPublic": {
+        "properties": {
+          "title": {
+            "maxLength": 200,
+            "title": "Title",
+            "type": "string"
+          },
+          "slug": {
+            "description": "URL-friendly identifier. Will be auto-generated from title if not provided.",
+            "maxLength": 200,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "title": "Slug",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "post_count": {
+            "default": 0,
+            "title": "Post Count",
+            "type": "integer"
+          },
+          "posts": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PostSummaryForSeries"
+            },
+            "title": "Posts",
+            "type": "array"
+          }
+        },
+        "required": [
+          "title",
+          "slug",
+          "id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "SeriesDetailPublic",
+        "type": "object"
+      },
+      "SeriesPublic": {
+        "properties": {
+          "title": {
+            "maxLength": 200,
+            "title": "Title",
+            "type": "string"
+          },
+          "slug": {
+            "description": "URL-friendly identifier. Will be auto-generated from title if not provided.",
+            "maxLength": 200,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "title": "Slug",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "post_count": {
+            "default": 0,
+            "title": "Post Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "title",
+          "slug",
+          "id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "SeriesPublic",
+        "type": "object"
+      },
+      "SeriesUpdate": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "title": "SeriesUpdate",
+        "type": "object"
+      },
+      "SeriesCreate": {
+        "properties": {
+          "title": {
+            "maxLength": 200,
+            "title": "Title",
+            "type": "string"
+          },
+          "slug": {
+            "description": "URL-friendly identifier. Will be auto-generated from title if not provided.",
+            "maxLength": 200,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "title": "Slug",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          }
+        },
+        "required": [
+          "title",
+          "slug"
+        ],
+        "title": "SeriesCreate",
+        "type": "object"
+      },
+      "PagedSeriesPublic": {
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/PostDetails"
+              "$ref": "#/components/schemas/SeriesPublic"
             },
             "title": "Items",
             "type": "array"
@@ -2676,22 +3290,75 @@
           "items",
           "count"
         ],
-        "title": "PagedPostDetails",
+        "title": "PagedSeriesPublic",
         "type": "object"
       },
-      "PostDetails": {
+      "PagedPostSummaryForSeries": {
         "properties": {
-          "id": {
-            "title": "Id",
-            "type": "integer"
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PostSummaryForSeries"
+            },
+            "title": "Items",
+            "type": "array"
           },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "PagedPostSummaryForSeries",
+        "type": "object"
+      },
+      "PostPublic": {
+        "properties": {
           "title": {
+            "maxLength": 200,
             "title": "Title",
             "type": "string"
           },
           "content": {
             "title": "Content",
             "type": "string"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "series_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ID of the series this post belongs to",
+            "title": "Series Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserPublic"
           },
           "created_at": {
             "format": "date-time",
@@ -2703,65 +3370,67 @@
             "title": "Updated At",
             "type": "string"
           },
-          "published": {
+          "comment_count": {
+            "default": 0,
+            "title": "Comment Count",
+            "type": "integer"
+          },
+          "series": {
             "anyOf": [
               {
-                "format": "date-time",
+                "$ref": "#/components/schemas/SeriesPublic"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Full details of the series this post belongs to"
+          }
+        },
+        "required": [
+          "title",
+          "content",
+          "id",
+          "slug",
+          "author",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "PostPublic",
+        "type": "object"
+      },
+      "UserPublic": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          },
+          "email": {
+            "anyOf": [
+              {
                 "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Published"
+            "title": "Email"
           },
-          "author_id": {
-            "title": "Author Id",
-            "type": "integer"
-          },
-          "slug": {
-            "title": "Slug",
-            "type": "string"
-          },
-          "series": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/SeriesSummary"
-              },
-              {
-                "type": "null"
-              }
-            ]
+          "is_staff": {
+            "default": false,
+            "title": "Is Staff",
+            "type": "boolean"
           }
         },
         "required": [
           "id",
-          "title",
-          "content",
-          "created_at",
-          "updated_at",
-          "author_id",
-          "slug"
+          "username"
         ],
-        "title": "PostDetails",
-        "type": "object"
-      },
-      "SeriesSummary": {
-        "properties": {
-          "id": {
-            "title": "Id",
-            "type": "integer"
-          },
-          "name": {
-            "title": "Name",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "name"
-        ],
-        "title": "SeriesSummary",
+        "title": "UserPublic",
         "type": "object"
       },
       "ValidationErrorResponse": {
@@ -2777,9 +3446,10 @@
         "title": "ValidationErrorResponse",
         "type": "object"
       },
-      "PostMutate": {
+      "PostCreate": {
         "properties": {
           "title": {
+            "maxLength": 200,
             "title": "Title",
             "type": "string"
           },
@@ -2787,7 +3457,7 @@
             "title": "Content",
             "type": "string"
           },
-          "published": {
+          "published_at": {
             "anyOf": [
               {
                 "format": "date-time",
@@ -2797,11 +3467,7 @@
                 "type": "null"
               }
             ],
-            "title": "Published"
-          },
-          "slug": {
-            "title": "Slug",
-            "type": "string"
+            "title": "Published At"
           },
           "series_id": {
             "anyOf": [
@@ -2812,15 +3478,201 @@
                 "type": "null"
               }
             ],
+            "description": "ID of the series this post belongs to",
             "title": "Series Id"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL-friendly identifier. Will be auto-generated from title if not provided and not present.",
+            "title": "Slug"
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ],
+        "title": "PostCreate",
+        "type": "object"
+      },
+      "PagedPostListPublic": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PostListPublic"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "count"
+        ],
+        "title": "PagedPostListPublic",
+        "type": "object"
+      },
+      "PostListPublic": {
+        "properties": {
+          "title": {
+            "maxLength": 200,
+            "title": "Title",
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "series_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ID of the series this post belongs to",
+            "title": "Series Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/UserPublic"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "comment_count": {
+            "default": 0,
+            "title": "Comment Count",
+            "type": "integer"
+          },
+          "series": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SeriesPublic"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Full details of the series this post belongs to"
           }
         },
         "required": [
           "title",
           "content",
-          "slug"
+          "id",
+          "slug",
+          "author",
+          "created_at",
+          "updated_at"
         ],
-        "title": "PostMutate",
+        "title": "PostListPublic",
+        "type": "object"
+      },
+      "PostUpdate": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          },
+          "content": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "series_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ID of the series this post belongs to",
+            "title": "Series Id"
+          }
+        },
+        "title": "PostUpdate",
         "type": "object"
       },
       "FileDetails": {
@@ -3177,6 +4029,91 @@
           "count"
         ],
         "title": "PagedCommentList",
+        "type": "object"
+      },
+      "PostDetails": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "published": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published"
+          },
+          "author_id": {
+            "title": "Author Id",
+            "type": "integer"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "series": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SeriesSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "content",
+          "created_at",
+          "updated_at",
+          "author_id",
+          "slug"
+        ],
+        "title": "PostDetails",
+        "type": "object"
+      },
+      "SeriesSummary": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "SeriesSummary",
         "type": "object"
       },
       "CommentCreate": {
@@ -3779,11 +4716,21 @@
       },
       "JSONFeed": {
         "example": {
-          "description": "The latest posts from my blog",
           "feed_url": "https://example.org/feed.json",
           "home_page_url": "https://example.org/",
-          "items": [],
-          "title": "My Blog Feed",
+          "items": [
+            {
+              "content_text": "This is a second item.",
+              "id": "2",
+              "url": "https://example.org/second-item"
+            },
+            {
+              "content_html": "<p>Hello, world!</p>",
+              "id": "1",
+              "url": "https://example.org/initial-post"
+            }
+          ],
+          "title": "My Example Feed",
           "version": "https://jsonfeed.org/version/1.1"
         },
         "properties": {
@@ -3937,7 +4884,7 @@
             "title": "Hubs"
           },
           "items": {
-            "description": "An array of items, in reverse-chronological order (newest first).",
+            "description": "The list of items in the feed. Must have at least one item.",
             "items": {
               "$ref": "#/components/schemas/FeedItem"
             },

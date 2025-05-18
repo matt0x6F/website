@@ -1,20 +1,20 @@
 from datetime import datetime
 from typing import List, Optional
 
-from ninja import Field, Schema
+from ninja import Schema
+from pydantic import Field
+
+
+class UserPublic(Schema):
+    id: int
+    username: str
+    email: Optional[str] = None
+    is_staff: bool = False
 
 
 class SeriesSummary(Schema):
     id: int
     name: str
-
-
-class PostMutate(Schema):
-    title: str
-    content: str
-    published: Optional[datetime] = None
-    slug: str
-    series_id: Optional[int] = None
 
 
 class PostDetails(Schema):
@@ -283,17 +283,134 @@ class JSONFeed(Schema):
         description="Endpoints that can be used to subscribe to real-time notifications from the publisher of this feed.",
     )
     items: List[FeedItem] = Field(
-        ..., description="An array of items, in reverse-chronological order (newest first)."
+        ..., description="The list of items in the feed. Must have at least one item."
     )
 
     class Config:
         json_schema_extra = {
             "example": {
                 "version": "https://jsonfeed.org/version/1.1",
-                "title": "My Blog Feed",
+                "title": "My Example Feed",
                 "home_page_url": "https://example.org/",
                 "feed_url": "https://example.org/feed.json",
-                "description": "The latest posts from my blog",
-                "items": [],
+                "items": [
+                    {
+                        "id": "2",
+                        "content_text": "This is a second item.",
+                        "url": "https://example.org/second-item",
+                    },
+                    {
+                        "id": "1",
+                        "content_html": "<p>Hello, world!</p>",
+                        "url": "https://example.org/initial-post",
+                    },
+                ],
             }
         }
+
+
+# SERIES SCHEMAS
+class SeriesBase(Schema):
+    title: str = Field(..., max_length=200)
+    slug: str = Field(
+        ...,
+        max_length=200,
+        pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$",
+        description="URL-friendly identifier. Will be auto-generated from title if not provided.",
+    )
+    description: Optional[str] = None
+
+
+class SeriesCreate(SeriesBase):
+    pass
+
+
+class SeriesUpdate(
+    Schema
+):  # Using Schema directly as all fields are optional for PATCH-like behavior
+    title: Optional[str] = Field(None, max_length=200)
+    slug: Optional[str] = Field(None, max_length=200, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+    description: Optional[str] = None
+
+
+class SeriesPublic(SeriesBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    post_count: int = 0  # This will typically be annotated in the query
+
+
+class PostSummaryForSeries(Schema):
+    id: int
+    title: str
+    slug: str
+    year: Optional[int] = None  # To help construct URLs, derived from published_at
+    published_at: Optional[datetime] = None
+
+
+class SeriesDetailPublic(SeriesPublic):
+    posts: List[PostSummaryForSeries] = []
+
+
+class SeriesListResponse(Schema):
+    items: List[SeriesPublic]
+    count: int
+
+
+# POST SCHEMAS (Updated)
+class PostBase(Schema):
+    title: str = Field(..., max_length=200)
+    # slug: str = Field(..., max_length=200) # Slug is handled in PostCreate and PostPublic explicitly
+    content: str
+    published_at: Optional[datetime] = None
+    series_id: Optional[int] = Field(None, description="ID of the series this post belongs to")
+
+
+class PostCreate(PostBase):
+    slug: Optional[str] = Field(
+        None,
+        max_length=200,
+        pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$",
+        description="URL-friendly identifier. Will be auto-generated from title if not provided and not present.",
+    )
+
+
+class PostUpdate(
+    Schema
+):  # Using Schema directly as all fields are optional for PATCH-like behavior
+    title: Optional[str] = Field(None, max_length=200)
+    slug: Optional[str] = Field(None, max_length=200, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+    content: Optional[str] = None
+    published_at: Optional[datetime] = None
+    series_id: Optional[int] = Field(None, description="ID of the series this post belongs to")
+    # tags: Optional[List[str]] = Field(None, description="List of tag names") # Assuming tags might be handled like this
+
+
+class PostPublic(PostBase):
+    id: int
+    slug: str  # Slug is mandatory in public representation
+    author: UserPublic  # Now UserPublic should be defined
+    created_at: datetime
+    updated_at: datetime
+    comment_count: int = 0  # Typically annotated
+    series: Optional[SeriesPublic] = Field(
+        None, description="Full details of the series this post belongs to"
+    )
+    # tags: List[TagPublic] = [] # Assuming TagPublic is defined elsewhere
+
+
+class PostListPublic(PostPublic):
+    # For list views, content might be truncated or have a summary
+    # content: Optional[str] = None # Override if full content not needed for lists
+    pass  # Inherits from PostPublic, can be specialized if needed (e.g. truncated content)
+
+
+class PostListResponse(Schema):
+    items: List[PostListPublic]
+    count: int
+    offset: Optional[int] = None  # For pagination metadata
+    limit: Optional[int] = None  # For pagination metadata
+
+
+# Ensure UserPublic, FilePublic, CommentPublic, TagPublic are defined as needed above or are already present.
+# For example:

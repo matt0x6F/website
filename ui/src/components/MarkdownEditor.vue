@@ -120,7 +120,8 @@
         </template>
       </Toolbar>
       
-      <div class="editor-content split-view"
+      <div class="editor-scroll-area editor-content split-view"
+           style="flex: 1 1 0%; height: 100%;"
            @dragover="handleDragOver"
            @dragleave="handleDragLeave"
            @drop="handleDrop"
@@ -176,12 +177,7 @@ const emit = defineEmits<{
 
 // Editor state
 const editorContent = ref('')
-const showPreview = ref(false)
 const isExpanded = ref(false)
-
-// Add scroll position tracking
-const lastEditorScrollPosition = ref(0)
-const lastPreviewScrollPosition = ref(0)
 
 // View mode can be 'edit', 'preview', or 'split'
 const viewMode = ref('split')
@@ -557,13 +553,9 @@ function applyListFormat(type: 'ordered' | 'unordered' | 'check') {
 
   // Find the start and end of the selection in terms of lines
   const before = value.slice(0, start);
-  const selection = value.slice(start, end);
-  const after = value.slice(end);
 
   // Get the start index of the first selected line
   const lineStart = before.lastIndexOf('\n') + 1;
-  // Get the end index of the last selected line
-  const lineEnd = end + (value.slice(end).indexOf('\n') === -1 ? value.length - end : value.slice(end).indexOf('\n'));
 
   // Get all lines in the selection
   const selectedText = value.slice(lineStart, end);
@@ -598,43 +590,6 @@ function applyListFormat(type: 'ordered' | 'unordered' | 'check') {
       textarea.value.focus();
     }
   });
-}
-
-// Add function to handle view mode changes
-function setViewMode(mode: 'edit' | 'preview' | 'split') {
-  viewMode.value = mode
-}
-
-// Add this function after other function declarations
-function syncScroll(source: 'editor' | 'preview', event: Event) {
-  if (viewMode.value !== 'split') return
-
-  const target = event.target as HTMLElement
-  const scrollPercentage = getScrollPercentage(target)
-
-  if (source === 'editor' && !isScrollingPreview.value) {
-    isScrollingEditor.value = true
-    const previewEl = previewRef.value?.previewEl as HTMLElement
-    if (previewEl) {
-      setScrollFromPercentage(previewEl, scrollPercentage)
-    }
-    setTimeout(() => {
-      isScrollingEditor.value = false
-    }, 50)
-  } else if (source === 'preview' && !isScrollingEditor.value) {
-    isScrollingPreview.value = true
-    if (textarea.value) {
-      setScrollFromPercentage(textarea.value, scrollPercentage)
-      // Also sync the highlight element
-      const highlight = textarea.value.nextElementSibling as HTMLElement
-      if (highlight) {
-        highlight.scrollTop = textarea.value.scrollTop
-      }
-    }
-    setTimeout(() => {
-      isScrollingPreview.value = false
-    }, 50)
-  }
 }
 
 const handlePreviewScroll = (e: Event) => {
@@ -681,10 +636,10 @@ const dragCursorStyle = computed((): CSSProperties => {
 
 <style>
 .editor-wrapper {
-  flex: 1;
-  min-height: 600px;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  height: 100%;
 }
 
 .editor-wrapper.expanded {
@@ -708,21 +663,9 @@ const dragCursorStyle = computed((): CSSProperties => {
 }
 
 .editor-container {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 0.5rem;
-  background: var(--p-surface-100);
-  min-height: 0;
-  overflow: hidden;
-  padding: 0;
-}
-
-@media (prefers-color-scheme: dark) {
-  .editor-container {
-    background: var(--p-surface-700);
-  }
+  height: 100%;
 }
 
 .editor-content {
@@ -730,13 +673,19 @@ const dragCursorStyle = computed((): CSSProperties => {
   position: relative;
   overflow: hidden;
   background: var(--p-surface-50);
+  height: 100%;
+}
+
+.editor-scroll-area {
+  height: 100%;
+  display: flex;
   min-height: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  .editor-content {
-    background: var(--p-surface-800);
-  }
+.editor-container-inner.split-editor,
+.split-preview {
+  height: 100%;
+  min-height: 0;
 }
 
 .editor-container-inner {

@@ -117,7 +117,7 @@ export interface JSONFeed {
      */
     hubs?: Array<Hub> | null;
     /**
-     * An array of items, in reverse-chronological order (newest first).
+     * The list of items in the feed. Must have at least one item.
      * @type {Array<FeedItem>}
      * @memberof JSONFeed
      */

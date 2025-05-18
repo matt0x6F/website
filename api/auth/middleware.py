@@ -129,10 +129,30 @@ class JWTAuth(JWTAuth):
 
     def authorize(self, request: HttpRequest, user: AbstractUser) -> Type[AbstractUser]:
         if self.permissions:
-            logger.debug("Checking permissions for user", user=user)
-
-            self.permissions.check(request, user)
-
-            logger.debug("User has required permissions", user=user)
-
+            logger.info(
+                "Authorizing request",
+                user=str(user),
+                method=request.method,
+                path=request.path,
+                permissions=str(self.permissions),
+            )
+            try:
+                self.permissions.check(request, user)
+                logger.info(
+                    "Authorization granted",
+                    user=str(user),
+                    method=request.method,
+                    path=request.path,
+                    permissions=str(self.permissions),
+                )
+            except Exception as e:
+                logger.error(
+                    "Authorization denied",
+                    user=str(user),
+                    method=request.method,
+                    path=request.path,
+                    permissions=str(self.permissions),
+                    error=str(e),
+                )
+                raise
         return user

@@ -1,17 +1,22 @@
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Union
 
 import structlog
-from django.db.models import Q
+from django.db import models
+
+# from config.utils.permissions import StaffPermission # Commented out problematic import
+from django.db.models import Count
 from django.db.utils import IntegrityError
 from django.http import HttpRequest
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.text import slugify
 from ninja import File as NinjaFile
 from ninja import Router, UploadedFile
 from ninja.errors import HttpError, ValidationError
-from ninja.pagination import paginate
+from ninja.pagination import PageNumberPagination, paginate
 from ninja.responses import Response
 
-from auth.middleware import JWTAuth, StaffOnly, StaffOnlyModify
+from auth.middleware import JWTAuth, StaffOnly
 from blog.feed_builder import FeedBuilder
 from blog.models import Comment, File, Post, Series
 from blog.schema import (
@@ -27,8 +32,15 @@ from blog.schema import (
     FileMutateMetadata,
     JSONFeed,
     OrphanedFiles,
-    PostDetails,
-    PostMutate,
+    PostCreate,
+    PostListPublic,
+    PostPublic,
+    PostSummaryForSeries,
+    PostUpdate,
+    SeriesCreate,
+    SeriesDetailPublic,
+    SeriesPublic,
+    SeriesUpdate,
     ValidationErrorResponse,
 )
 from files.storage import PrivateStorage, PublicStorage
@@ -39,6 +51,7 @@ posts_router = Router()
 files_router = Router()
 comments_router = Router()
 feed_router = Router()
+series_router = Router()
 
 
 #
@@ -82,163 +95,11 @@ def feed(request: HttpRequest, limit: int = 10, offset: int = 0):
 
     count = Post.objects.filter(published__lte=timezone.now()).count()
     if offset + limit < count:
-        builder.with_next_url(f"https://ooo-yay.com/feed.json?limit={limit}&offset={offset+limit}")
+        builder.with_next_url(
+            f"https://ooo-yay.com/feed.json?limit={limit}&offset={offset + limit}"
+        )
 
     return Response(builder.build(), content_type="application/feed+json")
-
-
-#
-# Posts
-#
-
-
-@posts_router.get("/", auth=JWTAuth(None, True), response={200: List[PostDetails]}, tags=["posts"])
-@paginate
-def list_posts(request: HttpRequest, all: bool = False, drafts: bool = False):
-    if all and request.user.is_staff:
-        logger.debug(
-            "Returning all posts", user=request.user.username, is_staff=request.user.is_staff
-        )
-
-        try:
-            return Post.objects.all().order_by("-id")
-        except Exception as err:
-            logger.error("Error fetching all posts", error=err)
-
-            raise HttpError(500, "Fail to fetch all posts") from err
-
-    if drafts and request.user.is_staff:
-        logger.debug(
-            "Returning draft posts", user=request.user.username, is_staff=request.user.is_staff
-        )
-
-        try:
-            today = timezone.now()
-            # published is null OR published is in the future
-            return Post.objects.filter(
-                Q(published__isnull=True) | Q(published__gte=today)
-            ).order_by("-id")
-        except Exception as err:
-            logger.error("Error fetching draft posts", error=err)
-
-            raise HttpError(500, "Fail to fetch draft posts") from err
-
-    logger.debug(
-        "Returning published posts",
-        user=request.user.username,
-        is_staff=request.user.is_staff,
-        method=request.method,
-    )
-
-    try:
-        return Post.objects.filter(published__lte=timezone.now()).order_by("-published")
-    except Exception as err:
-        logger.error("Error fetching published posts", error=err)
-
-        raise HttpError(500, "Fail to fetch published posts") from err
-
-
-@posts_router.get(
-    "/slug/{slug}", auth=JWTAuth(None, True), response={200: PostDetails}, tags=["posts"]
-)
-def get_post_by_slug(request: HttpRequest, slug: str, year: int = None, draft=False):
-    if request.user.is_staff:
-        if draft:
-            return Post.objects.filter(published__isnull=True).get(slug=slug)
-
-        return Post.objects.filter(published__year=year).get(slug=slug)
-
-    return (
-        Post.objects.filter(published__lte=timezone.now())
-        .filter(published__year=year)
-        .get(slug=slug)
-    )
-
-
-@posts_router.get("/{id}", auth=JWTAuth(None, True), response={200: PostDetails}, tags=["posts"])
-def get_post_by_id(request: HttpRequest, id: int):
-    if request.user.is_staff:
-        return Post.objects.get(id=id)
-    return Post.objects.filter(published__lte=timezone.now()).get(id=id)
-
-
-@posts_router.get(
-    "/{id}/files", auth=JWTAuth(StaffOnly, True), response={200: List[FileDetails]}, tags=["posts"]
-)
-def get_post_files_by_id(request: HttpRequest, id: int):
-    post = Post.objects.get(id=id)
-    return post.files.all()
-
-
-@posts_router.post(
-    "/",
-    response={200: PostDetails, 422: ValidationErrorResponse},
-    tags=["posts"],
-    auth=JWTAuth(permissions=StaffOnlyModify),
-)
-def create_post(request: HttpRequest, post: PostMutate):
-    try:
-        data = post.dict()
-        series_id = data.pop("series_id", None)
-        if series_id:
-            try:
-                series_instance = Series.objects.get(id=series_id)
-                post = Post.objects.create(**data, author=request.user, series=series_instance)
-            except Series.DoesNotExist as exc:
-                raise ValidationError(f"Series with id {series_id} does not exist") from exc
-        else:
-            post = Post.objects.create(**data, author=request.user)
-
-    except IntegrityError as err:
-        logger.error("Error creating post", error=err)
-
-        raise ValidationError("Post with this slug already exists") from err
-    return post
-
-
-@posts_router.put(
-    "/{id}",
-    response={200: PostDetails, 422: ValidationErrorResponse},
-    tags=["posts"],
-    auth=JWTAuth(permissions=StaffOnlyModify),
-)
-def update_post(request, id: int, post: PostMutate):
-    try:
-        original = Post.objects.get(id=id)
-        data = post.dict()
-        series_id = data.pop("series_id", None)
-
-        for attr, value in data.items():
-            setattr(original, attr, value)
-
-        if series_id is not None:
-            try:
-                series_instance = Series.objects.get(id=series_id)
-                original.series = series_instance
-            except Series.DoesNotExist as exc:
-                raise ValidationError(f"Series with id {series_id} does not exist") from exc
-        else:
-            original.series = None  # Explicitly set to None if series_id is not provided or is null
-
-        original.save()
-    except IntegrityError as err:
-        logger.error("Error updating post", error=err)
-        # It's better to provide a more specific error if possible, e.g. if slug uniqueness is violated.
-        raise ValidationError(
-            "Error updating post, possible duplicate slug or invalid data."
-        ) from err
-    except Post.DoesNotExist as exc:  # Catch if the post to update doesn't exist
-        raise HttpError(404, "Post not found") from exc
-    return original
-
-
-@posts_router.delete(
-    "/{id}", response={204: None}, tags=["posts"], auth=JWTAuth(permissions=StaffOnlyModify)
-)
-def delete_post(request, id: int):
-    post = Post.objects.get(id=id)
-    post.delete()
-    return None
 
 
 #
@@ -728,3 +589,365 @@ def delete_comment(request: HttpRequest, id: int):
             logger.error("Error deleting comment", error=err)
 
             raise HttpError(500, "Fail to delete comment") from err
+
+
+#
+# Series
+#
+
+
+@series_router.delete(
+    "/{series_id}", response={204: None}, auth=JWTAuth(permissions=StaffOnly), tags=["series"]
+)
+def delete_series(request, series_id: int):
+    """
+    Delete a series. Posts belonging to this series will have their 'series' field set to NULL.
+    Prevent deletion if any posts are still associated with the series.
+    """
+    series = get_object_or_404(Series, id=series_id)
+    if series.posts.exists():
+        raise HttpError(400, "You must disassociate all posts from this series before deleting it.")
+    series.delete()
+    return 204
+
+
+# SERIES API ENDPOINTS
+@series_router.post("", response=SeriesPublic, auth=JWTAuth(permissions=StaffOnly), tags=["series"])
+def create_series(request, payload: SeriesCreate):
+    """
+    Create a new series. Title and slug are required.
+    Slug is auto-generated from title if not provided or if an empty string is passed.
+    """
+    if not payload.slug or payload.slug.strip() == "":
+        payload.slug = slugify(payload.title)
+
+    # Check for slug uniqueness before creating
+    if Series.objects.filter(slug=payload.slug).exists():
+        return ValidationErrorResponse(
+            detail=f"Series with slug '{payload.slug}' already exists."
+        )  # This should be a 400/422
+
+    series = Series.objects.create(**payload.dict())
+    return series
+
+
+@series_router.get("", response=List[SeriesPublic], tags=["series"])
+@paginate(PageNumberPagination, page_size=20)
+def list_series(request, include_posts_count: bool = False):
+    """
+    List all series. Use `include_posts_count=true` to get the number of posts in each series.
+    """
+    series_qs = Series.objects.all()
+    if include_posts_count:
+        # Only count published posts
+        series_qs = series_qs.annotate(
+            post_count=Count("posts", filter=models.Q(posts__published_at__isnull=False))
+        )
+    return series_qs
+
+
+@series_router.get("/{series_id}", response=SeriesDetailPublic, tags=["series"])
+def get_series_detail_by_id(
+    request, series_id: int, include_posts: bool = True, posts_limit: int = 10
+):
+    """
+    Retrieve a single series by its ID.
+    Includes a list of associated posts (summaries) by default.
+    Use `include_posts=false` to omit posts.
+    Use `posts_limit` to control the number of posts returned.
+    """
+    series = get_object_or_404(Series, id=series_id)
+
+    series_data = SeriesPublic.from_orm(series).dict()
+    series_data["post_count"] = series.posts.filter(
+        published_at__isnull=False
+    ).count()  # Only published
+
+    if include_posts:
+        post_qs = series.posts.filter(published_at__isnull=False).order_by("-published_at")[
+            :posts_limit
+        ]
+        posts_summary = []
+        for post in post_qs:
+            summary = PostSummaryForSeries.from_orm(post).dict()
+            if post.published_at:
+                summary["year"] = post.published_at.year
+            posts_summary.append(summary)
+        series_data["posts"] = posts_summary
+    else:
+        series_data["posts"] = []
+
+    return series_data  # Return as dict because SeriesDetailPublic expects 'posts'
+
+
+@series_router.get("/slug/{slug}", response=SeriesDetailPublic, tags=["series"])
+def get_series_detail_by_slug(
+    request, slug: str, include_posts: bool = True, posts_limit: int = 10
+):
+    """
+    Retrieve a single series by its slug.
+    Includes a list of associated posts (summaries) by default.
+    Use `include_posts=false` to omit posts.
+    Use `posts_limit` to control the number of posts returned.
+    """
+    series = get_object_or_404(Series, slug=slug)
+
+    series_data = SeriesPublic.from_orm(series).dict()
+    series_data["post_count"] = series.posts.filter(
+        published_at__isnull=False
+    ).count()  # Only published
+
+    if include_posts:
+        post_qs = series.posts.filter(published_at__isnull=False).order_by("-published_at")[
+            :posts_limit
+        ]
+        posts_summary = []
+        for post in post_qs:
+            summary = PostSummaryForSeries.from_orm(post).dict()
+            if post.published_at:
+                summary["year"] = post.published_at.year
+            posts_summary.append(summary)
+        series_data["posts"] = posts_summary
+    else:
+        series_data["posts"] = []
+
+    return series_data  # Return as dict because SeriesDetailPublic expects 'posts'
+
+
+@series_router.put(
+    "/{series_id}", response=SeriesPublic, auth=JWTAuth(permissions=StaffOnly), tags=["series"]
+)
+def update_series(request, series_id: int, payload: SeriesUpdate):
+    """
+    Update an existing series. All fields in payload are optional.
+    If slug is provided and changed, it will be updated.
+    If title is changed and slug is not provided (or empty), slug might be regenerated.
+    """
+    series = get_object_or_404(Series, id=series_id)
+    payload_data = payload.dict(exclude_unset=True)
+
+    if "title" in payload_data and ("slug" not in payload_data or not payload_data["slug"]):
+        new_slug = slugify(payload_data["title"])
+        if (
+            new_slug != series.slug
+            and Series.objects.filter(slug=new_slug).exclude(id=series_id).exists()
+        ):
+            # This should be a 400/422 error
+            return ValidationErrorResponse(
+                detail=f"Another series with slug '{new_slug}' already exists."
+            )
+        series.slug = (
+            new_slug  # Update slug if title changed and slug wasn't manually set to something else
+        )
+
+    for attr, value in payload_data.items():
+        setattr(series, attr, value)
+
+    series.save()
+    # Re-fetch to get potentially updated slug and other model-generated fields correctly
+    series.refresh_from_db()
+    annotated_series = Series.objects.annotate(post_count=Count("posts")).get(id=series_id)
+    return annotated_series
+
+
+@series_router.get(
+    "/{series_id_or_slug}/posts", response=List[PostSummaryForSeries], tags=["series"]
+)  # Could be paginated too
+@paginate(PageNumberPagination, page_size=10)  # Example pagination
+def list_posts_in_series(
+    request, series_id_or_slug: Union[int, str], exclude_post_id: Optional[int] = None
+):
+    """
+    List all published posts belonging to a specific series.
+    Optionally exclude a specific post by its ID (e.g., the current post being viewed).
+    """
+    if isinstance(series_id_or_slug, int):
+        series = get_object_or_404(Series, id=series_id_or_slug)
+    else:
+        series = get_object_or_404(Series, slug=series_id_or_slug)
+
+    posts_qs = series.posts.filter(published_at__isnull=False).order_by("-published_at")
+    if exclude_post_id:
+        posts_qs = posts_qs.exclude(id=exclude_post_id)
+
+    # The @paginate decorator will handle creating PostSummaryForSeries from the queryset items
+    # if the response schema is List[PostSummaryForSeries] and PostSummaryForSeries.from_orm exists
+    return posts_qs
+
+
+#
+# Posts
+#
+
+
+# POST API ENDPOINTS (These are the ones we are keeping and have updated)
+@posts_router.post(
+    "",
+    response={201: PostPublic, 400: ValidationErrorResponse},
+    auth=JWTAuth(permissions=StaffOnly, allow_anonymous=False),
+    tags=["posts"],
+)
+def create_post(request, payload: PostCreate):
+    """
+    Create a new blog post.
+    If slug is not provided, it will be generated from the title.
+    `series_id` can be provided to associate the post with a series.
+    """
+    data = payload.dict()
+    if not data.get("slug") and data.get("title"):
+        data["slug"] = slugify(data["title"])
+
+    if (
+        data.get("slug")
+        and Post.objects.filter(
+            slug=data["slug"], published_at__isnull=False if not data.get("published_at") else True
+        ).exists()
+    ):
+        return 400, {
+            "detail": f"Post with slug '{data['slug']}' already exists for the publication status."
+        }
+
+    if payload.series_id:
+        get_object_or_404(Series, id=payload.series_id)
+
+    post = Post.objects.create(author=request.user, **data)
+    return 201, post
+
+
+@posts_router.put(
+    "/{post_id}",
+    response={200: PostPublic, 400: ValidationErrorResponse, 404: None},
+    auth=JWTAuth(permissions=StaffOnly, allow_anonymous=False),
+    tags=["posts"],
+)
+def update_post(request, post_id: int, payload: PostUpdate):
+    """
+    Update an existing blog post. All fields in payload are optional.
+    `series_id` can be provided or set to `null` to disassociate from a series.
+    """
+    post = get_object_or_404(Post, id=post_id, author=request.user)
+    data = payload.dict(exclude_unset=True)
+
+    if "title" in data and ("slug" not in data or not data["slug"]):
+        data["slug"] = slugify(data["title"])
+
+    if (
+        data.get("slug")
+        and data["slug"] != post.slug
+        and Post.objects.filter(
+            slug=data["slug"],
+            published_at__isnull=False if not data.get("published_at", post.published_at) else True,
+        )
+        .exclude(id=post_id)
+        .exists()
+    ):
+        return 400, {
+            "detail": f"Post with slug '{data['slug']}' already exists for the publication status."
+        }
+
+    if "series_id" in data:
+        if data["series_id"] is not None:
+            get_object_or_404(Series, id=data["series_id"])
+
+    for attr, value in data.items():
+        setattr(post, attr, value)
+    post.save()
+    post.refresh_from_db()
+    return 200, post
+
+
+@posts_router.get(
+    "/{post_id}",
+    response=PostPublic,
+    tags=["posts"],
+    auth=JWTAuth(permissions=None, allow_anonymous=True),
+)
+def get_post_by_id(request, post_id: int):
+    if request.user.is_authenticated and request.user.is_staff:
+        post = get_object_or_404(Post.objects.select_related("author", "series"), id=post_id)
+    else:
+        post = get_object_or_404(
+            Post.objects.select_related("author", "series"),
+            id=post_id,
+            published_at__isnull=False,
+        )
+    return post
+
+
+@posts_router.get(
+    "/slug/{year}/{slug}",
+    response=PostPublic,
+    tags=["posts"],
+    auth=JWTAuth(permissions=None, allow_anonymous=True),
+)
+def get_post_by_slug_and_year(request, year: int, slug: str, draft: bool = False):
+    if request.user.is_authenticated and request.user.is_staff:
+        if draft:
+            post = get_object_or_404(Post, slug=slug, published_at__isnull=True)
+        else:
+            post = get_object_or_404(Post, slug=slug, published_at__year=year)
+    else:
+        post = get_object_or_404(
+            Post, slug=slug, published_at__year=year, published_at__isnull=False
+        )
+    return post
+
+
+@posts_router.get(
+    "",
+    response=List[PostListPublic],
+    tags=["posts"],
+    auth=JWTAuth(permissions=None, allow_anonymous=True),
+)
+@paginate(PageNumberPagination, page_size=10)
+def list_posts(
+    request,
+    series_slug: Optional[str] = None,
+    author_id: Optional[int] = None,
+    drafts: bool = False,
+    all_posts: bool = False,  # Combines drafts and published
+):
+    posts = Post.objects.select_related("author", "series").all()
+    is_staff = request.user.is_authenticated and request.user.is_staff
+
+    if not is_staff:
+        posts = posts.filter(published_at__isnull=False)
+        if drafts or all_posts:
+            return Post.objects.none()
+    else:
+        if all_posts:
+            pass
+        elif drafts:
+            posts = posts.filter(published_at__isnull=True)
+        else:
+            posts = posts.filter(published_at__isnull=False)
+
+    if series_slug:
+        posts = posts.filter(series__slug=series_slug)
+    if author_id:
+        posts = posts.filter(author_id=author_id)
+
+    return posts
+
+
+@posts_router.get(
+    "/{post_id}/files",
+    response={200: List[FileDetails]},
+    tags=["posts"],
+    auth=JWTAuth(permissions=StaffOnly, allow_anonymous=True),
+)
+def get_post_files_by_id(request, post_id: int):
+    post = get_object_or_404(Post, id=post_id)
+    return post.files.all()
+
+
+@posts_router.delete(
+    "/{post_id}",
+    response={204: None},
+    tags=["posts"],
+    auth=JWTAuth(permissions=StaffOnly, allow_anonymous=False),
+)
+def delete_post(request, post_id: int):
+    post = get_object_or_404(Post, id=post_id, author=request.user)
+    post.delete()
+    return None

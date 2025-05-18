@@ -16,6 +16,8 @@ import FilesPage from '@/views/admin/FilesPage.vue'
 import PageNotFoundView from '@/views/PageNotFoundView.vue'
 import CommentDetailView from '@/views/admin/CommentDetailView.vue'
 import { useAuthStore } from '@/stores/auth'
+import SeriesListView from '@/views/admin/SeriesListView.vue'
+import SeriesFormView from '@/views/admin/SeriesFormView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -71,6 +73,21 @@ const router = createRouter({
           path: '',  // default child route
           name: 'admin-dashboard',
           component: DashboardView,
+        },
+        {
+          path: 'series',
+          name: 'admin-series',
+          component: SeriesListView
+        },
+        {
+          path: 'series/new',
+          name: 'admin-series-new',
+          component: SeriesFormView
+        },
+        {
+          path: 'series/edit/:id',
+          name: 'admin-series-edit',
+          component: SeriesFormView
         },
         {
           path: 'posts',
