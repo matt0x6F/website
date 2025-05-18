@@ -18,10 +18,10 @@
             <h2 class="text-xl font-semibold">{{ post.title }}</h2>
             <div class="flex items-center gap-4">
               <p class="text-sm text-gray-600 whitespace-nowrap">
-                {{ new Date(post.published || '').toLocaleDateString() }}
+                {{ new Date(post.publishedAt || '').toLocaleDateString() }}
               </p>
               <router-link 
-                :to="`/blog/${new Date(post.published || '').getFullYear()}/${post.slug}`" 
+                :to="`/blog/${new Date(post.publishedAt || '').getFullYear()}/${post.slug}`" 
                 class="text-primary underline hover:opacity-80 whitespace-nowrap"
               >
                 Read more
@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { PostsApi } from '@/lib/api/apis/PostsApi'
-import type { PostDetails } from '@/lib/api/models'
+import type { PostListPublic } from '@/lib/api/models'
 import { Configuration, type ConfigurationParameters } from '@/lib/api'
 
 const params: ConfigurationParameters = {
@@ -64,7 +64,7 @@ const params: ConfigurationParameters = {
 const config = new Configuration(params)
 const postsApi = new PostsApi(config)
 
-const posts = ref<PostDetails[]>([])
+const posts = ref<PostListPublic[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const total = ref(0)

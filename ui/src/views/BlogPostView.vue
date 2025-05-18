@@ -88,8 +88,18 @@ onMounted(async () => {
     const year = route.params.year as string
     
     // First load the post
-    const postResult = await posts.apiGetPostBySlug({ slug: slug, year: +year })
-    post.value = postResult
+    const postResult = await posts.apiGetPostBySlugAndYear({ slug: slug, year: +year })
+    post.value = {
+      id: postResult.id,
+      title: postResult.title,
+      content: postResult.content,
+      createdAt: postResult.createdAt,
+      updatedAt: postResult.updatedAt,
+      published: postResult.publishedAt,
+      authorId: postResult.author?.id ?? 0,
+      slug: postResult.slug,
+      series: postResult.series ? { id: postResult.series.id, title: postResult.series.title } : undefined
+    }
     
     // Then load comments using the post's ID
     await loadComments()

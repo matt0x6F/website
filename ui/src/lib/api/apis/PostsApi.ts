@@ -64,7 +64,8 @@ export interface ApiListPostsRequest {
     authorId?: number | null;
     drafts?: boolean;
     allPosts?: boolean;
-    page?: number;
+    limit?: number;
+    offset?: number;
 }
 
 export interface ApiUpdatePostRequest {
@@ -319,8 +320,12 @@ export class PostsApi extends runtime.BaseAPI {
             queryParameters['all_posts'] = requestParameters['allPosts'];
         }
 
-        if (requestParameters['page'] != null) {
-            queryParameters['page'] = requestParameters['page'];
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

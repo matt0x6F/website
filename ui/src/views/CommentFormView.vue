@@ -133,8 +133,18 @@ onMounted(async () => {
     const year = route.params.year as string
     
     // Load the post to get its ID and title
-    const postResult = await posts.apiGetPostBySlug({ slug: slug, year: +year })
-    post.value = postResult
+    const postResult = await posts.apiGetPostBySlugAndYear({ slug: slug, year: +year })
+    post.value = {
+      id: postResult.id,
+      title: postResult.title,
+      content: postResult.content,
+      createdAt: postResult.createdAt,
+      updatedAt: postResult.updatedAt,
+      published: postResult.publishedAt,
+      authorId: postResult.author?.id ?? 0,
+      slug: postResult.slug,
+      series: postResult.series ? { id: postResult.series.id, title: postResult.series.title } : undefined
+    }
     
     if (post.value && post.value.id) {
       form.value.postId = post.value.id

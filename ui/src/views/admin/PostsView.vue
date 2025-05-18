@@ -35,7 +35,7 @@
               <div>
                 <div class="flex items-center gap-2">
                   <h2 class="text-xl font-semibold">{{ post.title }}</h2>
-                  <Badge v-if="!post.published" value="Draft" severity="warning" />
+                  <Badge v-if="!post.publishedAt" value="Draft" severity="warning" />
                 </div>
                 <p class="text-gray-600 mt-1">
                   {{ new Date(post.createdAt).toLocaleDateString() }}
@@ -63,13 +63,13 @@
 import { ref, onMounted, watch } from 'vue'
 import { useApiClient } from '@/composables/useApiClient'
 import { PostsApi, type ApiListPostsRequest } from '@/lib/api/apis/PostsApi'
-import type { PostDetails } from '@/lib/api/models'
+import type { PostListPublic } from '@/lib/api/models'
 import Badge from 'primevue/badge'
 import Toolbar from 'primevue/toolbar'
 import SelectButton from 'primevue/selectbutton'
 import Button from 'primevue/button'
 
-const posts = ref<PostDetails[]>([])
+const posts = ref<PostListPublic[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 
@@ -91,7 +91,7 @@ const loadPosts = async () => {
     
     const queryParams: ApiListPostsRequest = {}
     if (filterStatus.value.value === 'all') {
-      queryParams.all = true
+      queryParams.allPosts = true
       queryParams.drafts = true
     } else {
       queryParams.drafts = filterStatus.value.value !== 'published'

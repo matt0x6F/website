@@ -63,12 +63,14 @@ export interface ApiGetSeriesDetailBySlugRequest {
 export interface ApiListPostsInSeriesRequest {
     seriesIdOrSlug: SeriesIdOrSlug;
     excludePostId?: number | null;
-    page?: number;
+    limit?: number;
+    offset?: number;
 }
 
 export interface ApiListSeriesRequest {
     includePostsCount?: boolean;
-    page?: number;
+    limit?: number;
+    offset?: number;
 }
 
 export interface ApiUpdateSeriesRequest {
@@ -289,8 +291,12 @@ export class SeriesApi extends runtime.BaseAPI {
             queryParameters['exclude_post_id'] = requestParameters['excludePostId'];
         }
 
-        if (requestParameters['page'] != null) {
-            queryParameters['page'] = requestParameters['page'];
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -333,8 +339,12 @@ export class SeriesApi extends runtime.BaseAPI {
             queryParameters['include_posts_count'] = requestParameters['includePostsCount'];
         }
 
-        if (requestParameters['page'] != null) {
-            queryParameters['page'] = requestParameters['page'];
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

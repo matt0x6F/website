@@ -83,7 +83,7 @@ const fetchPublishedPostCount = async () => {
       }
     })
     const postsApi = new PostsApi(config)
-    const response = await postsApi.apiListPosts({ all: false })
+    const response = await postsApi.apiListPosts({ allPosts: false })
     publishedPostCount.value = response.count || 0
   } catch (error) {
     console.error('Failed to fetch published post count:', error)
@@ -100,7 +100,7 @@ const fetchTotalPostCount = async () => {
       }
     })
     const postsApi = new PostsApi(config)
-    const response = await postsApi.apiListPosts({ all: true })
+    const response = await postsApi.apiListPosts({ allPosts: true })
     totalPostCount.value = response.count || 0
   } catch (error) {
     console.error('Failed to fetch total post count:', error)
