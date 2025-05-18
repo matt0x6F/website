@@ -1,23 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import AboutView from '@/views/AboutView.vue'
-import ProfileView from '@/views/ProfileView.vue'
-import BlogListView from '@/views/BlogListView.vue'
-import BlogPostView from '@/views/BlogPostView.vue'
-import ResumeView from '@/views/ResumeView.vue'
-import AdminTemplate from '@/views/admin/AdminTemplate.vue'
-import DashboardView from '@/views/admin/DashboardView.vue'
-import PostsView from '@/views/admin/PostsView.vue'
-import PostEditor from '@/views/admin/PostEditorView.vue'
-import UsersView from '@/views/admin/UsersView.vue'
-import UserEditor from '@/views/admin/UserEditorView.vue'
-import CommentsView from '@/views/admin/CommentsView.vue'
-import FilesPage from '@/views/admin/FilesView.vue'
-import PageNotFoundView from '@/views/PageNotFoundView.vue'
-import CommentDetailView from '@/views/admin/CommentDetailView.vue'
 import { useAuthStore } from '@/stores/auth'
-import SeriesListView from '@/views/admin/SeriesListView.vue'
-import SeriesFormView from '@/views/admin/SeriesFormView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,116 +7,116 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: () => import('@/views/HomeView.vue'),
     },
     {
       path: '/about',
       name: 'about',
-      component: AboutView,
+      component: () => import('@/views/AboutView.vue'),
     },
     {
       path: '/resume',
       name: 'resume',
-      component: ResumeView,
+      component: () => import('@/views/ResumeView.vue'),
     },
     {
       path: '/profile',
       name: 'profile',
-      component: ProfileView,
+      component: () => import('@/views/ProfileView.vue'),
       meta: { requiresAuth: true }
     },
     {
       path: '/blog',
       name: 'blog-list',
-      component: BlogListView
+      component: () => import('@/views/BlogListView.vue'),
     },
     {
       path: '/blog/:year/:slug',
       name: 'blog-post',
-      component: BlogPostView
+      component: () => import('@/views/BlogPostView.vue'),
     },
     {
       path: '/post/:year/:slug',
       name: 'BlogPost',
-      component: () => import('@/views/BlogPostView.vue')
+      component: () => import('@/views/BlogPostView.vue'),
     },
     {
       path: '/post/:year/:slug/comment',
       name: 'AddComment',
-      component: () => import('@/views/CommentFormView.vue')
+      component: () => import('@/views/CommentFormView.vue'),
     },
     {
       path: '/admin',
       name: 'admin',
-      component: AdminTemplate,
+      component: () => import('@/views/admin/AdminTemplate.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
       children: [
         {
           path: '',  // default child route
           name: 'admin-dashboard',
-          component: DashboardView,
+          component: () => import('@/views/admin/DashboardView.vue'),
         },
         {
           path: 'series',
           name: 'admin-series',
-          component: SeriesListView
+          component: () => import('@/views/admin/SeriesListView.vue'),
         },
         {
           path: 'series/new',
           name: 'admin-series-new',
-          component: SeriesFormView
+          component: () => import('@/views/admin/SeriesFormView.vue'),
         },
         {
           path: 'series/edit/:id',
           name: 'admin-series-edit',
-          component: SeriesFormView
+          component: () => import('@/views/admin/SeriesFormView.vue'),
         },
         {
           path: 'posts',
           name: 'admin-posts',
-          component: PostsView,
+          component: () => import('@/views/admin/PostsView.vue'),
         },
         {
           path: 'posts/new',
           name: 'admin-posts-new',
-          component: PostEditor,
+          component: () => import('@/views/admin/PostEditorView.vue'),
         },
         {
           path: 'posts/:id',
           name: 'admin-posts-edit',
-          component: PostEditor,
+          component: () => import('@/views/admin/PostEditorView.vue'),
         },
         {
           path: 'users',
           name: 'admin-users',
-          component: UsersView,
+          component: () => import('@/views/admin/UsersView.vue'),
         },
         {
           path: 'users/:id',
           name: 'admin-users-edit',
-          component: UserEditor,
+          component: () => import('@/views/admin/UserEditorView.vue'),
         },
         {
           path: 'comments',
           name: 'admin-comments',
-          component: CommentsView,
+          component: () => import('@/views/admin/CommentsView.vue'),
         },
         {
           path: 'comments/:id',
           name: 'admin-comment-detail',
-          component: CommentDetailView,
+          component: () => import('@/views/admin/CommentDetailView.vue'),
         },
         {
           path: 'files',
           name: 'admin-files',
-          component: FilesPage,
+          component: () => import('@/views/admin/FilesView.vue'),
         }
       ]
     },
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
-      component: PageNotFoundView,
+      component: () => import('@/views/PageNotFoundView.vue'),
     }
   ],
 })

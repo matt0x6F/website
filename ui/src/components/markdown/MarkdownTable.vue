@@ -5,9 +5,10 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
+import { defineProps, defineAsyncComponent } from 'vue'
+
+const DataTable = defineAsyncComponent(() => import('primevue/datatable'))
+const Column = defineAsyncComponent(() => import('primevue/column'))
 
 const props = defineProps<{
   columns: { field: string, header: string }[],
