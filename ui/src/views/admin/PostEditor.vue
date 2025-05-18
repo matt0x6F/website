@@ -121,7 +121,7 @@
                 <h3 class="font-medium mb-2">All Series</h3>
                 <ul>
                   <li v-for="series in availableSeries" :key="series.id" class="flex items-center gap-2 mb-1">
-                    <span>{{ series.name }}</span>
+                    <span>{{ series.title }}</span>
                     <Button
                       icon="pi pi-trash"
                       severity="danger"
@@ -238,7 +238,7 @@ const loadAvailableSeries = async () => {
     const response = await seriesApi.apiListSeries({ includePostsCount: true })
     availableSeries.value = response.items.map((s: any) => ({
       id: s.id,
-      name: s.name || s.title, // fallback for API field
+      title: s.title,
       post_count: s.post_count ?? 0
     }))
     // If editing a post that has a seriesId, pre-select it

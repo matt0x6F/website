@@ -13,6 +13,7 @@ export * from './CommentCreate';
 export * from './CommentList';
 export * from './CommentMutate';
 export * from './ContentType';
+export * from './FeedAuthorSchema';
 export * from './FeedItem';
 export * from './FileDetails';
 export * from './FileMetadata';

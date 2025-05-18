@@ -4104,14 +4104,14 @@
             "title": "Id",
             "type": "integer"
           },
-          "name": {
-            "title": "Name",
+          "title": {
+            "title": "Title",
             "type": "string"
           }
         },
         "required": [
           "id",
-          "name"
+          "title"
         ],
         "title": "SeriesSummary",
         "type": "object"
@@ -4495,6 +4495,45 @@
         "title": "Attachment",
         "type": "object"
       },
+      "FeedAuthorSchema": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "avatar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar"
+          }
+        },
+        "title": "FeedAuthorSchema",
+        "type": "object"
+      },
       "FeedItem": {
         "example": {
           "content_text": "Hello World!",
@@ -4833,7 +4872,7 @@
             "anyOf": [
               {
                 "items": {
-                  "$ref": "#/components/schemas/AuthorSummary"
+                  "$ref": "#/components/schemas/FeedAuthorSchema"
                 },
                 "type": "array"
               },

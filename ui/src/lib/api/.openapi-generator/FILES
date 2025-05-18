@@ -24,6 +24,7 @@ models/CommentCreate.ts
 models/CommentList.ts
 models/CommentMutate.ts
 models/ContentType.ts
+models/FeedAuthorSchema.ts
 models/FeedItem.ts
 models/FileDetails.ts
 models/FileMetadata.ts

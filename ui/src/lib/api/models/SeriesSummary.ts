@@ -30,7 +30,7 @@ export interface SeriesSummary {
      * @type {string}
      * @memberof SeriesSummary
      */
-    name: string;
+    title: string;
 }
 
 /**
@@ -38,7 +38,7 @@ export interface SeriesSummary {
  */
 export function instanceOfSeriesSummary(value: object): value is SeriesSummary {
     if (!('id' in value) || value['id'] === undefined) return false;
-    if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('title' in value) || value['title'] === undefined) return false;
     return true;
 }
 
@@ -53,7 +53,7 @@ export function SeriesSummaryFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'id': json['id'],
-        'name': json['name'],
+        'title': json['title'],
     };
 }
 
@@ -64,7 +64,7 @@ export function SeriesSummaryToJSON(value?: SeriesSummary | null): any {
     return {
         
         'id': value['id'],
-        'name': value['name'],
+        'title': value['title'],
     };
 }
 

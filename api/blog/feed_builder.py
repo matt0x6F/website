@@ -1,6 +1,6 @@
 from typing import List
 
-from .schema import AuthorSummary, FeedItem, Hub, JSONFeed
+from .schema import FeedAuthorSchema, FeedItem, Hub, JSONFeed
 
 
 class FeedBuilder:
@@ -45,7 +45,7 @@ class FeedBuilder:
         self._data["favicon"] = url
         return self
 
-    def with_authors(self, authors: List[AuthorSummary]) -> "FeedBuilder":
+    def with_authors(self, authors: List[FeedAuthorSchema]) -> "FeedBuilder":
         """Set the feed authors."""
         self._data["authors"] = authors
         return self

@@ -14,7 +14,7 @@ class UserPublic(Schema):
 
 class SeriesSummary(Schema):
     id: int
-    name: str
+    title: str
 
 
 class PostDetails(Schema):
@@ -235,6 +235,12 @@ class FeedItem(Schema):
         }
 
 
+class FeedAuthorSchema(Schema):
+    name: Optional[str] = None
+    url: Optional[str] = None
+    avatar: Optional[str] = None
+
+
 class JSONFeed(Schema):
     version: str = Field(
         "https://jsonfeed.org/version/1.1",
@@ -270,7 +276,7 @@ class JSONFeed(Schema):
         None,
         description="The URL of an image for the feed suitable to be used in a source list. Should be square and relatively small, but not smaller than 64 x 64 pixels.",
     )
-    authors: Optional[List[AuthorSummary]] = Field(None, description="The authors of the feed.")
+    authors: Optional[List[FeedAuthorSchema]] = Field(None, description="The authors of the feed.")
     language: Optional[str] = Field(
         None, description="The primary language for the feed in the format specified in RFC 5646."
     )

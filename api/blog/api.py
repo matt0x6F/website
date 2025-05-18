@@ -15,6 +15,7 @@ from ninja import Router, UploadedFile
 from ninja.errors import HttpError, ValidationError
 from ninja.pagination import PageNumberPagination, paginate
 from ninja.responses import Response
+from pydantic import BaseModel
 
 from auth.middleware import JWTAuth, StaffOnly
 from blog.feed_builder import FeedBuilder
@@ -22,10 +23,10 @@ from blog.models import Comment, File, Post, Series
 from blog.schema import (
     AdminCommentList,
     AdminCommentUpdate,
-    AuthorSummary,
     CommentCreate,
     CommentList,
     CommentMutate,
+    FeedAuthorSchema,
     FeedItem,
     FileDetails,
     FileMetadata,
@@ -54,6 +55,11 @@ feed_router = Router()
 series_router = Router()
 
 
+class FeedAuthor(BaseModel):
+    name: str
+    url: str
+
+
 #
 # Feed
 #
@@ -68,7 +74,7 @@ series_router = Router()
 def feed(request: HttpRequest, limit: int = 10, offset: int = 0):
     builder = (
         FeedBuilder(title="ooo-yay feed")
-        .with_authors([AuthorSummary(name="Matt Ouille", url="https://ooo-yay.com")])
+        .with_authors([FeedAuthorSchema(name="Matt Ouille", url="https://ooo-yay.com")])
         .with_description("Latest posts from @ooo-yay")
         .with_icon("https://ooo-yay.com/logo.svg")
         .with_favicon("https://ooo-yay.com/logo.svg")
@@ -76,7 +82,7 @@ def feed(request: HttpRequest, limit: int = 10, offset: int = 0):
         .with_home_page_url("https://ooo-yay.com")
     )
 
-    posts = Post.objects.filter(published__lte=timezone.now()).order_by("-published")[
+    posts = Post.objects.filter(published_at__lte=timezone.now()).order_by("-published_at")[
         offset : offset + limit
     ]
     for post in posts:
@@ -85,15 +91,15 @@ def feed(request: HttpRequest, limit: int = 10, offset: int = 0):
                 id=f"{post.id}",
                 title=post.title,
                 content_html=post.content,
-                date_published=post.published,
+                date_published=post.published_at,
                 date_modified=post.updated_at,
                 language="en",
-                author=AuthorSummary(name="Matt Ouille", url="https://ooo-yay.com"),
-                url=f"https://ooo-yay.com/posts/{post.published.year}/{post.slug}",
+                author=FeedAuthorSchema(name="Matt Ouille", url="https://ooo-yay.com"),
+                url=f"https://ooo-yay.com/posts/{post.published_at.year}/{post.slug}",
             )
         )
 
-    count = Post.objects.filter(published__lte=timezone.now()).count()
+    count = Post.objects.filter(published_at__lte=timezone.now()).count()
     if offset + limit < count:
         builder.with_next_url(
             f"https://ooo-yay.com/feed.json?limit={limit}&offset={offset + limit}"
