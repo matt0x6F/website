@@ -13,7 +13,7 @@ from django.utils.text import slugify
 from ninja import File as NinjaFile
 from ninja import Router, UploadedFile
 from ninja.errors import HttpError, ValidationError
-from ninja.pagination import PageNumberPagination, paginate
+from ninja.pagination import paginate
 from ninja.responses import Response
 from pydantic import BaseModel
 
@@ -330,6 +330,9 @@ def create_file(request: HttpRequest, metadata: FileMetadata, upload: NinjaFile[
 
         return upload
     except Exception as err:
+        import sys
+
+        print("Error creating file:", err, file=sys.stderr)
         logger.error("Error creating file", error=err)
 
         raise HttpError(500, "Fail to create file") from err
@@ -638,7 +641,7 @@ def create_series(request, payload: SeriesCreate):
 
 
 @series_router.get("", response=List[SeriesPublic], tags=["series"])
-@paginate(PageNumberPagination, page_size=20)
+@paginate
 def list_series(request, include_posts_count: bool = False):
     """
     List all series. Use `include_posts_count=true` to get the number of posts in each series.
@@ -759,7 +762,7 @@ def update_series(request, series_id: int, payload: SeriesUpdate):
 @series_router.get(
     "/{series_id_or_slug}/posts", response=List[PostSummaryForSeries], tags=["series"]
 )  # Could be paginated too
-@paginate(PageNumberPagination, page_size=10)  # Example pagination
+@paginate
 def list_posts_in_series(
     request, series_id_or_slug: Union[int, str], exclude_post_id: Optional[int] = None
 ):
@@ -905,7 +908,7 @@ def get_post_by_slug_and_year(request, year: int, slug: str, draft: bool = False
     tags=["posts"],
     auth=JWTAuth(permissions=None, allow_anonymous=True),
 )
-@paginate(PageNumberPagination, page_size=10)
+@paginate
 def list_posts(
     request,
     series_slug: Optional[str] = None,

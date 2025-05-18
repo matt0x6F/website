@@ -1071,11 +1071,22 @@
           },
           {
             "in": "query",
-            "name": "page",
+            "name": "limit",
             "schema": {
-              "default": 1,
+              "default": 100,
               "minimum": 1,
-              "title": "Page",
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
               "type": "integer"
             },
             "required": false
@@ -1201,11 +1212,22 @@
           },
           {
             "in": "query",
-            "name": "page",
+            "name": "limit",
             "schema": {
-              "default": 1,
+              "default": 100,
               "minimum": 1,
-              "title": "Page",
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
               "type": "integer"
             },
             "required": false
@@ -1339,11 +1361,22 @@
           },
           {
             "in": "query",
-            "name": "page",
+            "name": "limit",
             "schema": {
-              "default": 1,
+              "default": 100,
               "minimum": 1,
-              "title": "Page",
+              "title": "Limit",
+              "type": "integer"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
               "type": "integer"
             },
             "required": false

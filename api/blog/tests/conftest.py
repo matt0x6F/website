@@ -1,5 +1,4 @@
 import pytest
-from django.core.files.storage import FileSystemStorage
 from django.utils import timezone
 from ninja_jwt.tokens import RefreshToken
 
@@ -67,6 +66,6 @@ def comment(db, post, regular_user):
 @pytest.fixture(autouse=True)
 def mock_s3_storage(monkeypatch):
     # Patch PublicStorage and PrivateStorage to use FileSystemStorage
-    monkeypatch.setattr("files.storage.PublicStorage", FileSystemStorage)
-    monkeypatch.setattr("files.storage.PrivateStorage", FileSystemStorage)
+    # monkeypatch.setattr("files.storage.PublicStorage", FileSystemStorage)
+    # monkeypatch.setattr("files.storage.PrivateStorage", FileSystemStorage)
     yield
