@@ -27,11 +27,11 @@ import go from 'highlight.js/lib/languages/go'
 import rust from 'highlight.js/lib/languages/rust'
 import githubLight from 'highlight.js/styles/github.css?raw'
 import githubDarkDimmed from 'highlight.js/styles/github-dark-dimmed.css?raw'
-import CodeBlock from './CodeBlock.vue'
-import MarkdownTable from './MarkdownTable.vue'
-import TaskListItem from './TaskListItem.vue'
-import OrderedList from './OrderedList.vue'
-import { MarkdownParser } from '../services/MarkdownParser'
+import CodeBlock from '@/components/markdown/CodeBlock.vue'
+import MarkdownTable from '@/components/markdown/MarkdownTable.vue'
+import TaskListItem from '@/components/markdown/TaskListItem.vue'
+import OrderedList from '@/components/markdown/OrderedList.vue'
+import { MarkdownParser } from '@/services/MarkdownParser'
 
 const props = defineProps<{ content: string }>()
 const blocks = ref<any[]>([])
