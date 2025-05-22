@@ -92,7 +92,7 @@
               <Dropdown
                 v-model="selectedSeries"
                 :options="availableSeries"
-                optionLabel="name"
+                optionLabel="title"
                 placeholder="Select a series"
                 :disabled="!postId"
                 class="w-full md:w-40"
@@ -161,8 +161,7 @@ import type { PostUpdate } from '@/lib/api/models/PostUpdate'
 import type { SeriesSummary } from '@/lib/api/models/SeriesSummary'
 import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
-import { defineAsyncComponent } from 'vue'
-const DatePicker = defineAsyncComponent(() => import('primevue/datepicker'))
+import { DatePicker } from 'primevue'
 import { useApiClient } from '@/composables/useApiClient'
 import { useAuthStore } from '@/stores/auth'
 import MarkdownEditor from '@/components/MarkdownEditor.vue'

@@ -152,7 +152,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import Button from 'primevue/button'
 import Toolbar from 'primevue/toolbar'
 import MarkdownPreview from './MarkdownPreview.vue'
@@ -261,7 +261,6 @@ watch(viewMode, (newMode, oldMode) => {
 // Modify the handleEditorScroll function
 const handleEditorScroll = (e: Event) => {
   if (isSyncingEditorScroll) {
-    // Ignore scroll events triggered by sync
     isSyncingEditorScroll = false
     return
   }
@@ -269,7 +268,9 @@ const handleEditorScroll = (e: Event) => {
   const target = e.target as HTMLTextAreaElement
   const highlight = target.nextElementSibling as HTMLElement
   if (highlight) {
-    highlight.scrollTop = target.scrollTop
+    // Proportional scroll sync
+    const percent = getScrollPercentage(target)
+    highlight.scrollTop = percent * (highlight.scrollHeight - highlight.clientHeight)
   }
   
   const scrollPercentage = getScrollPercentage(target)
@@ -310,7 +311,9 @@ const handleEditorInput = (e: Event) => {
   const target = e.target as HTMLTextAreaElement
   const highlight = target.nextElementSibling as HTMLElement
   if (highlight) {
-    highlight.scrollTop = target.scrollTop
+    // Proportional scroll sync
+    const percent = getScrollPercentage(target)
+    highlight.scrollTop = percent * (highlight.scrollHeight - highlight.clientHeight)
   }
 }
 
@@ -455,11 +458,15 @@ function setScrollFromPercentage(element: HTMLElement, percentage: number) {
 }
 
 const highlightedContent = computed(() => {
-  if (!editorContent.value) return ''
+  let content = editorContent.value
+  // Only add dummy line if content ends with a newline or is empty
+  if (content === '' || content.endsWith('\n')) {
+    content += '\u200B'
+  }
   try {
-    return hljs.highlight(editorContent.value, { language: 'markdown' }).value
+    return hljs.highlight(content, { language: 'markdown' }).value
   } catch (error) {
-    return editorContent.value // fallback to plain text
+    return content // fallback to plain text
   }
 })
 

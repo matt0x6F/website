@@ -5,15 +5,20 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineAsyncComponent } from 'vue'
+import { defineProps, defineAsyncComponent, watchEffect } from 'vue'
 
-const DataTable = defineAsyncComponent(() => import('primevue/datatable'))
-const Column = defineAsyncComponent(() => import('primevue/column'))
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 const props = defineProps<{
   columns: { field: string, header: string }[],
   rows: Record<string, any>[]
 }>()
+
+watchEffect(() => {
+  console.log('MarkdownTable columns:', props.columns)
+  console.log('MarkdownTable rows:', props.rows)
+})
 </script>
 
 <style scoped>

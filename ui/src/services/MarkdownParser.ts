@@ -27,7 +27,7 @@ export class MarkdownParser {
         }
         return this.md.utils.escapeHtml(str)
       })
-    }).enable(['list'])
+    }).enable(['list', 'table'])
   }
 
   public escapeHtml(str: string): string {
