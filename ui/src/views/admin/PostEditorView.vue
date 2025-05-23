@@ -9,6 +9,20 @@
         <TabPanel value="0">
           <h1 class="text-2xl font-bold mb-6">{{ isEditing ? 'Edit Post' : 'Create New Post' }}</h1>
           
+          <!-- Created/Updated At Box -->
+          <div v-if="isEditing && post.createdAt" class="mb-4 p-3 rounded bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-wrap gap-6 text-xs text-gray-600 dark:text-gray-300">
+            <span class="flex items-center gap-1">
+              <i class="pi pi-calendar"></i>
+              <span>Created:</span>
+              <span>{{ post.createdAt ? new Date(post.createdAt).toLocaleString() : '' }}</span>
+            </span>
+            <span class="flex items-center gap-1">
+              <i class="pi pi-clock"></i>
+              <span>Updated:</span>
+              <span>{{ post.updatedAt ? new Date(post.updatedAt).toLocaleString() : '' }}</span>
+            </span>
+          </div>
+
           <form @submit.prevent class="h-full">
             <div class="editor-container-wrapper">
               <div class="grid grid-cols-3 gap-4 mb-4" :class="{ 'hidden': isExpanded }">
@@ -180,12 +194,14 @@ const toast = useToast()
 const isExpanded = ref(false)
 const isEditing = computed(() => route.params.id !== undefined)
 const postId = ref<number | undefined>(undefined)
-const post = ref<PostUpdate>({
+const post = ref<PostUpdate & { createdAt?: string | Date | null, updatedAt?: string | Date | null }>({
   title: '',
   slug: '',
   content: '',
   publishedAt: null,
-  seriesId: undefined
+  seriesId: undefined,
+  createdAt: null,
+  updatedAt: null
 })
 
 // Add this to track if slug was manually edited
@@ -324,7 +340,9 @@ onMounted(async () => {
         slug: response.slug,
         content: response.content ?? '',
         publishedAt: response.publishedAt,
-        seriesId: response.series?.id
+        seriesId: response.series?.id,
+        createdAt: response.createdAt ?? null,
+        updatedAt: response.updatedAt ?? null
       }
       // After post is loaded, if it has a seriesId, make sure selectedSeries is updated
       if (post.value.seriesId && availableSeries.value.length) {
@@ -548,7 +566,7 @@ const handleDeleteSeries = async (series: SeriesSummaryWithCount) => {
 };
 </script>
 
-<style>
+<style scoped>
 .fixed-editor-height {
   height: 32rem;
   min-height: 0;

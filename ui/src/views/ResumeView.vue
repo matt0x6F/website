@@ -265,16 +265,19 @@ const downloadPDF = () => {
 </script>
 
 <style scoped>
-@import "tailwindcss";
-@import "tailwindcss-primeui";
-
 :deep(.p-card) {
   height: 100%;
-  @apply overflow-hidden;
+  overflow: hidden;
 }
 
 :deep(.p-card-body) {
-  @apply bg-white dark:bg-gray-800 h-full;
+  background: #fff;
+  height: 100%;
+}
+@media (prefers-color-scheme: dark) {
+  :deep(.p-card-body) {
+    background: #1f2937;
+  }
 }
 
 :deep(.p-card-content) {

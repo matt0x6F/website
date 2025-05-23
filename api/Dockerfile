@@ -1,5 +1,5 @@
 # inspired by https://github.com/michaeloliverx/python-poetry-docker-example/blob/master/docker/Dockerfile
-FROM python:3.12-bookworm as base
+FROM python:3.12-bookworm AS base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -29,7 +29,7 @@ RUN poetry install --no-dev
 
 # 'development' stage installs all dev deps and can be used to develop code.
 # For example using docker-compose to mount local volume under /app
-FROM base as development
+FROM base AS development
 
 WORKDIR /app
 COPY . .

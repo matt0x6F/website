@@ -93,10 +93,10 @@ body {
 }
 
 #content a {
-  @apply text-primary;
+  color: var(--p-primary-color);
 }
 
 #content a:hover {
-  @apply underline;
+  text-decoration: underline;
 }
 

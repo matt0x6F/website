@@ -1,4 +1,4 @@
-FROM node:23-bookworm as base
+FROM node:23-bookworm AS base
 
 COPY . /app
 
@@ -6,15 +6,15 @@ WORKDIR /app
 
 RUN npm install
 
-FROM base as development
+FROM base AS development
 
 CMD ["npm", "run", "dev"]
 
-FROM base as build
+FROM base AS build
 
 RUN npm run build
 
-FROM nginx:alpine as production
+FROM nginx:alpine AS production
 
 COPY --from=build /app/dist /usr/share/nginx/html
 

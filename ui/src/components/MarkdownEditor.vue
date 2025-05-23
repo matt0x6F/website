@@ -814,27 +814,21 @@ const dragCursorStyle = computed((): CSSProperties => {
   .editor-highlight .hljs-section {
     color: var(--p-primary-400);
   }
-
   .editor-highlight .hljs-bullet {
     color: var(--p-primary-300);
   }
-
   .editor-highlight .hljs-link {
     color: var(--p-primary-300);
   }
-
   .editor-highlight .hljs-quote {
     color: var(--p-surface-400);
   }
-
   .editor-highlight .hljs-strong {
     color: var(--p-primary-300);
   }
-
   .editor-highlight .hljs-emphasis {
     color: var(--p-primary-300);
   }
-
   .editor-highlight .hljs-code {
     color: var(--p-primary-400);
   }
@@ -846,7 +840,14 @@ const dragCursorStyle = computed((): CSSProperties => {
   height: 100%;
 }
 
-/* Code block styles */
+/* All :deep(...) selectors have been removed from this global style block. */
+</style>
+
+<style scoped>
+/* Import Highlight.js styles */
+@import 'highlight.js/styles/github-dark.css';
+
+/* Base styles for code blocks */
 :deep(.hljs) {
   background: var(--p-surface-50);
   color: var(--p-text-color);
@@ -858,28 +859,23 @@ const dragCursorStyle = computed((): CSSProperties => {
     background: var(--p-surface-50);
     color: var(--p-surface-900);
   }
-
   :deep(.hljs-keyword),
   :deep(.hljs-selector-tag),
   :deep(.hljs-title),
   :deep(.hljs-section) {
     color: #d73a49;
   }
-
   :deep(.hljs-string),
   :deep(.hljs-attr) {
     color: #032f62;
   }
-
   :deep(.hljs-number),
   :deep(.hljs-literal) {
     color: #005cc5;
   }
-
   :deep(.hljs-comment) {
     color: #6a737d;
   }
-
   :deep(.hljs-doctag) {
     color: #d73a49;
   }
@@ -890,28 +886,23 @@ const dragCursorStyle = computed((): CSSProperties => {
     background: var(--p-surface-800);
     color: var(--p-surface-50);
   }
-
   :deep(.hljs-keyword),
   :deep(.hljs-selector-tag),
   :deep(.hljs-title),
   :deep(.hljs-section) {
     color: #ff7b72;
   }
-
   :deep(.hljs-string),
   :deep(.hljs-attr) {
     color: #a5d6ff;
   }
-
   :deep(.hljs-number),
   :deep(.hljs-literal) {
     color: #79c0ff;
   }
-
   :deep(.hljs-comment) {
     color: #8b949e;
   }
-
   :deep(.hljs-doctag) {
     color: #ff7b72;
   }
@@ -975,229 +966,6 @@ const dragCursorStyle = computed((): CSSProperties => {
   background: var(--p-primary-500);
   opacity: 0.7;
 }
-</style>
-
-<style scoped>
-/* Import Highlight.js styles */
-@import 'highlight.js/styles/github-dark.css';
-
-/* Base styles for code blocks */
-.hljs {
-  background: var(--p-surface-50);
-  color: var(--p-text-color);
-}
-
-/* Light mode theme */
-@media (prefers-color-scheme: light) {
-  .hljs {
-    color: #1a1a1a;  /* Darker base text color */
-  }
-
-  .hljs-subst {
-    color: #1a1a1a;  /* Match base text color */
-  }
-
-  .hljs-emphasis {
-    color: #1a1a1a;  /* Match base text color */
-    font-style: italic;
-  }
-
-  .hljs-strong {
-    color: #1a1a1a;  /* Match base text color */
-    font-weight: bold;
-  }
-
-  /* Keep GitHub's syntax highlighting colors for specific elements */
-  .hljs-doctag,
-  .hljs-keyword,
-  .hljs-meta .hljs-keyword,
-  .hljs-template-tag,
-  .hljs-template-variable,
-  .hljs-type,
-  .hljs-variable.language_ {
-    color: #d73a49;
-  }
-  
-  .hljs-title,
-  .hljs-title.class_,
-  .hljs-title.class_.inherited__,
-  .hljs-title.function_ {
-    color: #6f42c1;
-  }
-
-  .hljs-attr,
-  .hljs-attribute,
-  .hljs-literal,
-  .hljs-meta,
-  .hljs-number,
-  .hljs-operator,
-  .hljs-selector-attr,
-  .hljs-selector-class,
-  .hljs-selector-id,
-  .hljs-variable {
-    color: #005cc5;
-  }
-
-  .hljs-string,
-  .hljs-meta .hljs-string,
-  .hljs-regexp {
-    color: #032f62;
-  }
-
-  .hljs-built_in,
-  .hljs-symbol {
-    color: #e36209;
-  }
-
-  .hljs-comment,
-  .hljs-code,
-  .hljs-formula {
-    color: #6a737d;
-  }
-
-  .hljs-name,
-  .hljs-quote,
-  .hljs-selector-pseudo,
-  .hljs-selector-tag {
-    color: #22863a;
-  }
-
-  .hljs-addition {
-    color: #22863a;
-    background-color: #f0fff4;
-  }
-
-  .hljs-deletion {
-    color: #b31d28;
-    background-color: #ffeef0;
-  }
-
-  .hljs-section {
-    color: #005cc5;
-    font-weight: bold;
-  }
-
-  .hljs-bullet {
-    color: #735c0f;
-  }
-
-  .hljs-emphasis {
-    color: #24292e;
-    font-style: italic;
-  }
-
-  .hljs-strong {
-    color: #24292e;
-    font-weight: bold;
-  }
-}
-
-/* Dark mode theme */
-@media (prefers-color-scheme: dark) {
-  .hljs {
-    color: #c9d1d9;
-  }
-
-  .hljs-doctag,
-  .hljs-keyword,
-  .hljs-meta .hljs-keyword,
-  .hljs-template-tag,
-  .hljs-template-variable,
-  .hljs-type,
-  .hljs-variable.language_ {
-    color: #ff7b72;
-  }
-
-  .hljs-title,
-  .hljs-title.class_,
-  .hljs-title.class_.inherited__,
-  .hljs-title.function_ {
-    color: #d2a8ff;
-  }
-
-  .hljs-attr,
-  .hljs-attribute,
-  .hljs-literal,
-  .hljs-meta,
-  .hljs-number,
-  .hljs-operator,
-  .hljs-selector-attr,
-  .hljs-selector-class,
-  .hljs-selector-id,
-  .hljs-variable {
-    color: #79c0ff;
-  }
-
-  .hljs-string,
-  .hljs-meta .hljs-string,
-  .hljs-regexp {
-    color: #a5d6ff;
-  }
-
-  .hljs-built_in,
-  .hljs-symbol {
-    color: #ffa657;
-  }
-
-  .hljs-comment,
-  .hljs-code,
-  .hljs-formula {
-    color: #8b949e;
-  }
-
-  .hljs-name,
-  .hljs-quote,
-  .hljs-selector-pseudo,
-  .hljs-selector-tag {
-    color: #7ee787;
-  }
-
-  .hljs-subst {
-    color: #c9d1d9;
-  }
-
-  .hljs-section {
-    color: #1f6feb;
-    font-weight: bold;
-  }
-
-  .hljs-bullet {
-    color: #f2cc60;
-  }
-
-  .hljs-emphasis {
-    color: #c9d1d9;
-    font-style: italic;
-  }
-
-  .hljs-strong {
-    color: #c9d1d9;
-    font-weight: bold;
-  }
-
-  .hljs-addition {
-    color: #aff5b4;
-    background-color: #033a16;
-  }
-
-  .hljs-deletion {
-    color: #ffdcd7;
-    background-color: #67060c;
-  }
-}
-
-.editor-toolbar {
-  border-bottom: 1px solid var(--p-content-border-color);
-  background: var(--p-surface-50);
-  border-radius: 0.5rem 0.5rem 0 0;
-  padding: 0.5rem;
-}
-
-@media (prefers-color-scheme: dark) {
-  .editor-toolbar {
-    background: var(--p-surface-800);
-  }
-}
 
 .editor-toolbar :deep(.p-toolbar-group-start),
 .editor-toolbar :deep(.p-toolbar-group-end) {
@@ -1217,7 +985,6 @@ const dragCursorStyle = computed((): CSSProperties => {
   .editor-toolbar :deep(.p-button.p-button-text) {
     color: var(--p-surface-100);
   }
-  
   .editor-toolbar :deep(.p-button.p-button-text:hover) {
     background: var(--p-surface-700);
   }

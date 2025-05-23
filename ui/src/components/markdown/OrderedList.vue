@@ -16,10 +16,12 @@ defineProps<{
 <style lang="postcss">
 /* Handle nested lists - these styles can't be done with single Tailwind classes */
 .list-decimal ol {
-  @apply list-[lower-alpha] mt-2 mb-2;
+  list-style-type: lower-alpha;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .list-decimal ol ol {
-  @apply list-[lower-roman];
+  list-style-type: lower-roman;
 }
 </style> 
