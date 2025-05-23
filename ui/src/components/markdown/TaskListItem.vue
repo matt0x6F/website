@@ -1,5 +1,8 @@
 <template>
-  <div class="task-list-item flex items-center gap-2" :class="{ checked: modelValueProxy }">
+  <div
+    class="task-list-item flex items-center gap-2"
+    :class="[{ checked: modelValueProxy }, unordered ? 'ml-[-1.25em]' : '']"
+  >
     <Checkbox v-model="modelValueProxy" :inputId="inputId" :binary="true" disabled />
     <label :for="inputId" class="task-label select-text prose dark:prose-invert" v-html="label"></label>
   </div>
@@ -12,7 +15,8 @@ import Checkbox from 'primevue/checkbox'
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
   label: { type: String, default: '' },
-  inputId: { type: String, default: () => `task-checkbox-${Math.random().toString(36).slice(2, 10)}` }
+  inputId: { type: String, default: () => `task-checkbox-${Math.random().toString(36).slice(2, 10)}` },
+  unordered: { type: Boolean, default: false }
 })
 const emit = defineEmits(['update:modelValue'])
 

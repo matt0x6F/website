@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BlockquoteBlock: typeof import('./src/components/markdown/BlockquoteBlock.vue')['default']
     Button: typeof import('primevue/button')['default']
     CodeBlock: typeof import('./src/components/markdown/CodeBlock.vue')['default']
     Column: typeof import('primevue/column')['default']
@@ -16,12 +17,14 @@ declare module 'vue' {
     DataTable: typeof import('primevue/datatable')['default']
     Dialog: typeof import('primevue/dialog')['default']
     Dropdown: typeof import('primevue/dropdown')['default']
+    HeadingBlock: typeof import('./src/components/markdown/HeadingBlock.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
     IconEcosystem: typeof import('./src/components/icons/IconEcosystem.vue')['default']
     IconSupport: typeof import('./src/components/icons/IconSupport.vue')['default']
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     InputText: typeof import('primevue/inputtext')['default']
+    ListBlock: typeof import('./src/components/markdown/ListBlock.vue')['default']
     LoginDialog: typeof import('./src/components/LoginDialog.vue')['default']
     MarkdownEditor: typeof import('./src/components/MarkdownEditor.vue')['default']
     MarkdownListRenderer: typeof import('./src/components/markdown/MarkdownListRenderer.vue')['default']
@@ -29,6 +32,7 @@ declare module 'vue' {
     MarkdownTable: typeof import('./src/components/markdown/MarkdownTable.vue')['default']
     MenuBar: typeof import('primevue/menubar')['default']
     OrderedList: typeof import('./src/components/markdown/OrderedList.vue')['default']
+    ParagraphBlock: typeof import('./src/components/markdown/ParagraphBlock.vue')['default']
     Password: typeof import('primevue/password')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

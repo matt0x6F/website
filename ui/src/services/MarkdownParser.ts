@@ -2,7 +2,7 @@ import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js/lib/core'
 
 export interface Block {
-  type: 'code' | 'table' | 'html' | 'task';
+  type: string;
   [key: string]: any;
 }
 
@@ -97,66 +97,92 @@ export class MarkdownParser {
     }
   }
 
-  private parseListContent(tokens: any[], startIndex: number, depth: number = 0): { html: string; endIndex: number; taskBlocks: Block[] } {
+  private parseList(tokens: any[], startIndex: number): { block: Block; endIndex: number } {
     const token = tokens[startIndex]
     const isOrdered = token.type === 'ordered_list_open'
-    const start = isOrdered ? parseInt(token.info || '1', 10) : null
-    let html = `<${isOrdered ? 'ol' : 'ul'} class="${isOrdered ? 'list-decimal unpadded-ol' : 'list-disc unpadded-ul'} ${depth === 0 ? 'list-outside' : ''}"${start ? ` start="${start}"` : ''}>`;
+    const start = isOrdered ? parseInt(token.info || '1', 10) : undefined
     let i = startIndex + 1
-    const taskBlocks: Block[] = []
-
+    const items: any[] = []
     while (i < tokens.length && tokens[i].type !== (isOrdered ? 'ordered_list_close' : 'bullet_list_close')) {
       if (tokens[i].type === 'list_item_open') {
-        // Process list item content
         let j = i + 1
-        let hasNestedList = false
+        const children: any[] = []
+        let content = ''
+        let taskMatch = null
         let isTask = false
-        
+        let checked = false
+        let label = ''
         while (j < tokens.length && tokens[j].type !== 'list_item_close') {
           if (tokens[j].type === 'ordered_list_open' || tokens[j].type === 'bullet_list_open') {
-            hasNestedList = true
-            const { html: nestedHtml, endIndex, taskBlocks: nestedTasks } = this.parseListContent(tokens, j, depth + 1)
-            html += nestedHtml
-            taskBlocks.push(...nestedTasks)
-            j = endIndex
+            const { block: nestedBlock, endIndex } = this.parseList(tokens, j)
+            children.push(nestedBlock)
+            j = endIndex + 1
           } else if (tokens[j].type === 'inline') {
-            const match = tokens[j].content.trim().match(/^\[( |x|X)\]\s+(.*)$/)
-            if (match) {
+            // Detect task list item: [ ] or [x] at the start
+            taskMatch = tokens[j].content.match(/^\s*\[( |x|X)\]\s+(.*)$/)
+            if (taskMatch) {
               isTask = true
-              taskBlocks.push({
-                type: 'task',
-                modelValue: match[1].toLowerCase() === 'x',
-                label: this.md.renderInline(match[2])
-              })
+              checked = taskMatch[1].toLowerCase() === 'x'
+              label = this.md.renderInline(taskMatch[2])
             } else {
-              html += '<li class="my-2">' + this.md.renderInline(tokens[j].content)
-              if (!hasNestedList) {
-                html += '</li>'
-              }
+              content += this.md.renderInline(tokens[j].content)
             }
+            j++
+          } else {
+            j++
           }
-          j++
         }
-        
-        if (hasNestedList && !isTask) {
-          html += '</li>'
+        if (isTask) {
+          items.push({ type: 'task', checked, label })
+        } else {
+          items.push({ type: 'list_item', content, children: children.length ? children : undefined })
         }
         i = j
       }
       i++
     }
+    return {
+      block: {
+        type: 'list',
+        ordered: isOrdered,
+        start,
+        items
+      },
+      endIndex: i
+    }
+  }
 
-    html += `</${isOrdered ? 'ol' : 'ul'}>`
-    return { html, endIndex: i, taskBlocks }
+  private parseBlockquote(tokens: any[], startIndex: number): { block: Block; endIndex: number } {
+    let i = startIndex + 1
+    const childTokens: any[] = []
+    let depth = 1
+    while (i < tokens.length && depth > 0) {
+      if (tokens[i].type === 'blockquote_open') {
+        depth++
+        childTokens.push(tokens[i])
+      } else if (tokens[i].type === 'blockquote_close') {
+        depth--
+        if (depth > 0) childTokens.push(tokens[i])
+      } else {
+        childTokens.push(tokens[i])
+      }
+      i++
+    }
+    const content = this.parseBlocks(childTokens)
+    return {
+      block: {
+        type: 'blockquote',
+        content
+      },
+      endIndex: i - 1
+    }
   }
 
   private parseBlocks(tokens: any[]): Block[] {
     const blocks: Block[] = []
     let i = 0
-
     while (i < tokens.length) {
       const token = tokens[i]
-
       if (token.type === 'fence') {
         blocks.push(this.parseCodeBlock(token))
         i++
@@ -164,29 +190,37 @@ export class MarkdownParser {
         const { tableData, endIndex } = this.parseTableData(tokens, i)
         blocks.push({ type: 'table', ...tableData })
         i = endIndex + 1
-      } else if (token.type === 'ordered_list_open' || token.type === 'bullet_list_open') {
-        const { html, endIndex, taskBlocks } = this.parseListContent(tokens, i, 0)
-        if (html.includes('<li')) { // Only add the list if it has items
-          blocks.push({ type: 'html', html })
-        }
-        blocks.push(...taskBlocks)
+      } else if (token.type === 'heading_open') {
+        const level = parseInt(token.tag.replace('h', ''), 10)
+        const contentToken = tokens[i + 1]
+        blocks.push({
+          type: 'heading',
+          level,
+          content: contentToken.type === 'inline' ? this.md.renderInline(contentToken.content) : ''
+        })
+        i += 3 // heading_open, inline, heading_close
+      } else if (token.type === 'paragraph_open') {
+        const contentToken = tokens[i + 1]
+        blocks.push({
+          type: 'paragraph',
+          content: contentToken.type === 'inline' ? this.md.renderInline(contentToken.content) : ''
+        })
+        i += 3 // paragraph_open, inline, paragraph_close
+      } else if (token.type === 'blockquote_open') {
+        const { block, endIndex } = this.parseBlockquote(tokens, i)
+        blocks.push(block)
         i = endIndex + 1
+      } else if (token.type === 'ordered_list_open' || token.type === 'bullet_list_open') {
+        const { block, endIndex } = this.parseList(tokens, i)
+        blocks.push(block)
+        i = endIndex + 1
+      } else if (token.type === 'hr') {
+        blocks.push({ type: 'hr' })
+        i++
       } else {
-        // Collect consecutive non-special tokens into a single HTML block
-        let html = ''
-        while (i < tokens.length && 
-               !['fence', 'table_open', 'ordered_list_open', 'bullet_list_open'].includes(tokens[i].type)) {
-          html += this.md.renderer.render([tokens[i]], this.md.options, {})
-          i++
-        }
-        if (html.trim()) {
-          // Normalize: remove newlines after opening tags like <p>\nText</p> => <p>Text</p>
-          html = html.replace(/<(p|ul|ol|li|h[1-6])>\s*\n\s*/g, '<$1>');
-          blocks.push({ type: 'html', html })
-        }
+        i++
       }
     }
-
     return blocks
   }
 } 

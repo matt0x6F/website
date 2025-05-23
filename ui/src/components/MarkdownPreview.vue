@@ -1,11 +1,15 @@
 <template>
-  <div class="preview-content prose dark:prose-invert">
+  <div class="preview-content prose dark:prose-invert" ref="previewEl">
     <template v-for="(block, i) in blocks" :key="i">
-      <CodeBlock v-if="block.type === 'code'" :lang="block.lang" :code="block.content" />
+      <HeadingBlock v-if="block.type === 'heading'" :level="block.level" :content="block.content" />
+      <ParagraphBlock v-else-if="block.type === 'paragraph'" :content="block.content" />
+      <ListBlock v-else-if="block.type === 'list'" :ordered="block.ordered" :start="block.start" :items="block.items" />
+      <BlockquoteBlock v-else-if="block.type === 'blockquote'" :blocks="block.content" />
+      <CodeBlock v-else-if="block.type === 'code'" :lang="block.lang" :code="block.content" />
       <MarkdownTable v-else-if="block.type === 'table'" :columns="block.columns" :rows="block.rows" />
       <TaskListItem v-else-if="block.type === 'task'" :modelValue="block.modelValue" :label="block.label" />
       <OrderedList v-else-if="block.type === 'ordered_list'" :items="block.items" :start="block.start" />
-      <div v-else v-html="block.html"></div>
+      <section v-else v-html="block.html"></section>
     </template>
   </div>
 </template>
@@ -31,6 +35,10 @@ import CodeBlock from '@/components/markdown/CodeBlock.vue'
 import MarkdownTable from '@/components/markdown/MarkdownTable.vue'
 import TaskListItem from '@/components/markdown/TaskListItem.vue'
 import OrderedList from '@/components/markdown/OrderedList.vue'
+import HeadingBlock from '@/components/markdown/HeadingBlock.vue'
+import ParagraphBlock from '@/components/markdown/ParagraphBlock.vue'
+import ListBlock from '@/components/markdown/ListBlock.vue'
+import BlockquoteBlock from '@/components/markdown/BlockquoteBlock.vue'
 import { MarkdownParser } from '@/services/MarkdownParser'
 
 const props = defineProps<{ content: string }>()
