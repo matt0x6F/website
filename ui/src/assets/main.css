@@ -10,7 +10,3 @@
 @media (prefers-color-scheme: dark) {
   @import 'highlight.js/styles/github-dark-dimmed.css';
 }
-
-.prose-test {
-  @apply prose;
-}
