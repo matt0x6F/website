@@ -682,6 +682,11 @@ const dragCursorStyle = computed((): CSSProperties => {
   background: var(--p-surface-50);
   height: 100%;
 }
+@media (prefers-color-scheme: dark) {
+  .editor-content {
+    background: var(--p-surface-900);
+  }
+}
 
 .editor-scroll-area {
   height: 100%;

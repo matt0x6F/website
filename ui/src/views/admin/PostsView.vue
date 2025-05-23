@@ -37,9 +37,30 @@
                   <h2 class="text-xl font-semibold">{{ post.title }}</h2>
                   <Badge v-if="!post.publishedAt" value="Draft" severity="warning" />
                 </div>
-                <p class="text-gray-600 mt-1">
-                  {{ new Date(post.createdAt).toLocaleDateString() }}
-                </p>
+                <div class="flex flex-row flex-wrap items-center gap-4 mt-1 text-gray-500 text-xs">
+                  <span class="flex items-center gap-1" v-tooltip.bottom="{ value: new Date(post.createdAt).toLocaleString(), showDelay: 500 }">
+                    <i class="pi pi-calendar"></i>
+                    <span>Created</span>
+                    <span>
+                      {{ getRelativeDate(new Date(post.createdAt)) }}
+                    </span>
+                  </span>
+                  <span class="flex items-center gap-1" v-tooltip.bottom="{ value: new Date(post.updatedAt).toLocaleString(), showDelay: 500 }">
+                    <i class="pi pi-clock"></i>
+                    <span>Updated</span>
+                    <span>
+                      {{ getRelativeDate(new Date(post.updatedAt)) }}
+                    </span>
+                  </span>
+                  <span class="flex items-center gap-1" v-tooltip.bottom="{ value: post.publishedAt ? new Date(post.publishedAt).toLocaleString() : 'Not published', showDelay: 500 }">
+                    <i class="pi pi-calendar"></i>
+                    <span>Published</span>
+                    <span>
+                      <span v-if="post.publishedAt">{{ getRelativeDate(new Date(post.publishedAt)) }}</span>
+                      <span v-else class="italic text-yellow-700">Draft</span>
+                    </span>
+                  </span>
+                </div>
                 <p class="mt-2">{{ post.content.substring(0, 150) }}...</p>
               </div>
               <router-link 
@@ -80,6 +101,16 @@ const filterOptions = [
 ]
 
 const filterStatus = ref({ label: 'Published', value: 'published' })
+
+function getRelativeDate(date: Date): string {
+  const now = new Date()
+  const diff = (now.getTime() - date.getTime()) / 1000 // seconds
+  if (diff < 60) return 'just now'
+  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) === 1 ? '' : 's'} ago`
+  if (diff < 604800) return `${Math.floor(diff / 86400)} day${Math.floor(diff / 86400) === 1 ? '' : 's'} ago`
+  return date.toLocaleDateString()
+}
 
 const loadPosts = async () => {
   const client = useApiClient(PostsApi)

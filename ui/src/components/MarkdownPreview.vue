@@ -95,7 +95,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style>
 .preview-content {
   /* Remove padding here */
   overflow-y: auto;

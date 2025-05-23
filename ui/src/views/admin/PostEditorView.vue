@@ -57,28 +57,26 @@
                 />
               </div>
 
-              <div class="button-container" :class="{ 'hidden': isExpanded }">
-                <div class="flex gap-4">
-                  <Button
-                    type="button"
-                    size="small"
-                    label="Save"
-                    @click="handleSave(false)"
-                  />
-                  <Button
-                    type="button"
-                    size="small"
-                    label="Save & Back"
-                    @click="handleSave(true)"
-                  />
-                  <Button
-                    type="button"
-                    severity="secondary"
-                    size="small"
-                    label="Cancel"
-                    @click="$router.push({ name: 'admin-posts' })"
-                  />
-                </div>
+              <div class="button-container bg-white dark:bg-neutral-900 p-4 flex gap-4 border-t border-gray-200 dark:border-neutral-700 mt-4 shadow-sm" :class="{ 'hidden': isExpanded }">
+                <Button
+                  type="button"
+                  size="small"
+                  label="Save"
+                  @click="handleSave(false)"
+                />
+                <Button
+                  type="button"
+                  size="small"
+                  label="Save & Back"
+                  @click="handleSave(true)"
+                />
+                <Button
+                  type="button"
+                  severity="secondary"
+                  size="small"
+                  label="Cancel"
+                  @click="$router.push({ name: 'admin-posts' })"
+                />
               </div>
             </div>
           </form>
@@ -551,11 +549,6 @@ const handleDeleteSeries = async (series: SeriesSummaryWithCount) => {
 </script>
 
 <style>
-.button-container {
-  margin-top: 1rem;
-  position: relative;
-  z-index: 1;
-}
 .fixed-editor-height {
   height: 32rem;
   min-height: 0;
