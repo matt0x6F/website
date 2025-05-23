@@ -21,8 +21,10 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = computed(() => storedRefreshToken.value !== "")
   const router = useRouter()
   const redirectUrl = ref<string | null>(null)
+  const isInitialized = ref(false)
 
   async function init() {
+    isInitialized.value = false
     if (storedRefreshToken.value) {
       try {
         await refreshToken()
@@ -33,6 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
         throw error
       }
     }
+    isInitialized.value = true
   }
 
   async function getUserData() {
@@ -315,5 +318,6 @@ export const useAuthStore = defineStore('auth', () => {
     signup,
     startRefreshTokenTimer,
     stopRefreshTokenTimer,
+    isInitialized,
   }
 })

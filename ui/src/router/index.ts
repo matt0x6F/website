@@ -121,18 +121,25 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  
+
+  // Wait for auth store to initialize
+  if (!authStore.isInitialized) {
+    try {
+      await authStore.init()
+    } catch (e) {
+      // Optionally handle errors
+    }
+  }
+
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-    // Store the attempted URL for redirecting after login
     authStore.setRedirectUrl(to.fullPath)
     next({ 
       path: '/',
-      query: { login: 'required' }  // This can trigger the login dialog
+      query: { login: 'required' }
     })
   } else if (to.meta.requiresAdmin && !authStore.userData.isStaff) {
-    // Redirect non-staff users to home page
     next({ path: '/' })
   } else {
     next()
