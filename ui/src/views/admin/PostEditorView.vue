@@ -23,6 +23,16 @@
             </span>
           </div>
 
+          <div v-if="isEditing && !post.publishedAt" class="mb-4 flex justify-end">
+            <Button
+              icon="pi pi-trash"
+              severity="danger"
+              size="small"
+              label="Delete Post"
+              @click="confirmDeletePost()"
+            />
+          </div>
+
           <form @submit.prevent class="h-full">
             <div class="editor-container-wrapper">
               <div class="grid grid-cols-3 gap-4 mb-4" :class="{ 'hidden': isExpanded }">
@@ -162,6 +172,7 @@
         </TabPanel>
       </TabPanels>
     </Tabs>
+    <ConfirmDialog></ConfirmDialog>
   </div>
 </template>
 
@@ -186,10 +197,13 @@ import Tab from 'primevue/tab'
 import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
 import { ResponseError } from '@/lib/api/runtime'
+import ConfirmDialog from 'primevue/confirmdialog'
+import { useConfirm } from 'primevue/useconfirm'
 
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
+const confirm = useConfirm()
 
 const isExpanded = ref(false)
 const isEditing = computed(() => route.params.id !== undefined)
@@ -563,6 +577,31 @@ const handleDeleteSeries = async (series: SeriesSummaryWithCount) => {
       life: 3000
     });
   }
+};
+
+const deletePost = async () => {
+  if (!postId.value) return;
+  try {
+    const postsApi = useApiClient(PostsApi);
+    await postsApi.apiDeletePost({ postId: postId.value });
+    toast.add({ severity: 'success', summary: 'Deleted', detail: 'Post deleted successfully', life: 3000 });
+    router.push({ name: 'admin-posts' });
+  } catch (err) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete post', life: 3000 });
+  }
+};
+
+const confirmDeletePost = () => {
+  confirm.require({
+    message: `Are you sure you want to delete this draft post? This action cannot be undone.`,
+    header: 'Confirm Deletion',
+    icon: 'pi pi-exclamation-triangle',
+    acceptClass: 'p-button-danger',
+    accept: () => deletePost(),
+    reject: () => {
+      toast.add({ severity: 'info', summary: 'Cancelled', detail: 'Deletion cancelled', life: 2000 });
+    }
+  });
 };
 </script>
 

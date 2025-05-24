@@ -63,18 +63,31 @@
                 </div>
                 <p class="mt-2">{{ post.content.substring(0, 150) }}...</p>
               </div>
-              <router-link 
-                :to="{ name: 'admin-posts-edit', params: { id: post.id }}"
-                class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-100 dark:hover:bg-emerald-800"
-              >
-                Edit
-              </router-link>
+              <div class="flex flex-col gap-2 items-end">
+                <router-link 
+                  :to="{ name: 'admin-posts-edit', params: { id: post.id }}"
+                  class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-100 dark:hover:bg-emerald-800"
+                >
+                  Edit
+                </router-link>
+                <Button
+                  v-if="!post.publishedAt"
+                  icon="pi pi-trash"
+                  severity="danger"
+                  size="small"
+                  text
+                  label="Delete"
+                  @click="confirmDeletePost(post)"
+                  class="mt-2"
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
+    <ConfirmDialog></ConfirmDialog>
     <!-- Router view for nested routes (like new post form) -->
     <router-view></router-view>
   </div>
@@ -89,6 +102,9 @@ import Badge from 'primevue/badge'
 import Toolbar from 'primevue/toolbar'
 import SelectButton from 'primevue/selectbutton'
 import Button from 'primevue/button'
+import ConfirmDialog from 'primevue/confirmdialog'
+import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
 
 const posts = ref<PostListPublic[]>([])
 const loading = ref(true)
@@ -101,6 +117,9 @@ const filterOptions = [
 ]
 
 const filterStatus = ref({ label: 'Published', value: 'published' })
+
+const confirm = useConfirm()
+const toast = useToast()
 
 function getRelativeDate(date: Date): string {
   const now = new Date()
@@ -141,6 +160,30 @@ const loadPosts = async () => {
 watch(filterStatus, () => {
   loadPosts()
 })
+
+const deletePost = async (postId: number) => {
+  try {
+    const client = useApiClient(PostsApi)
+    await client.apiDeletePost({ postId })
+    toast.add({ severity: 'success', summary: 'Deleted', detail: 'Post deleted successfully', life: 3000 })
+    await loadPosts()
+  } catch (err) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete post', life: 3000 })
+  }
+}
+
+const confirmDeletePost = (post: PostListPublic) => {
+  confirm.require({
+    message: `Are you sure you want to delete the post "${post.title}"? This action cannot be undone.`,
+    header: 'Confirm Deletion',
+    icon: 'pi pi-exclamation-triangle',
+    acceptClass: 'p-button-danger',
+    accept: () => deletePost(post.id),
+    reject: () => {
+      toast.add({ severity: 'info', summary: 'Cancelled', detail: 'Deletion cancelled', life: 2000 })
+    }
+  })
+}
 
 onMounted(() => {
   loadPosts()
