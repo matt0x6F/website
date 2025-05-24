@@ -67,6 +67,11 @@ jobs:
           cd ui
           npm ci
 
+      - name: Install Playwright browsers
+        run: |
+          cd ui
+          npx playwright install --with-deps
+
       - name: Run frontend unit tests
         run: |
           cd ui
