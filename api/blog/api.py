@@ -764,18 +764,27 @@ def update_series(request, series_id: int, payload: SeriesUpdate):
 )  # Could be paginated too
 @paginate
 def list_posts_in_series(
-    request, series_id_or_slug: Union[int, str], exclude_post_id: Optional[int] = None
+    request,
+    series_id_or_slug: Union[int, str],
+    exclude_post_id: Optional[int] = None,
+    order: str = "-published_at",  # New parameter
 ):
     """
     List all published posts belonging to a specific series.
     Optionally exclude a specific post by its ID (e.g., the current post being viewed).
+    The 'order' parameter controls the ordering of posts. Use '-published_at' (default) for descending, 'published_at' for ascending.
     """
     if isinstance(series_id_or_slug, int):
         series = get_object_or_404(Series, id=series_id_or_slug)
     else:
         series = get_object_or_404(Series, slug=series_id_or_slug)
 
-    posts_qs = series.posts.filter(published_at__isnull=False).order_by("-published_at")
+    # Validate order param
+    allowed_orders = ["-published_at", "published_at"]
+    if order not in allowed_orders:
+        raise HttpError(400, f"Invalid order parameter. Allowed: {allowed_orders}")
+
+    posts_qs = series.posts.filter(published_at__isnull=False).order_by(order)
     if exclude_post_id:
         posts_qs = posts_qs.exclude(id=exclude_post_id)
 
@@ -915,7 +924,12 @@ def list_posts(
     author_id: Optional[int] = None,
     drafts: bool = False,
     all_posts: bool = False,  # Combines drafts and published
+    order: str = "-published_at",  # New parameter
 ):
+    """
+    List posts, optionally filtered by series, author, or draft status.
+    The 'order' parameter controls the ordering of posts. Use '-published_at' (default) for descending, 'published_at' for ascending.
+    """
     posts = Post.objects.select_related("author", "series").all()
     is_staff = request.user.is_authenticated and request.user.is_staff
 
@@ -935,6 +949,13 @@ def list_posts(
         posts = posts.filter(series__slug=series_slug)
     if author_id:
         posts = posts.filter(author_id=author_id)
+
+    # Validate order param
+    allowed_orders = ["-published_at", "published_at"]
+    if order not in allowed_orders:
+        raise HttpError(400, f"Invalid order parameter. Allowed: {allowed_orders}")
+
+    posts = posts.order_by(order)
 
     return posts
 

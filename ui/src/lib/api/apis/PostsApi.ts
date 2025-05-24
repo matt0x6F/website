@@ -64,6 +64,7 @@ export interface ApiListPostsRequest {
     authorId?: number | null;
     drafts?: boolean;
     allPosts?: boolean;
+    order?: string;
     limit?: number;
     offset?: number;
 }
@@ -299,6 +300,7 @@ export class PostsApi extends runtime.BaseAPI {
     }
 
     /**
+     * List posts, optionally filtered by series, author, or draft status. The \'order\' parameter controls the ordering of posts. Use \'-published_at\' (default) for descending, \'published_at\' for ascending.
      * List Posts
      */
     async apiListPostsRaw(requestParameters: ApiListPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPostListPublic>> {
@@ -318,6 +320,10 @@ export class PostsApi extends runtime.BaseAPI {
 
         if (requestParameters['allPosts'] != null) {
             queryParameters['all_posts'] = requestParameters['allPosts'];
+        }
+
+        if (requestParameters['order'] != null) {
+            queryParameters['order'] = requestParameters['order'];
         }
 
         if (requestParameters['limit'] != null) {
@@ -349,6 +355,7 @@ export class PostsApi extends runtime.BaseAPI {
     }
 
     /**
+     * List posts, optionally filtered by series, author, or draft status. The \'order\' parameter controls the ordering of posts. Use \'-published_at\' (default) for descending, \'published_at\' for ascending.
      * List Posts
      */
     async apiListPosts(requestParameters: ApiListPostsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPostListPublic> {

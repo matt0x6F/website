@@ -63,6 +63,7 @@ export interface ApiGetSeriesDetailBySlugRequest {
 export interface ApiListPostsInSeriesRequest {
     seriesIdOrSlug: SeriesIdOrSlug;
     excludePostId?: number | null;
+    order?: string;
     limit?: number;
     offset?: number;
 }
@@ -274,7 +275,7 @@ export class SeriesApi extends runtime.BaseAPI {
     }
 
     /**
-     * List all published posts belonging to a specific series. Optionally exclude a specific post by its ID (e.g., the current post being viewed).
+     * List all published posts belonging to a specific series. Optionally exclude a specific post by its ID (e.g., the current post being viewed). The \'order\' parameter controls the ordering of posts. Use \'-published_at\' (default) for descending, \'published_at\' for ascending.
      * List Posts In Series
      */
     async apiListPostsInSeriesRaw(requestParameters: ApiListPostsInSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPostSummaryForSeries>> {
@@ -289,6 +290,10 @@ export class SeriesApi extends runtime.BaseAPI {
 
         if (requestParameters['excludePostId'] != null) {
             queryParameters['exclude_post_id'] = requestParameters['excludePostId'];
+        }
+
+        if (requestParameters['order'] != null) {
+            queryParameters['order'] = requestParameters['order'];
         }
 
         if (requestParameters['limit'] != null) {
@@ -320,7 +325,7 @@ export class SeriesApi extends runtime.BaseAPI {
     }
 
     /**
-     * List all published posts belonging to a specific series. Optionally exclude a specific post by its ID (e.g., the current post being viewed).
+     * List all published posts belonging to a specific series. Optionally exclude a specific post by its ID (e.g., the current post being viewed). The \'order\' parameter controls the ordering of posts. Use \'-published_at\' (default) for descending, \'published_at\' for ascending.
      * List Posts In Series
      */
     async apiListPostsInSeries(requestParameters: ApiListPostsInSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPostSummaryForSeries> {

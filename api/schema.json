@@ -1212,6 +1212,16 @@
           },
           {
             "in": "query",
+            "name": "order",
+            "schema": {
+              "default": "-published_at",
+              "title": "Order",
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
             "name": "limit",
             "schema": {
               "default": 100,
@@ -1245,7 +1255,7 @@
             }
           }
         },
-        "description": "List all published posts belonging to a specific series.\nOptionally exclude a specific post by its ID (e.g., the current post being viewed).",
+        "description": "List all published posts belonging to a specific series.\nOptionally exclude a specific post by its ID (e.g., the current post being viewed).\nThe 'order' parameter controls the ordering of posts. Use '-published_at' (default) for descending, 'published_at' for ascending.",
         "tags": [
           "series"
         ],
@@ -1361,6 +1371,16 @@
           },
           {
             "in": "query",
+            "name": "order",
+            "schema": {
+              "default": "-published_at",
+              "title": "Order",
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
             "name": "limit",
             "schema": {
               "default": 100,
@@ -1394,6 +1414,7 @@
             }
           }
         },
+        "description": "List posts, optionally filtered by series, author, or draft status.\nThe 'order' parameter controls the ordering of posts. Use '-published_at' (default) for descending, 'published_at' for ascending.",
         "tags": [
           "posts"
         ],
