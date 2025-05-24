@@ -52,13 +52,14 @@
                       {{ getRelativeDate(new Date(post.updatedAt)) }}
                     </span>
                   </span>
-                  <span class="flex items-center gap-1" v-tooltip.bottom="{ value: post.publishedAt ? new Date(post.publishedAt).toLocaleString() : 'Not published', showDelay: 500 }">
+                  <span
+                    v-if="post.publishedAt"
+                    class="flex items-center gap-1"
+                    v-tooltip.bottom="{ value: new Date(post.publishedAt).toLocaleString(), showDelay: 500 }"
+                  >
                     <i class="pi pi-calendar"></i>
                     <span>Published</span>
-                    <span>
-                      <span v-if="post.publishedAt">{{ getRelativeDate(new Date(post.publishedAt)) }}</span>
-                      <span v-else class="italic text-yellow-700">Draft</span>
-                    </span>
+                    <span>{{ getRelativeDate(new Date(post.publishedAt)) }}</span>
                   </span>
                 </div>
                 <p class="mt-2">{{ post.content.substring(0, 150) }}...</p>
