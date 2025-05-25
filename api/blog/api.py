@@ -486,6 +486,23 @@ def mod_update_comment(request: HttpRequest, id: int, comment: AdminCommentUpdat
 
 
 @comments_router.get(
+    "/moderation/{id}",
+    response={200: AdminCommentList},
+    tags=["moderation"],
+    auth=JWTAuth(permissions=StaffOnly, allow_anonymous=False),
+)
+def mod_get_comment(request: HttpRequest, id: int):
+    """
+    Gets all the details of a comment for moderation.
+    """
+    try:
+        return Comment.objects.get(id=id)
+    except Exception as err:
+        logger.error("Error fetching comment", error=err)
+        raise HttpError(500, "Fail to fetch comment") from err
+
+
+@comments_router.get(
     "/{id}",
     response={200: CommentList},
     tags=["comments"],

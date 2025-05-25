@@ -73,24 +73,40 @@
           </div>
           
           <!-- Moderation actions -->
-          <div v-if="!comment.reviewed" class="mt-4 flex gap-2">
-            <Button 
-              label="Approve" 
-              icon="pi pi-check" 
-              class="p-button-success" 
-              @click="approveComment(comment.id)" 
-            />
-            <Button 
-              label="Reject" 
-              icon="pi pi-times" 
-              class="p-button-danger" 
-              @click="rejectComment(comment.id)" 
-            />
+          <div class="mt-4 flex gap-2 items-center">
+            <template v-if="!comment.reviewed">
+              <Button 
+                label="Approve" 
+                icon="pi pi-check" 
+                class="p-button-success" 
+                @click="approveComment(comment.id)" 
+              />
+              <Button 
+                label="Reject" 
+                icon="pi pi-times" 
+                class="p-button-danger" 
+                @click="rejectComment(comment.id)" 
+              />
+            </template>
+            <template v-else-if="comment.visible">
+              <Button 
+                label="Reject" 
+                icon="pi pi-times" 
+                class="p-button-danger" 
+                @click="rejectComment(comment.id)" 
+              />
+            </template>
+            <template v-else>
+              <Button 
+                label="Approve" 
+                icon="pi pi-check" 
+                class="p-button-success" 
+                @click="approveComment(comment.id)" 
+              />
+            </template>
           </div>
-          <div v-else class="mt-4">
-            <div v-if="comment.note" class="italic text-gray-600">
-              Note: {{ comment.note }}
-            </div>
+          <div v-if="comment.reviewed && comment.note" class="mt-2 italic text-gray-600">
+            Note: {{ comment.note }}
           </div>
         </div>
       </div>
@@ -167,15 +183,13 @@ const formatDate = (dateString: string | null | undefined) => {
 const loadComment = async () => {
   loading.value = true;
   error.value = null;
-  
+
   try {
     const commentId = parseInt(route.params.id as string);
-    
-    // Use the comments API to get detailed comment info including parent and children
-    const response = await commentsApi.apiGetComment({ id: commentId });
+    // Use the moderation API to get the comment with admin fields
+    const response = await moderationApi.apiModGetComment({ id: commentId });
     comment.value = response;
-    
-    console.log('Loaded comment with parent:', comment.value);
+    console.log('Loaded admin comment:', comment.value);
   } catch (err) {
     console.error('Error loading comment:', err);
     error.value = 'Failed to load comment details';

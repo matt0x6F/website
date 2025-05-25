@@ -2129,6 +2129,42 @@
             "JWTAuth": []
           }
         ]
+      },
+      "get": {
+        "operationId": "blog_api_mod_get_comment",
+        "summary": "Mod Get Comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "title": "Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCommentList"
+                }
+              }
+            }
+          }
+        },
+        "description": "Gets all the details of a comment for moderation.",
+        "tags": [
+          "moderation"
+        ],
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
       }
     },
     "/api/comments/{id}": {

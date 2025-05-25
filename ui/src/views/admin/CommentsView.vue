@@ -1,93 +1,97 @@
 <template>
-  <div>
-    <div class="flex justify-between items-center mb-4">
-      <h1 class="text-2xl font-bold">Comment Moderation</h1>
-      <div class="flex gap-2">
-        <Button 
-          :class="{ 'p-button-outlined': reviewFilter !== null }"
-          label="All Comments" 
-          @click="setReviewFilter(null)" 
-        />
-        <Button 
-          :class="{ 'p-button-outlined': reviewFilter !== false }"
-          label="Pending Review" 
-          @click="setReviewFilter(false)" 
-        />
-        <Button 
-          :class="{ 'p-button-outlined': reviewFilter !== true }"
-          label="Reviewed" 
-          @click="setReviewFilter(true)" 
-        />
-      </div>
-    </div>
-
-    <DataTable 
-      :value="comments" 
-      :loading="loading" 
-      paginator 
-      :rows="10"
-      :rowsPerPageOptions="[5, 10, 20, 50]"
-      v-model:filters="filters"
-      filterDisplay="menu"
-      :globalFilterFields="['content', 'author.username', 'post.title']"
-      responsiveLayout="scroll"
-      class="p-datatable-sm"
-      selectionMode="single"
-      @row-click="onRowClick"
-      v-model:selection="selectedComment"
-    >
-      <template #header>
-        <div class="flex justify-content-end">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText v-model="filters['global'].value" placeholder="Search..." />
-          </span>
+  <div class="max-w-5xl mx-auto mt-6 px-2 sm:px-4">
+    <div class="p-4 sm:p-6 bg-white rounded-lg shadow mb-8">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
+        <h1 class="text-2xl font-bold">Comment Moderation</h1>
+        <div class="flex gap-2 flex-wrap">
+          <Button 
+            :class="{ 'p-button-outlined': reviewFilter !== null }"
+            label="All Comments" 
+            @click="setReviewFilter(null)" 
+          />
+          <Button 
+            :class="{ 'p-button-outlined': reviewFilter !== false }"
+            label="Pending Review" 
+            @click="setReviewFilter(false)" 
+          />
+          <Button 
+            :class="{ 'p-button-outlined': reviewFilter !== true }"
+            label="Reviewed" 
+            @click="setReviewFilter(true)" 
+          />
         </div>
-      </template>
+      </div>
 
-      <Column field="id" header="ID" sortable style="width: 5%"></Column>
-      <Column field="content" header="Content" sortable style="width: 35%">
-        <template #body="{ data }">
-          <div class="whitespace-pre-wrap">{{ data.content }}</div>
-        </template>
-      </Column>
-      <Column field="author.username" header="Author" sortable style="width: 15%"></Column>
-      <Column field="post.title" header="Post" sortable style="width: 20%"></Column>
-      <Column field="createdAt" header="Date" sortable style="width: 15%">
-        <template #body="{ data }">
-          {{ formatDate(data.createdAt) }}
-        </template>
-      </Column>
-      <Column header="Actions" style="width: 10%">
-        <template #body="{ data }">
-          <div class="flex gap-2">
-            <Button 
-              v-if="!data.reviewed" 
-              icon="pi pi-check" 
-              class="p-button-success p-button-sm" 
-              @click="approveComment(data.id)" 
-              tooltip="Approve" 
-            />
-            <Button 
-              v-if="!data.reviewed" 
-              icon="pi pi-times" 
-              class="p-button-danger p-button-sm" 
-              @click="rejectComment(data.id)" 
-              tooltip="Reject" 
-            />
-            <Button 
-              icon="pi pi-trash" 
-              class="p-button-danger p-button-sm" 
-              @click="confirmDelete(data)" 
-              tooltip="Delete" 
-            />
+      <DataTable 
+        :value="comments" 
+        :loading="loading" 
+        paginator 
+        :rows="10"
+        :rowsPerPageOptions="[5, 10, 20, 50]"
+        v-model:filters="filters"
+        filterDisplay="menu"
+        :globalFilterFields="['content', 'author.username', 'post.title']"
+        responsiveLayout="scroll"
+        class="p-datatable-sm"
+        selectionMode="single"
+        @row-click="onRowClick"
+        v-model:selection="selectedComment"
+      >
+        <template #header>
+          <div class="flex justify-end">
+            <InputGroup>
+              <InputGroupAddon>
+                <i class="pi pi-search" />
+              </InputGroupAddon>
+              <InputText v-model="filters['global'].value" placeholder="Search..." />
+            </InputGroup>
           </div>
         </template>
-      </Column>
-    </DataTable>
 
-    <ConfirmDialog></ConfirmDialog>
-    <Toast />
+        <Column field="id" header="ID" sortable style="width: 5%"></Column>
+        <Column field="content" header="Content" sortable style="width: 35%">
+          <template #body="{ data }">
+            <div class="whitespace-pre-wrap">{{ data.content }}</div>
+          </template>
+        </Column>
+        <Column field="author.username" header="Author" sortable style="width: 15%"></Column>
+        <Column field="post.title" header="Post" sortable style="width: 20%"></Column>
+        <Column field="createdAt" header="Date" sortable style="width: 15%">
+          <template #body="{ data }">
+            {{ formatDate(data.createdAt) }}
+          </template>
+        </Column>
+        <Column header="Actions" style="width: 10%">
+          <template #body="{ data }">
+            <div class="flex gap-2">
+              <Button 
+                v-if="!data.reviewed" 
+                icon="pi pi-check" 
+                class="p-button-success p-button-sm" 
+                @click="approveComment(data.id)" 
+                tooltip="Approve" 
+              />
+              <Button 
+                v-if="!data.reviewed" 
+                icon="pi pi-times" 
+                class="p-button-danger p-button-sm" 
+                @click="rejectComment(data.id)" 
+                tooltip="Reject" 
+              />
+              <Button 
+                icon="pi pi-trash" 
+                class="p-button-danger p-button-sm" 
+                @click="confirmDelete(data)" 
+                tooltip="Delete" 
+              />
+            </div>
+          </template>
+        </Column>
+      </DataTable>
+
+      <ConfirmDialog></ConfirmDialog>
+      <Toast />
+    </div>
   </div>
 </template>
 
@@ -101,6 +105,9 @@ import type { AdminCommentUpdate } from '@/lib/api/models';
 import ConfirmDialog from 'primevue/confirmdialog';
 import Toast from 'primevue/toast';
 import { useRouter } from 'vue-router';
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
+import InputText from 'primevue/inputtext';
 
 const router = useRouter();
 const moderationApi = useApiClient(ModerationApi);
@@ -286,4 +293,20 @@ const onRowClick = (event: { data: { id: number } }) => {
 onMounted(() => {
   loadComments();
 });
-</script> 
+</script>
+
+<style scoped>
+:deep(.p-datatable-table),
+:deep(.p-datatable-thead),
+:deep(.p-datatable-tbody),
+:deep(.p-datatable-tfoot),
+:deep(.p-datatable-header),
+:deep(.p-datatable-thead > tr > th),
+:deep(.p-datatable-tbody > tr > td) {
+  border: none !important;
+}
+
+:deep(.p-datatable-paginator-bottom) {
+  border: none !important;
+}
+</style> 

@@ -28,6 +28,10 @@ import {
     PagedAdminCommentListToJSON,
 } from '../models/index';
 
+export interface ApiModGetCommentRequest {
+    id: number;
+}
+
 export interface ApiModQueueListRequest {
     reviewed?: boolean | null;
     limit?: number;
@@ -43,6 +47,49 @@ export interface ApiModUpdateCommentRequest {
  * 
  */
 export class ModerationApi extends runtime.BaseAPI {
+
+    /**
+     * Gets all the details of a comment for moderation.
+     * Mod Get Comment
+     */
+    async apiModGetCommentRaw(requestParameters: ApiModGetCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AdminCommentList>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling apiModGetComment().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/comments/moderation/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AdminCommentListFromJSON(jsonValue));
+    }
+
+    /**
+     * Gets all the details of a comment for moderation.
+     * Mod Get Comment
+     */
+    async apiModGetComment(requestParameters: ApiModGetCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AdminCommentList> {
+        const response = await this.apiModGetCommentRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Mod Queue List
