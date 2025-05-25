@@ -77,6 +77,11 @@ jobs:
           cd ui
           npm run test:unit
 
+      - name: Build frontend for preview
+        run: |
+          cd ui
+          npm run build
+
       - name: Run frontend e2e tests
         run: |
           cd ui
