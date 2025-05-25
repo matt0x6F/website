@@ -36,6 +36,17 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+            api/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('api/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
       - name: Install backend dependencies
         run: |
           cd api
