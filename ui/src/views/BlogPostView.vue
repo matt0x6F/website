@@ -9,40 +9,6 @@
     </div>
     
     <template v-else-if="post">
-      <!-- Series box -->
-      <div
-        v-if="post.series && seriesPosts.length > 1"
-        class="mb-6 p-4 border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 rounded"
-      >
-        <div class="font-semibold text-emerald-700 dark:text-emerald-300 mb-2">
-          Part of the series: <span class="underline">{{ post.series.title }}</span>
-        </div>
-        <ol class="list-decimal list-inside space-y-1">
-          <li
-            v-for="sp in seriesPosts"
-            :key="sp.id"
-            :class="{
-              'font-bold text-emerald-800 dark:text-emerald-200': sp.id === post.id,
-              'text-gray-700 dark:text-gray-300': sp.id !== post.id
-            }"
-          >
-            <router-link
-              v-if="sp.id !== post.id"
-              :to="{
-                name: 'blog-post',
-                params: { slug: sp.slug, year: sp.year || (sp.publishedAt ? new Date(sp.publishedAt).getFullYear() : undefined) }
-              }"
-              class="hover:underline"
-            >
-              {{ sp.title }}
-            </router-link>
-            <span v-else>
-              {{ sp.title }} <span class="text-xs text-emerald-600">(current)</span>
-            </span>
-          </li>
-        </ol>
-      </div>
-      <!-- End Series box -->
       <article class="mb-8">
         <header class="mb-8">
           <h1 class="text-4xl font-bold mb-2">{{ post.title }}</h1>
@@ -50,7 +16,40 @@
             Published {{ new Date(post.published).toLocaleDateString() }}
           </div>
         </header>
-        
+        <!-- Series box below the title -->
+        <div
+          v-if="post.series && seriesPosts.length > 1"
+          class="mb-6 p-4 border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 rounded"
+        >
+          <div class="font-semibold text-emerald-700 dark:text-emerald-300 mb-2">
+            Part of the series: <span class="underline">{{ post.series.title }}</span>
+          </div>
+          <ol class="list-decimal list-inside space-y-1">
+            <li
+              v-for="sp in seriesPosts"
+              :key="sp.id"
+              :class="{
+                'font-bold text-emerald-800 dark:text-emerald-200': sp.id === post.id,
+                'text-gray-700 dark:text-gray-300': sp.id !== post.id
+              }"
+            >
+              <router-link
+                v-if="sp.id !== post.id"
+                :to="{
+                  name: 'blog-post',
+                  params: { slug: sp.slug, year: sp.year || (sp.publishedAt ? new Date(sp.publishedAt).getFullYear() : undefined) }
+                }"
+                class="hover:underline"
+              >
+                {{ sp.title }}
+              </router-link>
+              <span v-else>
+                {{ sp.title }} <span class="text-xs text-emerald-600">(current)</span>
+              </span>
+            </li>
+          </ol>
+        </div>
+        <!-- End Series box -->
         <MarkdownPreview class="no-prose-padding" :content="post?.content || ''" />
       </article>
       
