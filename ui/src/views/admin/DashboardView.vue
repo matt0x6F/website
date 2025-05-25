@@ -52,6 +52,12 @@
         </div>
       </div>
     </div>
+
+    <!-- Calendar Heatmap -->
+    <div class="mt-10">
+      <h2 class="text-xl font-semibold mb-4">Posts Calendar Heatmap</h2>
+      <CalendarHeatmap :data="calendarHeatmapData" @select="onHeatmapSelect" />
+    </div>
   </div>
 </template>
 
@@ -62,11 +68,13 @@ import { useAuthStore } from '@/stores/auth'
 import { PostsApi } from '@/lib/api/apis/PostsApi'
 import { AccountsApi } from '@/lib/api/apis/AccountsApi'
 import { Configuration } from '@/lib/api'
+import CalendarHeatmap from '@/components/CalendarHeatmap.vue'
 
 const authStore = useAuthStore()
 const publishedPostCount = ref(0)
 const totalPostCount = ref(0)
 const userCount = ref(0)
+const calendarHeatmapData = ref<{ date: string, count: number }[]>([])
 
 const draftPostCount = computed(() => {
   return totalPostCount.value - publishedPostCount.value
@@ -125,6 +133,57 @@ const fetchUserCount = async () => {
   }
 }
 
+const fetchPublishedPostsForHeatmap = async () => {
+  try {
+    const config = new Configuration({
+      basePath: import.meta.env.VITE_API_URL,
+      headers: {
+        Authorization: `Bearer ${authStore.storedAccessToken}`
+      }
+    })
+    const postsApi = new PostsApi(config)
+    const limit = 100
+    let offset = 0
+    let allPosts: any[] = []
+    let total = 0
+    do {
+      const response = await postsApi.apiListPosts({ allPosts: false, order: 'published_at', limit, offset })
+      const posts = response.items || []
+      if (offset === 0) total = response.count || 0
+      allPosts = allPosts.concat(posts)
+      offset += limit
+    } while (allPosts.length < total)
+    // Group by publishedAt date
+    const counts: Record<string, number> = {}
+    for (const post of allPosts) {
+      let dateObj: Date | null = null;
+      if (post.publishedAt) {
+        if (typeof post.publishedAt === 'string') {
+          dateObj = new Date(post.publishedAt);
+        } else if (post.publishedAt instanceof Date) {
+          dateObj = post.publishedAt;
+        }
+      }
+      if (dateObj && !isNaN(dateObj.getTime())) {
+        const dateStr = dateObj.toISOString().slice(0, 10);
+        counts[dateStr] = (counts[dateStr] || 0) + 1;
+      }
+    }
+    calendarHeatmapData.value = Object.entries(counts).map(([date, count]) => ({ date, count }))
+    console.log('calendarHeatmapData', calendarHeatmapData.value)
+  } catch (error) {
+    console.error('Failed to fetch posts for heatmap:', error)
+    calendarHeatmapData.value = []
+  }
+}
+
+function onHeatmapSelect(day: { date: string, count: number }) {
+  // You can handle cell selection here (e.g., show a modal or filter posts)
+  if (day.count > 0) {
+    alert(`Posts published on ${day.date}: ${day.count}`)
+  }
+}
+
 onMounted(() => {
   // Verify user is staff, though the router guard should prevent non-staff access
   if (!authStore.userData.isStaff) {
@@ -135,5 +194,6 @@ onMounted(() => {
   fetchPublishedPostCount()
   fetchTotalPostCount()
   fetchUserCount()
+  fetchPublishedPostsForHeatmap()
 })
 </script> 

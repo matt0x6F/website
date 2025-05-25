@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     BlockquoteBlock: typeof import('./src/components/markdown/BlockquoteBlock.vue')['default']
     Button: typeof import('primevue/button')['default']
+    CalendarHeatmap: typeof import('./src/components/CalendarHeatmap.vue')['default']
     CodeBlock: typeof import('./src/components/markdown/CodeBlock.vue')['default']
     Column: typeof import('primevue/column')['default']
     Comments: typeof import('./src/components/Comments.vue')['default']
