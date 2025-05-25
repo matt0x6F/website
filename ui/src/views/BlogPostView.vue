@@ -9,6 +9,40 @@
     </div>
     
     <template v-else-if="post">
+      <!-- Series box -->
+      <div
+        v-if="post.series && seriesPosts.length > 1"
+        class="mb-6 p-4 border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 rounded"
+      >
+        <div class="font-semibold text-emerald-700 dark:text-emerald-300 mb-2">
+          Part of the series: <span class="underline">{{ post.series.title }}</span>
+        </div>
+        <ol class="list-decimal list-inside space-y-1">
+          <li
+            v-for="sp in seriesPosts"
+            :key="sp.id"
+            :class="{
+              'font-bold text-emerald-800 dark:text-emerald-200': sp.id === post.id,
+              'text-gray-700 dark:text-gray-300': sp.id !== post.id
+            }"
+          >
+            <router-link
+              v-if="sp.id !== post.id"
+              :to="{
+                name: 'blog-post',
+                params: { slug: sp.slug, year: sp.year || (sp.publishedAt ? new Date(sp.publishedAt).getFullYear() : undefined) }
+              }"
+              class="hover:underline"
+            >
+              {{ sp.title }}
+            </router-link>
+            <span v-else>
+              {{ sp.title }} <span class="text-xs text-emerald-600">(current)</span>
+            </span>
+          </li>
+        </ol>
+      </div>
+      <!-- End Series box -->
       <article class="mb-8">
         <header class="mb-8">
           <h1 class="text-4xl font-bold mb-2">{{ post.title }}</h1>
@@ -60,8 +94,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useApiClient } from '@/composables/useApiClient'
-import { PostsApi, CommentsApi } from '@/lib/api'
-import type { PostDetails, CommentList } from '@/lib/api'
+import { PostsApi, CommentsApi, SeriesApi } from '@/lib/api'
+import type { PostDetails, CommentList, PostSummaryForSeries } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth'
 import Comments from '@/components/Comments.vue'
 import LoginDialog from '@/components/LoginDialog.vue'
@@ -71,6 +105,7 @@ import MarkdownPreview from '@/components/MarkdownPreview.vue'
 const route = useRoute()
 const posts = useApiClient(PostsApi)
 const commentsApi = useApiClient(CommentsApi)
+const seriesApi = useApiClient(SeriesApi)
 const authStore = useAuthStore()
 
 const post = ref<PostDetails | null>(null)
@@ -81,6 +116,9 @@ const showLoginDialog = ref(false)
 const showSignupDialog = ref(false)
 
 const isLoggedIn = computed(() => authStore.isLoggedIn)
+
+// Series state
+const seriesPosts = ref<PostSummaryForSeries[]>([])
 
 onMounted(async () => {
   try {
@@ -100,7 +138,10 @@ onMounted(async () => {
       slug: postResult.slug,
       series: postResult.series ? { id: postResult.series.id, title: postResult.series.title } : undefined
     }
-    
+    // If post is part of a series, load series posts using slug if available
+    if (postResult.series?.slug) {
+      await loadSeriesPosts(postResult.series.slug)
+    }
     // Then load comments using the post's ID
     await loadComments()
   } catch (e) {
@@ -119,6 +160,32 @@ async function loadComments() {
       topLevel: true 
     })
     comments.value = commentsResult.items || []
+  }
+}
+
+// Function to load all posts in the series
+async function loadSeriesPosts(seriesIdOrSlug: number | string) {
+  try {
+    const result = await seriesApi.apiListPostsInSeries({ seriesIdOrSlug })
+    let items = result.items || []
+    if (post.value && !items.some(p => p.id === post.value!.id)) {
+      items = [...items, {
+        id: post.value.id,
+        title: post.value.title,
+        slug: post.value.slug,
+        year: post.value.published ? new Date(post.value.published).getFullYear() : undefined,
+        publishedAt: post.value.published ? new Date(post.value.published) : undefined
+      }]
+      items.sort((a, b) => {
+        if (!a.publishedAt || !b.publishedAt) return 0
+        return a.publishedAt.getTime() - b.publishedAt.getTime()
+      })
+    }
+    seriesPosts.value = items
+  } catch (e) {
+    // Log the error, but do not block the page
+    console.warn('Failed to load series posts:', e)
+    seriesPosts.value = []
   }
 }
 </script>
