@@ -1,5 +1,5 @@
 <template>
-  <div class="preview-content prose dark:prose-invert" ref="previewEl">
+  <div class="preview-content prose prose-fullwidth dark:prose-invert" ref="previewEl">
     <template v-for="(block, i) in blocks" :key="i">
       <HeadingBlock v-if="block.type === 'heading'" :level="block.level" :content="block.content" />
       <ParagraphBlock v-else-if="block.type === 'paragraph'" :content="block.content" />
@@ -82,6 +82,9 @@ watch(() => props.content, (val) => {
 .no-prose-padding.prose {
   padding: 0 !important;
   margin: 0 !important;
+}
+.prose-fullwidth {
+  max-width: 100% !important;
 }
 </style>
 
