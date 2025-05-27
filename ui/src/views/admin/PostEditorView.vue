@@ -121,7 +121,7 @@
                 optionLabel="title"
                 placeholder="Select a series"
                 :disabled="!postId"
-                class="w-full md:w-40"
+                class="w-64"
                 @change="handleSeriesChange"
               />
               <div class="flex gap-2">
@@ -132,6 +132,7 @@
                   severity="secondary"
                   size="small"
                   @click="handleDisassociateSeries"
+                  class="w-40"
                 />
                 <!-- Create new series -->
                 <Button
@@ -140,6 +141,7 @@
                   icon="pi pi-plus"
                   size="small"
                   @click="showCreateSeries = true"
+                  class="w-48 whitespace-nowrap"
                 />
               </div>
               <!-- List all series with delete option -->
