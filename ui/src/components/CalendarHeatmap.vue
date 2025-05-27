@@ -16,6 +16,8 @@
           :width="cellSize"
           :height="cellSize"
           :fill="getColor(day.count)"
+          rx="3"
+          ry="3"
           class="cursor-pointer transition-all duration-150"
           @mouseenter="showTooltip(day, $event)"
           @mouseleave="hideTooltip"
@@ -30,7 +32,7 @@
           :x="label.x"
           :y="svgHeight + 16"
           text-anchor="middle"
-          class="fill-slate-500 text-xs select-none"
+          class="fill-slate-500 dark:fill-slate-400 text-xs select-none"
         >
           {{ label.name }}
         </text>
@@ -43,7 +45,7 @@
           :x="leftMargin - 4"
           :y="i * (cellSize + cellGap) + cellSize / 1.5"
           text-anchor="end"
-          class="fill-slate-400 text-xs select-none"
+          class="fill-slate-500 dark:fill-slate-400 text-xs select-none"
         >
           {{ d }}
         </text>
@@ -52,7 +54,7 @@
     <div
       v-if="tooltip.visible"
       :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }"
-      class="pointer-events-none absolute z-10 px-3 py-2 rounded shadow-lg text-xs bg-slate-800 text-white whitespace-nowrap"
+      class="pointer-events-none absolute z-10 px-3 py-2 rounded shadow-lg text-xs bg-slate-800 dark:bg-slate-900 text-white whitespace-nowrap"
     >
       <span v-if="tooltip.day">
         <strong>{{ tooltip.day.date }}</strong><br />
@@ -66,6 +68,7 @@
 import { ref, computed } from 'vue'
 import type { Ref, PropType } from 'vue'
 import { getWeekIndex } from './calendarUtils'
+import { useDark } from '@vueuse/core'
 
 interface HeatmapDay {
   date: string // 'YYYY-MM-DD'
@@ -85,9 +88,8 @@ const props = defineProps({
 })
 
 const cellSize = 16
-const cellGap = 4
+const cellGap = 2
 const daysInWeek = 7
-const numDays = 365
 
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -162,15 +164,16 @@ const monthLabels = computed(() => {
 const svgWidth = computed(() => {
   // Number of weeks in the range
   const firstDate = new Date(days.value[0].date)
-  const lastDate = new Date(days.value[days.value.length - 1].date)
   const numWeeks = Math.ceil((days.value.length + firstDate.getDay()) / daysInWeek)
   return leftMargin + numWeeks * (cellSize + cellGap)
 })
 const svgHeight = computed(() => daysInWeek * (cellSize + cellGap))
 
+const isDark = useDark()
+
 // Color scale (simple 5-step)
 function getColor(count: number) {
-  if (!count) return '#e5e7eb' // slate-200
+  if (!count) return isDark.value ? '#1e293b' : '#e5e7eb'
   if (count < 2) return '#bbf7d0' // green-200
   if (count < 4) return '#4ade80' // green-400
   if (count < 7) return '#22c55e' // green-500
@@ -198,7 +201,4 @@ function selectDay(day: HeatmapDay) {
   if (!day.date) return
   emit('select', day)
 }
-</script>
-
-<style scoped>
-</style> 
+</script> 
