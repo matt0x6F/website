@@ -100,34 +100,30 @@ const dataMap = computed(() => {
   return map
 })
 
-// Get the last 365 days ending with today
-function getLastNDays(n: number) {
-  const days: { date: string; count: number }[] = []
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(today)
-    d.setDate(today.getDate() - i)
-    const dateStr = d.toISOString().slice(0, 10)
+// Get the last 52 weeks ending with today
+function getLast52Weeks() {
+  const days: { date: string; count: number }[] = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Find the most recent Sunday (today if today is Sunday)
+  const lastSunday = new Date(today);
+  lastSunday.setDate(today.getDate() - today.getDay());
+
+  // Go back 52 weeks (364 days)
+  for (let i = 0; i < 52 * 7; i++) {
+    const d = new Date(lastSunday);
+    d.setDate(lastSunday.getDate() - (52 * 7 - 1) + i);
+    const dateStr = d.toISOString().slice(0, 10);
     days.push({
       date: dateStr,
       count: dataMap.value[dateStr] || 0
-    })
+    });
   }
-  // Pad the start so the first day is always a Sunday
-  const firstDayOfWeek = new Date(days[0].date + 'T00:00:00Z').getDay()
-  for (let i = 0; i < firstDayOfWeek; i++) {
-    const d = new Date(days[0].date + 'T00:00:00Z')
-    d.setDate(d.getDate() - 1)
-    days.unshift({
-      date: d.toISOString().slice(0, 10),
-      count: 0
-    })
-  }
-  return days
+  return days;
 }
 
-const days = computed(() => getLastNDays(numDays))
+const days = computed(() => getLast52Weeks())
 
 const daysArr = computed(() => days.value)
 
