@@ -10,27 +10,28 @@
           <h1 class="text-2xl font-bold mb-6">{{ isEditing ? 'Edit Post' : 'Create New Post' }}</h1>
           
           <!-- Created/Updated At Box -->
-          <div v-if="isEditing && post.createdAt" class="mb-4 p-3 rounded bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-wrap gap-6 text-xs text-gray-600 dark:text-gray-300">
-            <span class="flex items-center gap-1">
-              <i class="pi pi-calendar"></i>
-              <span>Created:</span>
-              <span>{{ post.createdAt ? new Date(post.createdAt).toLocaleString() : '' }}</span>
-            </span>
-            <span class="flex items-center gap-1">
-              <i class="pi pi-clock"></i>
-              <span>Updated:</span>
-              <span>{{ post.updatedAt ? new Date(post.updatedAt).toLocaleString() : '' }}</span>
-            </span>
-          </div>
-
-          <div v-if="isEditing && !post.publishedAt" class="mb-4 flex justify-end">
-            <Button
-              icon="pi pi-trash"
-              severity="danger"
-              size="small"
-              label="Delete Post"
-              @click="confirmDeletePost()"
-            />
+          <div v-if="isEditing && post.createdAt" class="mb-4 p-3 rounded bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex w-full items-center text-xs text-gray-600 dark:text-gray-300">
+            <div class="flex gap-6">
+              <span class="flex items-center gap-1">
+                <i class="pi pi-calendar"></i>
+                <span>Created:</span>
+                <span>{{ post.createdAt ? new Date(post.createdAt).toLocaleString() : '' }}</span>
+              </span>
+              <span class="flex items-center gap-1">
+                <i class="pi pi-clock"></i>
+                <span>Updated:</span>
+                <span>{{ post.updatedAt ? new Date(post.updatedAt).toLocaleString() : '' }}</span>
+              </span>
+            </div>
+            <div v-if="!post.publishedAt" class="ml-auto">
+              <Button
+                icon="pi pi-trash"
+                severity="danger"
+                size="small"
+                label="Delete Post"
+                @click="confirmDeletePost()"
+              />
+            </div>
           </div>
 
           <form @submit.prevent class="h-full">
