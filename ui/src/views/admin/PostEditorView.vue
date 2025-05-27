@@ -39,13 +39,14 @@
               <div class="grid grid-cols-3 gap-4 mb-4" :class="{ 'hidden': isExpanded }">
                 <div class="col-span-2">
                   <label for="title" class="block mb-2 font-medium">Title</label>
-                  <input
+                  <InputText
                     id="title"
                     v-model="post.title"
                     type="text"
-                    class="w-full p-2 border rounded-lg"
+                    class="w-full h-11"
                     required
-                  >
+                    size="small"
+                  />
                 </div>
 
                 <div>
@@ -57,19 +58,21 @@
                     showIcon
                     size="small"
                     fluid
+                    class="h-11 w-full"
                   />
                 </div>
 
                 <div class="col-span-2">
                   <label for="slug" class="block mb-2 font-medium">Slug</label>
-                  <input
+                  <InputText
                     id="slug"
                     v-model="post.slug"
                     type="text"
-                    class="w-full p-2 border rounded-lg"
+                    class="w-full h-11"
                     required
                     @input="handleSlugInput"
-                  >
+                    size="small"
+                  />
                 </div>
               </div>
 
