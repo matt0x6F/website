@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-8 p-6">
+  <div class="space-y-8 p-2 sm:p-6">
     <div class="flex justify-between items-center">
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Files</h1>
       <Button
@@ -21,45 +21,32 @@
       <p class="text-red-600 dark:text-red-400">{{ error }}</p>
     </div>
 
-    <!-- Files List -->
-    <div v-else-if="files.length" class="bg-white dark:bg-neutral-800 shadow rounded-lg overflow-hidden">
-      <ul class="divide-y divide-gray-200 dark:divide-neutral-700">
-        <li v-for="file in files" :key="file.id" class="p-4 hover:bg-gray-50 dark:hover:bg-neutral-700">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-6">
-              <span class="text-gray-600 dark:text-gray-300">{{ file.name }}</span>
-              <span class="text-sm text-gray-500 dark:text-gray-400">{{ formatFileSize(file.size) }}</span>
-            </div>
-            <div class="flex items-center space-x-4">
-              <div class="flex gap-2">
-                <Button
-                  @click="() => openInNewTab(getSpacesUrl(file.name))"
-                  size="small"
-                  icon="pi pi-cloud"
-                  label="View in DO Spaces"
-                />
-                <Button
-                  @click="downloadFile(file)"
-                  size="small"
-                  icon="pi pi-download"
-                  label="Download"
-                />
-                <Button
-                  @click="deleteFile(file)"
-                  variant="danger"
-                  size="small"
-                  icon="pi pi-trash"
-                  label="Delete"
-                />
+    <!-- Main Files Section -->
+    <DataView v-if="files.length" :value="files" dataKey="id" :paginator="true" :rows="10">
+      <template #list="slotProps">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card v-for="file in slotProps.items" :key="file.id" class="h-full flex flex-col" style="min-width:320px;max-width:400px;">
+            <template #title>
+              <span class="font-bold">{{ file.name }}</span>
+            </template>
+            <template #content>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                Size: {{ formatFileSize(file.size) }}<br>
+                Type: {{ file.contentType || 'Unknown' }}
               </div>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Empty State -->
-    <div v-else class="text-center py-12 bg-white dark:bg-neutral-800 rounded-lg">
+            </template>
+            <template #footer>
+              <div class="flex flex-wrap gap-2">
+                <Button @click="() => openInNewTab(getSpacesUrl(file.name))" icon="pi pi-cloud" label="View in DO Spaces" size="small" />
+                <Button @click="downloadFile(file)" icon="pi pi-download" label="Download" size="small" />
+                <Button @click="deleteFile(file)" icon="pi pi-trash" label="Delete" size="small" severity="danger" />
+              </div>
+            </template>
+          </Card>
+        </div>
+      </template>
+    </DataView>
+    <div v-if="!files.length && !loading && !error" class="text-center py-12 bg-white dark:bg-neutral-800 rounded-lg">
       <p class="text-gray-600 dark:text-gray-400">No files uploaded yet.</p>
     </div>
 
@@ -73,81 +60,71 @@
           :loading="checkingOrphaned"
           icon="pi pi-refresh"
           label="Check for Orphaned Files"
-      />
+        />
       </div>
-
       <div class="text-gray-600 dark:text-gray-400 text-xs">
         <p>Orphaned files are files that exist in storage but lack corresponding database entries. This inconsistency typically occurs in three scenarios: when file uploads fail to complete properly, when database records are deleted without removing the actual files, or when files are not properly synchronized between public and private storage locations. These files need to be manually deleted from storage to maintain system consistency.</p>
       </div>
-
-      <!-- Orphaned Files Loading State -->
       <div v-if="checkingOrphaned" class="text-center py-6">
         <ProgressSpinner class="h-8 w-8" strokeWidth="4" />
         <p class="mt-2 text-gray-600 dark:text-gray-400">Checking for orphaned files...</p>
       </div>
-
       <div v-else-if="orphanedError" class="bg-red-50 dark:bg-red-900/20 p-4 rounded-md">
         <p class="text-red-600 dark:text-red-400">{{ orphanedError }}</p>
       </div>
-
-      <div v-else-if="orphanedFiles._public.length || orphanedFiles._private.length" class="bg-white dark:bg-neutral-800 shadow rounded-lg overflow-hidden">
-        <div class="p-4">
-          <div v-if="orphanedFiles._public.length" class="mb-6">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Public Storage</h3>
-            <ul class="space-y-2">
-              <li v-for="file in orphanedFiles._public" :key="file.name" class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-neutral-700 rounded-md">
-                <div class="flex items-center gap-6">
-                  <span class="text-gray-600 dark:text-gray-300">{{ file.name }}</span>
-                  <span class="text-sm text-gray-500 dark:text-gray-400">{{ formatFileSize(file.size) }}</span>
-                  <span class="text-sm text-gray-500 dark:text-gray-400">{{ file.contentType }}</span>
-                </div>
-                <div class="flex items-center gap-4">
-                  <Button
-                    @click="() => openInNewTab(getSpacesUrl(file.name))"
-                    size="small"
-                    icon="pi pi-cloud"
-                    label="View in DO Spaces"
-                  />
-                  <Button
-                    @click="() => openInNewTab(file.location)"
-                    size="small"
-                    icon="pi pi-eye"
-                    label="View File"
-                  />
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div v-if="orphanedFiles._private.length">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Private Storage</h3>
-            <ul class="space-y-2">
-              <li v-for="file in orphanedFiles._private" :key="file.name" class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-neutral-700 rounded-md">
-                <div class="flex items-center gap-6">
-                  <span class="text-gray-600 dark:text-gray-300">{{ file.name }}</span>
-                  <span class="text-sm text-gray-500 dark:text-gray-400">{{ formatFileSize(file.size) }}</span>
-                  <span class="text-sm text-gray-500 dark:text-gray-400">{{ file.contentType }}</span>
-                </div>
-                <div class="flex items-center gap-4">
-                  <Button
-                    @click="() => openInNewTab(getSpacesUrl(file.name))"
-                    size="small"
-                    icon="pi pi-cloud"
-                    label="View in DO Spaces"
-                  />
-                  <Button
-                    @click="() => openInNewTab(file.location)"
-                    size="small"
-                    icon="pi pi-eye"
-                    label="View File"
-                  />
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
+      <div v-else-if="orphanedFiles._public.length">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Public Storage</h3>
+        <DataView :value="orphanedFiles._public" dataKey="name" :paginator="true" :rows="10">
+          <template #list="slotProps">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card v-for="file in slotProps.items" :key="file.name" class="h-full flex flex-col" style="min-width:320px;max-width:400px;">
+                <template #title>
+                  <span class="font-bold">{{ file.name }}</span>
+                </template>
+                <template #content>
+                  <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    Size: {{ formatFileSize(file.size) }}<br>
+                    Type: {{ file.contentType || 'Unknown' }}
+                  </div>
+                </template>
+                <template #footer>
+                  <div class="flex flex-wrap gap-2">
+                    <Button @click="() => openInNewTab(getSpacesUrl(file.name))" icon="pi pi-cloud" label="View in DO Spaces" size="small" />
+                    <Button @click="() => openInNewTab(file.location)" icon="pi pi-eye" label="View File" size="small" />
+                  </div>
+                </template>
+              </Card>
+            </div>
+          </template>
+        </DataView>
       </div>
-
-      <div v-else-if="hasCheckedOrphaned" class="text-center py-6 bg-white dark:bg-neutral-800 rounded-lg">
+      <div v-if="orphanedFiles._private.length">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Private Storage</h3>
+        <DataView :value="orphanedFiles._private" dataKey="name" :paginator="true" :rows="10">
+          <template #list="slotProps">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card v-for="file in slotProps.items" :key="file.name" class="h-full flex flex-col" style="min-width:320px;max-width:400px;">
+                <template #title>
+                  <span class="font-bold">{{ file.name }}</span>
+                </template>
+                <template #content>
+                  <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    Size: {{ formatFileSize(file.size) }}<br>
+                    Type: {{ file.contentType || 'Unknown' }}
+                  </div>
+                </template>
+                <template #footer>
+                  <div class="flex flex-wrap gap-2">
+                    <Button @click="() => openInNewTab(getSpacesUrl(file.name))" icon="pi pi-cloud" label="View in DO Spaces" size="small" />
+                    <Button @click="() => openInNewTab(file.location)" icon="pi pi-eye" label="View File" size="small" />
+                  </div>
+                </template>
+              </Card>
+            </div>
+          </template>
+        </DataView>
+      </div>
+      <div v-if="!orphanedFiles._public.length && !orphanedFiles._private.length && hasCheckedOrphaned && !checkingOrphaned && !orphanedError" class="text-center py-6 bg-white dark:bg-neutral-800 rounded-lg">
         <p class="text-gray-600 dark:text-gray-400">No orphaned files found.</p>
       </div>
     </div>
@@ -164,12 +141,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, nextTick } from 'vue'
 import { useApiClient } from '@/composables/useApiClient'
 import { FilesApi } from '@/lib/api'
 import type { FileDetails, OrphanedFiles } from '@/lib/api'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
+import Menu from 'primevue/menu'
+import DataView from 'primevue/dataview'
+import Card from 'primevue/card'
 
 const filesApi = useApiClient(FilesApi)
 const files = ref<FileDetails[]>([])
@@ -200,6 +180,51 @@ const orphanedFiles = ref<OrphanedFiles>({ _public: [], _private: [] })
 const checkingOrphaned = ref(false)
 const orphanedError = ref<string | null>(null)
 const hasCheckedOrphaned = ref(false)
+
+// Add separate menu and activeFile refs for orphaned files
+const menu = ref()
+const activeFile = ref<FileDetails | null>(null)
+// Use a single menu instance for orphaned files
+const orphanedMenu = ref<any>(null)
+const orphanedActiveFile = ref<any | null>(null)
+
+// Define menu items for the dropdown menu (main files section)
+function getMenuItems(file: FileDetails) {
+  return [
+    {
+      label: 'View in DO Spaces',
+      icon: 'pi pi-cloud',
+      command: () => openInNewTab(getSpacesUrl(file.name))
+    },
+    {
+      label: 'Download',
+      icon: 'pi pi-download',
+      command: () => downloadFile(file)
+    },
+    {
+      label: 'Delete',
+      icon: 'pi pi-trash',
+      class: 'text-red-600',
+      command: () => deleteFile(file)
+    }
+  ]
+}
+
+// Define menu items for orphaned files (no download or delete, just view)
+function getOrphanedMenuItems(file: any) {
+  return [
+    {
+      label: 'View in DO Spaces',
+      icon: 'pi pi-cloud',
+      command: () => openInNewTab(getSpacesUrl(file.name))
+    },
+    {
+      label: 'View File',
+      icon: 'pi pi-eye',
+      command: () => openInNewTab(file.location)
+    }
+  ]
+}
 
 // Fetch files on component mount
 onMounted(async () => {
@@ -301,6 +326,16 @@ async function checkOrphanedFiles() {
     console.error('Error checking orphaned files:', err)
   } finally {
     checkingOrphaned.value = false
+  }
+}
+
+function openOrphanedMenu(event: MouseEvent, file: any) {
+  orphanedActiveFile.value = file;
+  console.log('orphanedMenu.value:', orphanedMenu.value);
+  if (orphanedMenu.value && typeof orphanedMenu.value.toggle === 'function') {
+    orphanedMenu.value.toggle(event);
+  } else {
+    console.error('Menu ref is not a PrimeVue Menu instance:', orphanedMenu.value);
   }
 }
 </script> 
