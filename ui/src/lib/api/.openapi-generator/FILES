@@ -8,7 +8,6 @@ apis/ModerationApi.ts
 apis/PermissionsApi.ts
 apis/PostsApi.ts
 apis/SeriesApi.ts
-apis/SharecodesApi.ts
 apis/TokenApi.ts
 apis/index.ts
 index.ts

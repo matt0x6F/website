@@ -1687,8 +1687,7 @@
           }
         },
         "tags": [
-          "posts",
-          "sharecodes"
+          "posts"
         ],
         "security": [
           {
@@ -1723,8 +1722,7 @@
           }
         },
         "tags": [
-          "posts",
-          "sharecodes"
+          "posts"
         ],
         "requestBody": {
           "content": {
@@ -1773,8 +1771,7 @@
           }
         },
         "tags": [
-          "posts",
-          "sharecodes"
+          "posts"
         ],
         "security": [
           {

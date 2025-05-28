@@ -1033,7 +1033,7 @@ def delete_post(request, post_id: int):
     "/{post_id}/sharecodes",
     response=List[ShareCodeSchema],
     auth=JWTAuth(permissions=StaffOnly),
-    tags=["posts", "sharecodes"],
+    tags=["posts"],
 )
 def list_sharecodes(request, post_id: int):
     post = get_object_or_404(Post, id=post_id)
@@ -1044,7 +1044,7 @@ def list_sharecodes(request, post_id: int):
     "/{post_id}/sharecodes",
     response=ShareCodeSchema,
     auth=JWTAuth(permissions=StaffOnly),
-    tags=["posts", "sharecodes"],
+    tags=["posts"],
 )
 def create_sharecode(request, post_id: int, payload: ShareCodeCreate):
     post = get_object_or_404(Post, id=post_id)
@@ -1062,7 +1062,7 @@ def create_sharecode(request, post_id: int, payload: ShareCodeCreate):
     "/{post_id}/sharecodes/{code}",
     response={204: None},
     auth=JWTAuth(permissions=StaffOnly),
-    tags=["posts", "sharecodes"],
+    tags=["posts"],
 )
 def delete_sharecode(request, post_id: int, code: str):
     post = get_object_or_404(Post, id=post_id)
