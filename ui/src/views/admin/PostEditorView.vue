@@ -4,6 +4,7 @@
       <TabList>
         <Tab value="0">Post Editor</Tab>
         <Tab value="1">Series Management</Tab>
+        <Tab v-if="isEditing" value="2">Share Codes</Tab>
       </TabList>
       <TabPanels>
         <TabPanel value="0">
@@ -176,6 +177,40 @@
             </Dialog>
           </div>
         </TabPanel>
+        <TabPanel v-if="isEditing" value="2">
+          <!-- Share Codes Management (only for drafts) -->
+          <div v-if="!post.publishedAt" class="mb-4 p-3 rounded bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700">
+            <div class="flex items-center mb-2">
+              <span class="font-semibold text-blue-700 dark:text-blue-300">Share Codes</span>
+              <Button size="small" icon="pi pi-plus" label="New Share Code" class="ml-auto" @click="showCreateShareCode = true" />
+            </div>
+            <div v-if="loadingShareCodes" class="text-xs text-blue-500">Loading share codes...</div>
+            <div v-else-if="shareCodes.length === 0" class="text-xs text-blue-500">No share codes created yet.</div>
+            <ul v-else class="divide-y divide-blue-100 dark:divide-blue-800">
+              <li v-for="sc in shareCodes" :key="sc.id" class="flex items-center py-2 gap-2">
+                <span class="font-mono bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded text-xs select-all">{{ sc.code }}</span>
+                <Button icon="pi pi-copy" size="small" text class="ml-1" :aria-label="'Copy share link for code ' + sc.code" @click="copyShareCode(sc.code)" />
+                <span v-if="copiedCode === sc.code" class="text-green-600 text-xs ml-1">Copied!</span>
+                <span v-if="sc.note" class="ml-2 text-xs text-blue-700 dark:text-blue-300 italic">{{ sc.note }}</span>
+                <span v-if="sc.expiresAt" class="ml-2 text-xs text-blue-400">(expires {{ new Date(sc.expiresAt).toLocaleString() }})</span>
+                <Button icon="pi pi-trash" size="small" text severity="danger" class="ml-auto" @click="deleteShareCode(sc)" />
+              </li>
+            </ul>
+            <!-- Create Share Code Dialog -->
+            <Dialog v-model:visible="showCreateShareCode" header="Create Share Code" :modal="true" :closable="true" :style="{ width: '400px' }">
+              <div class="flex flex-col gap-4">
+                <InputText v-model="newShareCodeNote" placeholder="Note (optional)" />
+                <label class="text-xs">Expiry (optional)</label>
+                <DatePicker v-model="newShareCodeExpiry" showTime hourFormat="24" showIcon size="small" fluid class="w-full" />
+                <div class="flex gap-2 justify-end">
+                  <Button label="Cancel" severity="secondary" @click="showCreateShareCode = false" />
+                  <Button label="Create" @click="createShareCode" :disabled="creatingShareCode" />
+                </div>
+              </div>
+            </Dialog>
+          </div>
+          <div v-else class="text-xs text-blue-500">Share codes are only available for draft posts.</div>
+        </TabPanel>
       </TabPanels>
     </Tabs>
     <ConfirmDialog></ConfirmDialog>
@@ -205,6 +240,8 @@ import TabPanel from 'primevue/tabpanel'
 import { ResponseError } from '@/lib/api/runtime'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
+import type { ShareCodeSchema } from '@/lib/api/models/ShareCodeSchema'
+import type { ShareCodeCreate } from '@/lib/api/models/ShareCodeCreate'
 
 const router = useRouter()
 const route = useRoute()
@@ -238,6 +275,14 @@ const newSeriesTitle = ref('')
 const newSeriesSlug = ref('')
 
 const activeTab = ref('0')
+
+const shareCodes = ref<ShareCodeSchema[]>([])
+const loadingShareCodes = ref(false)
+const showCreateShareCode = ref(false)
+const newShareCodeNote = ref('')
+const newShareCodeExpiry = ref<Date | null>(null)
+const creatingShareCode = ref(false)
+const copiedCode = ref<string | null>(null)
 
 // Add function to generate slug from title
 const generateSlug = (title: string): string => {
@@ -609,6 +654,77 @@ const confirmDeletePost = () => {
     }
   });
 };
+
+const loadShareCodes = async () => {
+  if (!postId.value) return
+  loadingShareCodes.value = true
+  try {
+    const postsApi = useApiClient(PostsApi)
+    shareCodes.value = await postsApi.apiListSharecodes({ postId: postId.value })
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load share codes', life: 3000 })
+  } finally {
+    loadingShareCodes.value = false
+  }
+}
+
+const createShareCode = async () => {
+  if (!postId.value) return
+  creatingShareCode.value = true
+  try {
+    const postsApi = useApiClient(PostsApi)
+    const payload: ShareCodeCreate = {
+      note: newShareCodeNote.value || undefined,
+      expiresAt: newShareCodeExpiry.value || undefined
+    }
+    await postsApi.apiCreateSharecode({ postId: postId.value, shareCodeCreate: payload })
+    showCreateShareCode.value = false
+    newShareCodeNote.value = ''
+    newShareCodeExpiry.value = null
+    await loadShareCodes()
+    toast.add({ severity: 'success', summary: 'Created', detail: 'Share code created', life: 2000 })
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create share code', life: 3000 })
+  } finally {
+    creatingShareCode.value = false
+  }
+}
+
+const deleteShareCode = async (sc: ShareCodeSchema) => {
+  if (!postId.value) return
+  try {
+    const postsApi = useApiClient(PostsApi)
+    await postsApi.apiDeleteSharecode({ postId: postId.value, code: sc.code })
+    await loadShareCodes()
+    toast.add({ severity: 'success', summary: 'Deleted', detail: 'Share code deleted', life: 2000 })
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete share code', life: 3000 })
+  }
+}
+
+const copyShareCode = async (code: string) => {
+  try {
+    // Compose the full share URL
+    const origin = window.location.origin
+    const year = post.value.publishedAt
+      ? new Date(post.value.publishedAt).getFullYear()
+      : new Date().getFullYear()
+    const slug = post.value.slug
+    const url = `${origin}/blog/${year}/${slug}?sharecode=${code}`
+    await navigator.clipboard.writeText(url)
+    copiedCode.value = code
+    setTimeout(() => {
+      if (copiedCode.value === code) copiedCode.value = null
+    }, 1500)
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to copy link', life: 2000 })
+  }
+}
+
+// Load share codes after post is loaded (if editing and not published)
+watch([postId, () => post.value.publishedAt], ([id, published]) => {
+  if (id && !published) loadShareCodes()
+})
 </script>
 
 <style scoped>

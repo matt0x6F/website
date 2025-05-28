@@ -420,3 +420,16 @@ class PostListResponse(Schema):
 
 # Ensure UserPublic, FilePublic, CommentPublic, TagPublic are defined as needed above or are already present.
 # For example:
+
+
+class ShareCodeSchema(Schema):
+    id: int
+    code: str
+    note: Optional[str] = None
+    created_at: datetime
+    expires_at: Optional[datetime] = None
+
+
+class ShareCodeCreate(Schema):
+    note: Optional[str] = None
+    expires_at: Optional[datetime] = None

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from blog.models import Comment, File, Post, Series
+from blog.models import Comment, File, Post, Series, ShareCode
 
 
 # Register your models here.
@@ -29,6 +29,7 @@ class FileAdmin(admin.ModelAdmin):
 
 
 admin.site.register(File, FileAdmin)
+admin.site.register(ShareCode)
 
 
 @admin.register(Comment)

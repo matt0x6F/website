@@ -123,9 +123,9 @@ onMounted(async () => {
   try {
     const slug = route.params.slug as string
     const year = route.params.year as string
-    
+    const sharecode = route.query.sharecode as string | undefined
     // First load the post
-    const postResult = await posts.apiGetPostBySlugAndYear({ slug: slug, year: +year })
+    const postResult = await posts.apiGetPostBySlugAndYear({ slug: slug, year: +year, ...(sharecode ? { sharecode } : {}) })
     post.value = {
       id: postResult.id,
       title: postResult.title,

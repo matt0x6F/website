@@ -52,6 +52,8 @@ export * from './SeriesIdOrSlug';
 export * from './SeriesPublic';
 export * from './SeriesSummary';
 export * from './SeriesUpdate';
+export * from './ShareCodeCreate';
+export * from './ShareCodeSchema';
 export * from './TokenObtainPairInputSchema';
 export * from './TokenObtainPairOutputSchema';
 export * from './TokenRefreshInputSchema';

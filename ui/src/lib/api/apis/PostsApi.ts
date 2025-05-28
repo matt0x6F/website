@@ -20,6 +20,8 @@ import type {
   PostCreate,
   PostPublic,
   PostUpdate,
+  ShareCodeCreate,
+  ShareCodeSchema,
   ValidationErrorResponse,
 } from '../models/index';
 import {
@@ -33,6 +35,10 @@ import {
     PostPublicToJSON,
     PostUpdateFromJSON,
     PostUpdateToJSON,
+    ShareCodeCreateFromJSON,
+    ShareCodeCreateToJSON,
+    ShareCodeSchemaFromJSON,
+    ShareCodeSchemaToJSON,
     ValidationErrorResponseFromJSON,
     ValidationErrorResponseToJSON,
 } from '../models/index';
@@ -41,8 +47,18 @@ export interface ApiCreatePostRequest {
     postCreate: PostCreate;
 }
 
+export interface ApiCreateSharecodeRequest {
+    postId: number;
+    shareCodeCreate: ShareCodeCreate;
+}
+
 export interface ApiDeletePostRequest {
     postId: number;
+}
+
+export interface ApiDeleteSharecodeRequest {
+    postId: number;
+    code: string;
 }
 
 export interface ApiGetPostByIdRequest {
@@ -53,6 +69,7 @@ export interface ApiGetPostBySlugAndYearRequest {
     year: number;
     slug: string;
     draft?: boolean;
+    sharecode?: string;
 }
 
 export interface ApiGetPostFilesByIdRequest {
@@ -67,6 +84,10 @@ export interface ApiListPostsRequest {
     order?: string;
     limit?: number;
     offset?: number;
+}
+
+export interface ApiListSharecodesRequest {
+    postId: number;
 }
 
 export interface ApiUpdatePostRequest {
@@ -126,6 +147,57 @@ export class PostsApi extends runtime.BaseAPI {
     }
 
     /**
+     * Create Sharecode
+     */
+    async apiCreateSharecodeRaw(requestParameters: ApiCreateSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ShareCodeSchema>> {
+        if (requestParameters['postId'] == null) {
+            throw new runtime.RequiredError(
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiCreateSharecode().'
+            );
+        }
+
+        if (requestParameters['shareCodeCreate'] == null) {
+            throw new runtime.RequiredError(
+                'shareCodeCreate',
+                'Required parameter "shareCodeCreate" was null or undefined when calling apiCreateSharecode().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/posts/{post_id}/sharecodes`.replace(`{${"post_id"}}`, encodeURIComponent(String(requestParameters['postId']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ShareCodeCreateToJSON(requestParameters['shareCodeCreate']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ShareCodeSchemaFromJSON(jsonValue));
+    }
+
+    /**
+     * Create Sharecode
+     */
+    async apiCreateSharecode(requestParameters: ApiCreateSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ShareCodeSchema> {
+        const response = await this.apiCreateSharecodeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Delete Post
      */
     async apiDeletePostRaw(requestParameters: ApiDeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
@@ -163,6 +235,53 @@ export class PostsApi extends runtime.BaseAPI {
      */
     async apiDeletePost(requestParameters: ApiDeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.apiDeletePostRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Delete Sharecode
+     */
+    async apiDeleteSharecodeRaw(requestParameters: ApiDeleteSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['postId'] == null) {
+            throw new runtime.RequiredError(
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiDeleteSharecode().'
+            );
+        }
+
+        if (requestParameters['code'] == null) {
+            throw new runtime.RequiredError(
+                'code',
+                'Required parameter "code" was null or undefined when calling apiDeleteSharecode().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/posts/{post_id}/sharecodes/{code}`.replace(`{${"post_id"}}`, encodeURIComponent(String(requestParameters['postId']))).replace(`{${"code"}}`, encodeURIComponent(String(requestParameters['code']))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete Sharecode
+     */
+    async apiDeleteSharecode(requestParameters: ApiDeleteSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiDeleteSharecodeRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -228,6 +347,10 @@ export class PostsApi extends runtime.BaseAPI {
 
         if (requestParameters['draft'] != null) {
             queryParameters['draft'] = requestParameters['draft'];
+        }
+
+        if (requestParameters['sharecode'] != null) {
+            queryParameters['sharecode'] = requestParameters['sharecode'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -360,6 +483,47 @@ export class PostsApi extends runtime.BaseAPI {
      */
     async apiListPosts(requestParameters: ApiListPostsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPostListPublic> {
         const response = await this.apiListPostsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * List Sharecodes
+     */
+    async apiListSharecodesRaw(requestParameters: ApiListSharecodesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ShareCodeSchema>>> {
+        if (requestParameters['postId'] == null) {
+            throw new runtime.RequiredError(
+                'postId',
+                'Required parameter "postId" was null or undefined when calling apiListSharecodes().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("JWTAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/posts/{post_id}/sharecodes`.replace(`{${"post_id"}}`, encodeURIComponent(String(requestParameters['postId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ShareCodeSchemaFromJSON));
+    }
+
+    /**
+     * List Sharecodes
+     */
+    async apiListSharecodes(requestParameters: ApiListSharecodesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ShareCodeSchema>> {
+        const response = await this.apiListSharecodesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

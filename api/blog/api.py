@@ -9,6 +9,7 @@ from django.db.utils import IntegrityError
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from ninja import File as NinjaFile
 from ninja import Router, UploadedFile
@@ -19,7 +20,7 @@ from pydantic import BaseModel
 
 from auth.middleware import JWTAuth, StaffOnly
 from blog.feed_builder import FeedBuilder
-from blog.models import Comment, File, Post, Series
+from blog.models import Comment, File, Post, Series, ShareCode
 from blog.schema import (
     AdminCommentList,
     AdminCommentUpdate,
@@ -42,6 +43,8 @@ from blog.schema import (
     SeriesDetailPublic,
     SeriesPublic,
     SeriesUpdate,
+    ShareCodeCreate,
+    ShareCodeSchema,
     ValidationErrorResponse,
 )
 from files.storage import PrivateStorage, PublicStorage
@@ -915,16 +918,42 @@ def get_post_by_id(request, post_id: int):
     tags=["posts"],
     auth=JWTAuth(permissions=None, allow_anonymous=True),
 )
-def get_post_by_slug_and_year(request, year: int, slug: str, draft: bool = False):
-    if request.user.is_authenticated and request.user.is_staff:
-        if draft:
-            post = get_object_or_404(Post, slug=slug, published_at__isnull=True)
-        else:
-            post = get_object_or_404(Post, slug=slug, published_at__year=year)
-    else:
-        post = get_object_or_404(
-            Post, slug=slug, published_at__year=year, published_at__isnull=False
+def get_post_by_slug_and_year(
+    request, year: int, slug: str, draft: bool = False, sharecode: str = None
+):
+    # 1. Always try to fetch the published post first (ignore sharecode if found)
+    try:
+        post = Post.objects.select_related("author", "series").get(
+            slug=slug, published_at__year=year, published_at__isnull=False
         )
+        return post
+    except Post.DoesNotExist:
+        pass
+    # 2. If not found, and sharecode is present, try to fetch the unpublished post and validate sharecode
+    if sharecode:
+        try:
+            post = Post.objects.select_related("author", "series").get(
+                slug=slug, published_at__isnull=True
+            )
+            valid_code = ShareCode.objects.filter(post=post, code=sharecode).first()
+            if not valid_code:
+                raise Post.DoesNotExist()
+            if valid_code.expires_at and valid_code.expires_at < timezone.now():
+                raise Post.DoesNotExist()
+            return post
+        except Post.DoesNotExist as err:
+            raise HttpError(404, "Post not found") from err
+    # 3. If not found, check staff/draft logic (for staff direct draft access)
+    try:
+        if request.user.is_authenticated and request.user.is_staff:
+            if draft:
+                post = get_object_or_404(Post, slug=slug, published_at__isnull=True)
+            else:
+                post = get_object_or_404(Post, slug=slug, published_at__year=year)
+        else:
+            raise Post.DoesNotExist()
+    except Post.DoesNotExist as err:
+        raise HttpError(404, "Post not found") from err
     return post
 
 
@@ -998,3 +1027,45 @@ def delete_post(request, post_id: int):
     post = get_object_or_404(Post, id=post_id, author=request.user)
     post.delete()
     return None
+
+
+@posts_router.get(
+    "/{post_id}/sharecodes",
+    response=List[ShareCodeSchema],
+    auth=JWTAuth(permissions=StaffOnly),
+    tags=["posts", "sharecodes"],
+)
+def list_sharecodes(request, post_id: int):
+    post = get_object_or_404(Post, id=post_id)
+    return post.sharecodes.all()
+
+
+@posts_router.post(
+    "/{post_id}/sharecodes",
+    response=ShareCodeSchema,
+    auth=JWTAuth(permissions=StaffOnly),
+    tags=["posts", "sharecodes"],
+)
+def create_sharecode(request, post_id: int, payload: ShareCodeCreate):
+    post = get_object_or_404(Post, id=post_id)
+    code = get_random_string(16)
+    sharecode = ShareCode.objects.create(
+        code=code,
+        post=post,
+        note=payload.note,
+        expires_at=payload.expires_at,
+    )
+    return sharecode
+
+
+@posts_router.delete(
+    "/{post_id}/sharecodes/{code}",
+    response={204: None},
+    auth=JWTAuth(permissions=StaffOnly),
+    tags=["posts", "sharecodes"],
+)
+def delete_sharecode(request, post_id: int, code: str):
+    post = get_object_or_404(Post, id=post_id)
+    sharecode = get_object_or_404(ShareCode, post=post, code=code)
+    sharecode.delete()
+    return 204

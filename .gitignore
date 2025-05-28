@@ -3,6 +3,7 @@ node_modules/
 .task/
 dbdata/
 config.ini
+tmp/
 
 # Python
 __pycache__/

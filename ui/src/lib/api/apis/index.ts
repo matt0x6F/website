@@ -10,4 +10,5 @@ export * from './ModerationApi';
 export * from './PermissionsApi';
 export * from './PostsApi';
 export * from './SeriesApi';
+export * from './SharecodesApi';
 export * from './TokenApi';
