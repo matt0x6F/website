@@ -135,6 +135,7 @@
             @scroll="handleEditorScroll"
             @keydown="handleEditorKeydown"
             @input="handleEditorInput"
+            @paste="handlePaste"
           ></textarea>
           <pre class="editor-highlight"><code v-html="highlightedContent"></code></pre>
           <div v-if="isDragging && dragCursorPos !== null" class="drag-cursor-indicator" :style="dragCursorStyle"></div>
@@ -639,6 +640,33 @@ const dragCursorStyle = computed((): CSSProperties => {
     zIndex: 10
   }
 })
+
+function handlePaste(e: ClipboardEvent) {
+  if (!textarea.value) return;
+  const clipboardData = e.clipboardData;
+  if (!clipboardData) return;
+
+  const pastedText = clipboardData.getData('text');
+  // Only match https URLs
+  const urlPattern = /^https:\/\/[^\s]+$/i;
+
+  const start = textarea.value.selectionStart;
+  const end = textarea.value.selectionEnd;
+  const selectedText = editorContent.value.substring(start, end);
+
+  if (selectedText && urlPattern.test(pastedText.trim())) {
+    // Replace selection with markdown link
+    e.preventDefault();
+    const replacement = `[${selectedText}](${pastedText.trim()})`;
+    editorContent.value = editorContent.value.substring(0, start) + replacement + editorContent.value.substring(end);
+
+    // Set cursor after the inserted link
+    nextTick(() => {
+      textarea.value!.selectionStart = textarea.value!.selectionEnd = start + replacement.length;
+      textarea.value!.focus();
+    });
+  }
+}
 </script>
 
 <style>
