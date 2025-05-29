@@ -1,56 +1,32 @@
-import structlog
-
-# from config.utils.permissions import StaffPermission # Commented out problematic import
 from django.http import HttpRequest
 from django.utils import timezone
 from ninja import Router
 from ninja.responses import Response
-from pydantic import BaseModel
 
 from auth.middleware import JWTAuth
 from blog.feed_builder import FeedBuilder
-from blog.models import Post
-from blog.schema import (
-    FeedAuthorSchema,
-    FeedItem,
-    JSONFeed,
-)
+from blog.schema.feed import FeedAuthorSchema, FeedItem, JSONFeed
 
-logger = structlog.get_logger(__name__)
+from ..models import Post
 
-posts_router = Router()
-series_router = Router()
+feed_router = Router()
 
 
-class FeedAuthor(BaseModel):
-    name: str
-    url: str
-
-
-#
-# Feed
-#
-
-
-#
-# Series
-#
-
-
-@series_router.get(
+@feed_router.get(
     "/",
     auth=JWTAuth(None, True),
     response={200: JSONFeed},
-    tags=["series"],
+    tags=["feed"],
+    operation_id="getFeed",
 )
-def series(request: HttpRequest, limit: int = 10, offset: int = 0):
+def feed(request: HttpRequest, limit: int = 10, offset: int = 0):
     builder = (
-        FeedBuilder(title="ooo-yay series")
+        FeedBuilder(title="ooo-yay feed")
         .with_authors([FeedAuthorSchema(name="Matt Ouille", url="https://ooo-yay.com")])
-        .with_description("Latest series from @ooo-yay")
+        .with_description("Latest posts from @ooo-yay")
         .with_icon("https://ooo-yay.com/logo.svg")
         .with_favicon("https://ooo-yay.com/logo.svg")
-        .with_feed_url("https://ooo-yay.com/api/series/")
+        .with_feed_url("https://ooo-yay.com/api/feed/")
         .with_home_page_url("https://ooo-yay.com")
     )
 
@@ -74,7 +50,7 @@ def series(request: HttpRequest, limit: int = 10, offset: int = 0):
     count = Post.objects.filter(published_at__lte=timezone.now()).count()
     if offset + limit < count:
         builder.with_next_url(
-            f"https://ooo-yay.com/series.json?limit={limit}&offset={offset + limit}"
+            f"https://ooo-yay.com/api/feed/?limit={limit}&offset={offset + limit}"
         )
 
     return Response(builder.build(), content_type="application/feed+json")

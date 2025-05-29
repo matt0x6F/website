@@ -76,7 +76,7 @@ const loadSeries = async () => {
   loading.value = true
   error.value = null
   try {
-    const response = await seriesApi.apiListSeries({ includePostsCount: true })
+    const response = await seriesApi.listSeries({ includePostsCount: true })
     seriesList.value = response.items
   } catch (e) {
     console.error('Error loading series:', e)
@@ -88,7 +88,7 @@ const loadSeries = async () => {
 
 const deleteSeries = async (seriesId: number) => {
   try {
-    await seriesApi.apiDeleteSeries({ seriesId })
+    await seriesApi.deleteSeries({ seriesId })
     seriesList.value = seriesList.value.filter(s => s.id !== seriesId)
     toast.add({ severity: 'success', summary: 'Deleted', detail: 'Series deleted successfully', life: 3000 })
     // Optionally reload the list: await loadSeries()

@@ -25,7 +25,11 @@ accounts_router = Router()
 
 
 @accounts_router.get(
-    "/me", auth=JWTAuth(), response={200: UserSelf, 403: AuthError}, tags=["accounts"]
+    "/me",
+    auth=JWTAuth(),
+    response={200: UserSelf, 403: AuthError},
+    tags=["accounts"],
+    operation_id="whoami",
 )
 def whoami(request: HttpRequest):
     """
@@ -45,6 +49,7 @@ def whoami(request: HttpRequest):
     auth=JWTAuth(AuthenticatedOnly),
     response={200: UserSelf, 403: AuthError},
     tags=["accounts"],
+    operation_id="updateSelf",
 )
 def update_self(request: HttpRequest, new_details: UpdateAccount):
     """
@@ -79,6 +84,7 @@ def update_self(request: HttpRequest, new_details: UpdateAccount):
     auth=JWTAuth(permissions=AuthenticatedOnly),
     response={200: None, 403: AuthError},
     tags=["accounts"],
+    operation_id="deleteSelf",
 )
 def delete_self(request: HttpRequest):
     """
@@ -111,6 +117,7 @@ def delete_self(request: HttpRequest):
     auth=JWTAuth(permissions=AnonymousOnly),
     response={200: UserSelf, 403: AuthError},
     tags=["accounts"],
+    operation_id="signUp",
 )
 def sign_up(request: HttpRequest, new_acct_details: NewAccount):
     """
@@ -137,6 +144,7 @@ def sign_up(request: HttpRequest, new_acct_details: NewAccount):
     auth=JWTAuth(permissions=StaffOnly),
     response={200: List[AdminUserDetails], 403: AuthError},
     tags=["accounts"],
+    operation_id="listUsers",
 )
 @paginate
 def list_users(request: HttpRequest):
@@ -156,6 +164,7 @@ def list_users(request: HttpRequest):
     auth=JWTAuth(permissions=StaffOnly),
     response={200: AdminUserDetails, 403: AuthError},
     tags=["accounts"],
+    operation_id="getUser",
 )
 def get_user(request: HttpRequest, user_id: int):
     """
@@ -174,6 +183,7 @@ def get_user(request: HttpRequest, user_id: int):
     auth=JWTAuth(permissions=StaffOnly),
     response={200: AdminUserDetails, 403: AuthError},
     tags=["accounts"],
+    operation_id="updateUser",
 )
 def update_user(request: HttpRequest, user_id: int, new_details: AdminUserModify):
     """
@@ -218,6 +228,7 @@ def update_user(request: HttpRequest, user_id: int, new_details: AdminUserModify
     auth=JWTAuth(permissions=StaffOnly),
     response={200: None, 403: AuthError},
     tags=["accounts"],
+    operation_id="deleteUser",
 )
 def delete_user(request: HttpRequest, user_id: int):
     """

@@ -236,7 +236,7 @@ async function fetchFiles() {
   loading.value = true
   error.value = null
   try {
-    const response = await filesApi.apiListFiles()
+    const response = await filesApi.listFiles()
     files.value = response.items
   } catch (err) {
     error.value = 'Failed to load files. Please try again.'
@@ -257,7 +257,7 @@ async function handleFileUpload(event: Event) {
   try {
     loading.value = true
     for (const file of Array.from(target.files)) {
-      await filesApi.apiCreateFile({
+      await filesApi.createFile({
         upload: file,
         metadata: {
           visibility: 'public'
@@ -279,7 +279,7 @@ async function deleteFile(file: FileDetails) {
 
   try {
     loading.value = true
-    await filesApi.apiDeleteFile({ id: file.id })
+    await filesApi.deleteFile({ id: file.id })
     await fetchFiles()
   } catch (err) {
     error.value = 'Failed to delete file. Please try again.'
@@ -318,7 +318,7 @@ async function checkOrphanedFiles() {
   checkingOrphaned.value = true
   orphanedError.value = null
   try {
-    const response = await filesApi.apiListOrphanedFiles()
+    const response = await filesApi.listOrphanedFiles()
     orphanedFiles.value = response
     hasCheckedOrphaned.value = true
   } catch (err) {

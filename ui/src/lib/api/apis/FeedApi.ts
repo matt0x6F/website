@@ -22,7 +22,7 @@ import {
     JSONFeedToJSON,
 } from '../models/index';
 
-export interface ApiFeedRequest {
+export interface GetFeedRequest {
     limit?: number;
     offset?: number;
 }
@@ -35,7 +35,7 @@ export class FeedApi extends runtime.BaseAPI {
     /**
      * Feed
      */
-    async apiFeedRaw(requestParameters: ApiFeedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JSONFeed>> {
+    async getFeedRaw(requestParameters: GetFeedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JSONFeed>> {
         const queryParameters: any = {};
 
         if (requestParameters['limit'] != null) {
@@ -69,8 +69,8 @@ export class FeedApi extends runtime.BaseAPI {
     /**
      * Feed
      */
-    async apiFeed(requestParameters: ApiFeedRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JSONFeed> {
-        const response = await this.apiFeedRaw(requestParameters, initOverrides);
+    async getFeed(requestParameters: GetFeedRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JSONFeed> {
+        const response = await this.getFeedRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

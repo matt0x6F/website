@@ -6,7 +6,16 @@ from ninja import Schema
 from ninja_extra import NinjaExtraAPI
 from ninja_jwt.controller import NinjaJWTDefaultController
 
+# Direct router imports
+from accounts.api import accounts_router
+from accounts.contenttypes import contenttypes_router
+from accounts.groups import groups_router, permissions_router
 from auth.middleware import JWTAuth, StaffOnly, StaffOnlyModify
+from blog.api.comments import comments_router
+from blog.api.feed import feed_router
+from blog.api.files import files_router
+from blog.api.posts import posts_router
+from blog.api.series import series_router
 
 api = NinjaExtraAPI(
     title="ooo-yay.com API",
@@ -34,18 +43,16 @@ def healthcheck(request) -> HealthResponse:
     return {"status": "ok"}
 
 
-api.add_router("/accounts/", "accounts.api.accounts_router")
-api.add_router("/groups/", "accounts.groups.groups_router", auth=JWTAuth(permissions=StaffOnly))
-api.add_router(
-    "/permissions/", "accounts.groups.permissions_router", auth=JWTAuth(permissions=StaffOnly)
-)
-api.add_router("/contenttypes/", "accounts.contenttypes.contenttypes_router")
-api.add_router("/series/", "blog.api.series_router", auth=JWTAuth())
-api.add_router("/posts/", "blog.api.posts_router", auth=JWTAuth(permissions=StaffOnlyModify))
-api.add_router("/files/", "blog.api.files_router", auth=JWTAuth(permissions=StaffOnlyModify))
-api.add_router("/comments/", "blog.api.comments_router", auth=JWTAuth())
-api.add_router("/feed/", "blog.api.feed_router", auth=JWTAuth())
-
+# Register routers directly
+api.add_router("/accounts/", accounts_router)
+api.add_router("/groups/", groups_router, auth=JWTAuth(permissions=StaffOnly))
+api.add_router("/permissions/", permissions_router, auth=JWTAuth(permissions=StaffOnly))
+api.add_router("/contenttypes/", contenttypes_router)
+api.add_router("/series/", series_router, auth=JWTAuth())
+api.add_router("/posts/", posts_router, auth=JWTAuth(permissions=StaffOnlyModify))
+api.add_router("/files/", files_router, auth=JWTAuth(permissions=StaffOnlyModify))
+api.add_router("/comments/", comments_router, auth=JWTAuth())
+api.add_router("/feed/", feed_router, auth=JWTAuth())
 
 urlpatterns = [
     path("api/", api.urls),

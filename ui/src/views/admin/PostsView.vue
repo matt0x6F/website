@@ -97,7 +97,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useApiClient } from '@/composables/useApiClient'
-import { PostsApi, type ApiListPostsRequest } from '@/lib/api/apis/PostsApi'
+import { PostsApi, type ListPostsRequest } from '@/lib/api/apis/PostsApi'
 import type { PostListPublic } from '@/lib/api/models'
 import Badge from 'primevue/badge'
 import Toolbar from 'primevue/toolbar'
@@ -140,7 +140,7 @@ const loadPosts = async () => {
 
     console.log("Filter status: ", filterStatus.value)
     
-    const queryParams: ApiListPostsRequest = {}
+    const queryParams: ListPostsRequest = {}
     if (filterStatus.value.value === 'all') {
       queryParams.allPosts = true
       queryParams.drafts = true
@@ -148,7 +148,7 @@ const loadPosts = async () => {
       queryParams.drafts = filterStatus.value.value !== 'published'
     }
     
-    const response = await client.apiListPosts(queryParams)
+    const response = await client.listPosts(queryParams)
     posts.value = response.items
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'An error occurred'
@@ -165,7 +165,7 @@ watch(filterStatus, () => {
 const deletePost = async (postId: number) => {
   try {
     const client = useApiClient(PostsApi)
-    await client.apiDeletePost({ postId })
+    await client.deletePost({ postId })
     toast.add({ severity: 'success', summary: 'Deleted', detail: 'Post deleted successfully', life: 3000 })
     await loadPosts()
   } catch (err) {

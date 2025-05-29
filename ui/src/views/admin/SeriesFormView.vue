@@ -149,7 +149,7 @@ const validateForm = (): boolean => {
 onMounted(async () => {
   if (isEditing.value && seriesId.value) {
     try {
-      const fetchedSeries = await seriesApi.apiGetSeriesDetailById({ seriesId: seriesId.value })
+      const fetchedSeries = await seriesApi.getSeriesDetailById({ seriesId: seriesId.value })
       series.value.title = fetchedSeries.title
       series.value.slug = fetchedSeries.slug
       series.value.description = fetchedSeries.description || ''
@@ -176,10 +176,10 @@ const handleSave = async () => {
   saving.value = true
   try {
     if (isEditing.value && seriesId.value) {
-      await seriesApi.apiUpdateSeries({ seriesId: seriesId.value, seriesUpdate: series.value as SeriesUpdate })
+      await seriesApi.updateSeries({ seriesId: seriesId.value, seriesUpdate: series.value as SeriesUpdate })
       toast.add({ severity: 'success', summary: 'Success', detail: 'Series updated successfully', life: 3000 })
     } else {
-      const newSeries = await seriesApi.apiCreateSeries({ seriesCreate: series.value })
+      const newSeries = await seriesApi.createSeries({ seriesCreate: series.value })
       toast.add({ severity: 'success', summary: 'Success', detail: 'Series created successfully', life: 3000 })
       router.replace({ name: 'admin-series-edit', params: { id: newSeries.id.toString() }})
     }

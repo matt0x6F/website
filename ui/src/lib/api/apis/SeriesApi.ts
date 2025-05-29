@@ -40,27 +40,27 @@ import {
     SeriesUpdateToJSON,
 } from '../models/index';
 
-export interface ApiCreateSeriesRequest {
+export interface CreateSeriesRequest {
     seriesCreate: SeriesCreate;
 }
 
-export interface ApiDeleteSeriesRequest {
+export interface DeleteSeriesRequest {
     seriesId: number;
 }
 
-export interface ApiGetSeriesDetailByIdRequest {
+export interface GetSeriesDetailByIdRequest {
     seriesId: number;
     includePosts?: boolean;
     postsLimit?: number;
 }
 
-export interface ApiGetSeriesDetailBySlugRequest {
+export interface GetSeriesDetailBySlugRequest {
     slug: string;
     includePosts?: boolean;
     postsLimit?: number;
 }
 
-export interface ApiListPostsInSeriesRequest {
+export interface ListPostsInSeriesRequest {
     seriesIdOrSlug: SeriesIdOrSlug;
     excludePostId?: number | null;
     order?: string;
@@ -68,13 +68,13 @@ export interface ApiListPostsInSeriesRequest {
     offset?: number;
 }
 
-export interface ApiListSeriesRequest {
+export interface ListSeriesRequest {
     includePostsCount?: boolean;
     limit?: number;
     offset?: number;
 }
 
-export interface ApiUpdateSeriesRequest {
+export interface UpdateSeriesRequest {
     seriesId: number;
     seriesUpdate: SeriesUpdate;
 }
@@ -88,11 +88,11 @@ export class SeriesApi extends runtime.BaseAPI {
      * Create a new series. Title and slug are required. Slug is auto-generated from title if not provided or if an empty string is passed.
      * Create Series
      */
-    async apiCreateSeriesRaw(requestParameters: ApiCreateSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeriesPublic>> {
+    async createSeriesRaw(requestParameters: CreateSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeriesPublic>> {
         if (requestParameters['seriesCreate'] == null) {
             throw new runtime.RequiredError(
                 'seriesCreate',
-                'Required parameter "seriesCreate" was null or undefined when calling apiCreateSeries().'
+                'Required parameter "seriesCreate" was null or undefined when calling createSeries().'
             );
         }
 
@@ -125,8 +125,8 @@ export class SeriesApi extends runtime.BaseAPI {
      * Create a new series. Title and slug are required. Slug is auto-generated from title if not provided or if an empty string is passed.
      * Create Series
      */
-    async apiCreateSeries(requestParameters: ApiCreateSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeriesPublic> {
-        const response = await this.apiCreateSeriesRaw(requestParameters, initOverrides);
+    async createSeries(requestParameters: CreateSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeriesPublic> {
+        const response = await this.createSeriesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -134,11 +134,11 @@ export class SeriesApi extends runtime.BaseAPI {
      * Delete a series. Posts belonging to this series will have their \'series\' field set to NULL. Prevent deletion if any posts are still associated with the series.
      * Delete Series
      */
-    async apiDeleteSeriesRaw(requestParameters: ApiDeleteSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteSeriesRaw(requestParameters: DeleteSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['seriesId'] == null) {
             throw new runtime.RequiredError(
                 'seriesId',
-                'Required parameter "seriesId" was null or undefined when calling apiDeleteSeries().'
+                'Required parameter "seriesId" was null or undefined when calling deleteSeries().'
             );
         }
 
@@ -168,19 +168,19 @@ export class SeriesApi extends runtime.BaseAPI {
      * Delete a series. Posts belonging to this series will have their \'series\' field set to NULL. Prevent deletion if any posts are still associated with the series.
      * Delete Series
      */
-    async apiDeleteSeries(requestParameters: ApiDeleteSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiDeleteSeriesRaw(requestParameters, initOverrides);
+    async deleteSeries(requestParameters: DeleteSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteSeriesRaw(requestParameters, initOverrides);
     }
 
     /**
      * Retrieve a single series by its ID. Includes a list of associated posts (summaries) by default. Use `include_posts=false` to omit posts. Use `posts_limit` to control the number of posts returned.
      * Get Series Detail By Id
      */
-    async apiGetSeriesDetailByIdRaw(requestParameters: ApiGetSeriesDetailByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeriesDetailPublic>> {
+    async getSeriesDetailByIdRaw(requestParameters: GetSeriesDetailByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeriesDetailPublic>> {
         if (requestParameters['seriesId'] == null) {
             throw new runtime.RequiredError(
                 'seriesId',
-                'Required parameter "seriesId" was null or undefined when calling apiGetSeriesDetailById().'
+                'Required parameter "seriesId" was null or undefined when calling getSeriesDetailById().'
             );
         }
 
@@ -218,8 +218,8 @@ export class SeriesApi extends runtime.BaseAPI {
      * Retrieve a single series by its ID. Includes a list of associated posts (summaries) by default. Use `include_posts=false` to omit posts. Use `posts_limit` to control the number of posts returned.
      * Get Series Detail By Id
      */
-    async apiGetSeriesDetailById(requestParameters: ApiGetSeriesDetailByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeriesDetailPublic> {
-        const response = await this.apiGetSeriesDetailByIdRaw(requestParameters, initOverrides);
+    async getSeriesDetailById(requestParameters: GetSeriesDetailByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeriesDetailPublic> {
+        const response = await this.getSeriesDetailByIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -227,11 +227,11 @@ export class SeriesApi extends runtime.BaseAPI {
      * Retrieve a single series by its slug. Includes a list of associated posts (summaries) by default. Use `include_posts=false` to omit posts. Use `posts_limit` to control the number of posts returned.
      * Get Series Detail By Slug
      */
-    async apiGetSeriesDetailBySlugRaw(requestParameters: ApiGetSeriesDetailBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeriesDetailPublic>> {
+    async getSeriesDetailBySlugRaw(requestParameters: GetSeriesDetailBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeriesDetailPublic>> {
         if (requestParameters['slug'] == null) {
             throw new runtime.RequiredError(
                 'slug',
-                'Required parameter "slug" was null or undefined when calling apiGetSeriesDetailBySlug().'
+                'Required parameter "slug" was null or undefined when calling getSeriesDetailBySlug().'
             );
         }
 
@@ -269,8 +269,8 @@ export class SeriesApi extends runtime.BaseAPI {
      * Retrieve a single series by its slug. Includes a list of associated posts (summaries) by default. Use `include_posts=false` to omit posts. Use `posts_limit` to control the number of posts returned.
      * Get Series Detail By Slug
      */
-    async apiGetSeriesDetailBySlug(requestParameters: ApiGetSeriesDetailBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeriesDetailPublic> {
-        const response = await this.apiGetSeriesDetailBySlugRaw(requestParameters, initOverrides);
+    async getSeriesDetailBySlug(requestParameters: GetSeriesDetailBySlugRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeriesDetailPublic> {
+        const response = await this.getSeriesDetailBySlugRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -278,11 +278,11 @@ export class SeriesApi extends runtime.BaseAPI {
      * List all published posts belonging to a specific series. Optionally exclude a specific post by its ID (e.g., the current post being viewed). The \'order\' parameter controls the ordering of posts. Use \'-published_at\' (default) for descending, \'published_at\' for ascending.
      * List Posts In Series
      */
-    async apiListPostsInSeriesRaw(requestParameters: ApiListPostsInSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPostSummaryForSeries>> {
+    async listPostsInSeriesRaw(requestParameters: ListPostsInSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPostSummaryForSeries>> {
         if (requestParameters['seriesIdOrSlug'] == null) {
             throw new runtime.RequiredError(
                 'seriesIdOrSlug',
-                'Required parameter "seriesIdOrSlug" was null or undefined when calling apiListPostsInSeries().'
+                'Required parameter "seriesIdOrSlug" was null or undefined when calling listPostsInSeries().'
             );
         }
 
@@ -328,8 +328,8 @@ export class SeriesApi extends runtime.BaseAPI {
      * List all published posts belonging to a specific series. Optionally exclude a specific post by its ID (e.g., the current post being viewed). The \'order\' parameter controls the ordering of posts. Use \'-published_at\' (default) for descending, \'published_at\' for ascending.
      * List Posts In Series
      */
-    async apiListPostsInSeries(requestParameters: ApiListPostsInSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPostSummaryForSeries> {
-        const response = await this.apiListPostsInSeriesRaw(requestParameters, initOverrides);
+    async listPostsInSeries(requestParameters: ListPostsInSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPostSummaryForSeries> {
+        const response = await this.listPostsInSeriesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -337,7 +337,7 @@ export class SeriesApi extends runtime.BaseAPI {
      * List all series. Use `include_posts_count=true` to get the number of posts in each series.
      * List Series
      */
-    async apiListSeriesRaw(requestParameters: ApiListSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedSeriesPublic>> {
+    async listSeriesRaw(requestParameters: ListSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedSeriesPublic>> {
         const queryParameters: any = {};
 
         if (requestParameters['includePostsCount'] != null) {
@@ -376,8 +376,8 @@ export class SeriesApi extends runtime.BaseAPI {
      * List all series. Use `include_posts_count=true` to get the number of posts in each series.
      * List Series
      */
-    async apiListSeries(requestParameters: ApiListSeriesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedSeriesPublic> {
-        const response = await this.apiListSeriesRaw(requestParameters, initOverrides);
+    async listSeries(requestParameters: ListSeriesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedSeriesPublic> {
+        const response = await this.listSeriesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -385,18 +385,18 @@ export class SeriesApi extends runtime.BaseAPI {
      * Update an existing series. All fields in payload are optional. If slug is provided and changed, it will be updated. If title is changed and slug is not provided (or empty), slug might be regenerated.
      * Update Series
      */
-    async apiUpdateSeriesRaw(requestParameters: ApiUpdateSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeriesPublic>> {
+    async updateSeriesRaw(requestParameters: UpdateSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SeriesPublic>> {
         if (requestParameters['seriesId'] == null) {
             throw new runtime.RequiredError(
                 'seriesId',
-                'Required parameter "seriesId" was null or undefined when calling apiUpdateSeries().'
+                'Required parameter "seriesId" was null or undefined when calling updateSeries().'
             );
         }
 
         if (requestParameters['seriesUpdate'] == null) {
             throw new runtime.RequiredError(
                 'seriesUpdate',
-                'Required parameter "seriesUpdate" was null or undefined when calling apiUpdateSeries().'
+                'Required parameter "seriesUpdate" was null or undefined when calling updateSeries().'
             );
         }
 
@@ -429,8 +429,8 @@ export class SeriesApi extends runtime.BaseAPI {
      * Update an existing series. All fields in payload are optional. If slug is provided and changed, it will be updated. If title is changed and slug is not provided (or empty), slug might be regenerated.
      * Update Series
      */
-    async apiUpdateSeries(requestParameters: ApiUpdateSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeriesPublic> {
-        const response = await this.apiUpdateSeriesRaw(requestParameters, initOverrides);
+    async updateSeries(requestParameters: UpdateSeriesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SeriesPublic> {
+        const response = await this.updateSeriesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

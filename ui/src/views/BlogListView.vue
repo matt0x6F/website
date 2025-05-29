@@ -80,7 +80,7 @@ const loadPosts = async (newOffset: number) => {
   offset.value = newOffset
 
   try {
-    const response = await postsApi.apiListPosts({
+    const response = await postsApi.listPosts({
       offset: offset.value,
       limit: limit.value
     })

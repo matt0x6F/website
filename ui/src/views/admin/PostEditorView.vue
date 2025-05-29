@@ -314,7 +314,7 @@ const loadAvailableSeries = async () => {
   loadingSeries.value = true;
   try {
     const seriesApi = useApiClient(SeriesApi)
-    const response = await seriesApi.apiListSeries({ includePostsCount: true })
+    const response = await seriesApi.listSeries({ includePostsCount: true })
     availableSeries.value = response.items.map((s: any) => ({
       id: s.id,
       title: s.title,
@@ -395,7 +395,7 @@ onMounted(async () => {
   if (isEditing.value) {
     try {
       const postsApi = useApiClient(PostsApi)
-      const response = await postsApi.apiGetPostById({
+      const response = await postsApi.getPostById({
         postId: parseInt(route.params.id as string)
       })
       console.log('Post loaded:', response)
@@ -440,7 +440,7 @@ const startAutoSave = () => {
     if (postId.value && !post.value.publishedAt) {
       try {
         const postsApi = useApiClient(PostsApi)
-        await postsApi.apiUpdatePost({
+        await postsApi.updatePost({
           postId: postId.value,
           postUpdate: post.value
         })
@@ -497,7 +497,7 @@ const handleSave = async (shouldRedirect: boolean) => {
   try {
     if (isEditing.value) {
       const postsApi = useApiClient(PostsApi)
-      await postsApi.apiUpdatePost({
+      await postsApi.updatePost({
         postId: parseInt(route.params.id as string),
         postUpdate: post.value
       })
@@ -512,7 +512,7 @@ const handleSave = async (shouldRedirect: boolean) => {
       }
     } else {
       const postsApi = useApiClient(PostsApi)
-      const response = await postsApi.apiCreatePost({
+      const response = await postsApi.createPost({
         postCreate: {
           title: post.value.title ?? '',
           slug: post.value.slug ?? '',
@@ -568,7 +568,7 @@ const handleDisassociateSeries = async () => {
     post.value.seriesId = undefined;
     selectedSeries.value = undefined;
     const postsApi = useApiClient(PostsApi);
-    await postsApi.apiUpdatePost({
+    await postsApi.updatePost({
       postId: postId.value,
       postUpdate: post.value
     });
@@ -591,7 +591,7 @@ const handleDisassociateSeries = async () => {
   }
 };
 const handleCreateSeries = async () => {
-  // TODO: Call SeriesApi.apiCreateSeries, then associate post and refresh list
+  // TODO: Call SeriesApi.createSeries, then associate post and refresh list
 }
 const handleDeleteSeries = async (series: SeriesSummaryWithCount) => {
   if (series.post_count && series.post_count > 0) {
@@ -605,7 +605,7 @@ const handleDeleteSeries = async (series: SeriesSummaryWithCount) => {
   }
   try {
     const seriesApi = useApiClient(SeriesApi);
-    await seriesApi.apiDeleteSeries({ seriesId: series.id });
+    await seriesApi.deleteSeries({ seriesId: series.id });
     toast.add({
       severity: 'success',
       summary: 'Deleted',
@@ -634,7 +634,7 @@ const deletePost = async () => {
   if (!postId.value) return;
   try {
     const postsApi = useApiClient(PostsApi);
-    await postsApi.apiDeletePost({ postId: postId.value });
+    await postsApi.deletePost({ postId: postId.value });
     toast.add({ severity: 'success', summary: 'Deleted', detail: 'Post deleted successfully', life: 3000 });
     router.push({ name: 'admin-posts' });
   } catch (err) {
@@ -660,7 +660,7 @@ const loadShareCodes = async () => {
   loadingShareCodes.value = true
   try {
     const postsApi = useApiClient(PostsApi)
-    shareCodes.value = await postsApi.apiListSharecodes({ postId: postId.value })
+    shareCodes.value = await postsApi.listSharecodes({ postId: postId.value })
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load share codes', life: 3000 })
   } finally {
@@ -677,7 +677,7 @@ const createShareCode = async () => {
       note: newShareCodeNote.value || undefined,
       expiresAt: newShareCodeExpiry.value || undefined
     }
-    await postsApi.apiCreateSharecode({ postId: postId.value, shareCodeCreate: payload })
+    await postsApi.createSharecode({ postId: postId.value, shareCodeCreate: payload })
     showCreateShareCode.value = false
     newShareCodeNote.value = ''
     newShareCodeExpiry.value = null
@@ -694,7 +694,7 @@ const deleteShareCode = async (sc: ShareCodeSchema) => {
   if (!postId.value) return
   try {
     const postsApi = useApiClient(PostsApi)
-    await postsApi.apiDeleteSharecode({ postId: postId.value, code: sc.code })
+    await postsApi.deleteSharecode({ postId: postId.value, code: sc.code })
     await loadShareCodes()
     toast.add({ severity: 'success', summary: 'Deleted', detail: 'Share code deleted', life: 2000 })
   } catch (e) {

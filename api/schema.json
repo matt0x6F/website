@@ -124,7 +124,7 @@
     },
     "/api/accounts/me": {
       "get": {
-        "operationId": "accounts_api_whoami",
+        "operationId": "whoami",
         "summary": "Whoami",
         "parameters": [],
         "responses": {
@@ -160,7 +160,7 @@
         ]
       },
       "put": {
-        "operationId": "accounts_api_update_self",
+        "operationId": "updateSelf",
         "summary": "Update Self",
         "parameters": [],
         "responses": {
@@ -206,7 +206,7 @@
         ]
       },
       "delete": {
-        "operationId": "accounts_api_delete_self",
+        "operationId": "deleteSelf",
         "summary": "Delete Self",
         "parameters": [],
         "responses": {
@@ -237,7 +237,7 @@
     },
     "/api/accounts/sign_up": {
       "post": {
-        "operationId": "accounts_api_sign_up",
+        "operationId": "signUp",
         "summary": "Sign Up",
         "parameters": [],
         "responses": {
@@ -285,7 +285,7 @@
     },
     "/api/accounts/": {
       "get": {
-        "operationId": "accounts_api_list_users",
+        "operationId": "listUsers",
         "summary": "List Users",
         "parameters": [
           {
@@ -346,7 +346,7 @@
     },
     "/api/accounts/{user_id}": {
       "get": {
-        "operationId": "accounts_api_get_user",
+        "operationId": "getUser",
         "summary": "Get User",
         "parameters": [
           {
@@ -392,7 +392,7 @@
         ]
       },
       "put": {
-        "operationId": "accounts_api_update_user",
+        "operationId": "updateUser",
         "summary": "Update User",
         "parameters": [
           {
@@ -448,7 +448,7 @@
         ]
       },
       "delete": {
-        "operationId": "accounts_api_delete_user",
+        "operationId": "deleteUser",
         "summary": "Delete User",
         "parameters": [
           {
@@ -887,7 +887,7 @@
     },
     "/api/series/{series_id}": {
       "delete": {
-        "operationId": "blog_api_delete_series",
+        "operationId": "deleteSeries",
         "summary": "Delete Series",
         "parameters": [
           {
@@ -916,7 +916,7 @@
         ]
       },
       "get": {
-        "operationId": "blog_api_get_series_detail_by_id",
+        "operationId": "getSeriesDetailById",
         "summary": "Get Series Detail By Id",
         "parameters": [
           {
@@ -972,7 +972,7 @@
         ]
       },
       "put": {
-        "operationId": "blog_api_update_series",
+        "operationId": "updateSeries",
         "summary": "Update Series",
         "parameters": [
           {
@@ -1020,7 +1020,7 @@
     },
     "/api/series/": {
       "post": {
-        "operationId": "blog_api_create_series",
+        "operationId": "createSeries",
         "summary": "Create Series",
         "parameters": [],
         "responses": {
@@ -1056,7 +1056,7 @@
         ]
       },
       "get": {
-        "operationId": "blog_api_list_series",
+        "operationId": "listSeries",
         "summary": "List Series",
         "parameters": [
           {
@@ -1117,7 +1117,7 @@
     },
     "/api/series/slug/{slug}": {
       "get": {
-        "operationId": "blog_api_get_series_detail_by_slug",
+        "operationId": "getSeriesDetailBySlug",
         "summary": "Get Series Detail By Slug",
         "parameters": [
           {
@@ -1175,7 +1175,7 @@
     },
     "/api/series/{series_id_or_slug}/posts": {
       "get": {
-        "operationId": "blog_api_list_posts_in_series",
+        "operationId": "listPostsInSeries",
         "summary": "List Posts In Series",
         "parameters": [
           {
@@ -1268,7 +1268,7 @@
     },
     "/api/posts/": {
       "post": {
-        "operationId": "blog_api_create_post",
+        "operationId": "createPost",
         "summary": "Create Post",
         "parameters": [],
         "responses": {
@@ -1314,7 +1314,7 @@
         ]
       },
       "get": {
-        "operationId": "blog_api_list_posts",
+        "operationId": "listPosts",
         "summary": "List Posts",
         "parameters": [
           {
@@ -1427,7 +1427,7 @@
     },
     "/api/posts/{post_id}": {
       "put": {
-        "operationId": "blog_api_update_post",
+        "operationId": "updatePost",
         "summary": "Update Post",
         "parameters": [
           {
@@ -1486,7 +1486,7 @@
         ]
       },
       "get": {
-        "operationId": "blog_api_get_post_by_id",
+        "operationId": "getPostById",
         "summary": "Get Post By Id",
         "parameters": [
           {
@@ -1521,7 +1521,7 @@
         ]
       },
       "delete": {
-        "operationId": "blog_api_delete_post",
+        "operationId": "deletePost",
         "summary": "Delete Post",
         "parameters": [
           {
@@ -1551,7 +1551,7 @@
     },
     "/api/posts/slug/{year}/{slug}": {
       "get": {
-        "operationId": "blog_api_get_post_by_slug_and_year",
+        "operationId": "getPostBySlugAndYear",
         "summary": "Get Post By Slug And Year",
         "parameters": [
           {
@@ -1616,7 +1616,7 @@
     },
     "/api/posts/{post_id}/files": {
       "get": {
-        "operationId": "blog_api_get_post_files_by_id",
+        "operationId": "getPostFilesById",
         "summary": "Get Post Files By Id",
         "parameters": [
           {
@@ -1657,7 +1657,7 @@
     },
     "/api/posts/{post_id}/sharecodes": {
       "get": {
-        "operationId": "blog_api_list_sharecodes",
+        "operationId": "listSharecodes",
         "summary": "List Sharecodes",
         "parameters": [
           {
@@ -1696,7 +1696,7 @@
         ]
       },
       "post": {
-        "operationId": "blog_api_create_sharecode",
+        "operationId": "createSharecode",
         "summary": "Create Sharecode",
         "parameters": [
           {
@@ -1743,7 +1743,7 @@
     },
     "/api/posts/{post_id}/sharecodes/{code}": {
       "delete": {
-        "operationId": "blog_api_delete_sharecode",
+        "operationId": "deleteSharecode",
         "summary": "Delete Sharecode",
         "parameters": [
           {
@@ -1782,7 +1782,7 @@
     },
     "/api/files/": {
       "get": {
-        "operationId": "blog_api_list_files",
+        "operationId": "listFiles",
         "summary": "List Files",
         "parameters": [
           {
@@ -1846,7 +1846,7 @@
         ]
       },
       "post": {
-        "operationId": "blog_api_create_file",
+        "operationId": "createFile",
         "summary": "Create File",
         "parameters": [],
         "responses": {
@@ -1861,7 +1861,6 @@
             }
           }
         },
-        "description": "Creates a file with or without post associations.",
         "tags": [
           "files"
         ],
@@ -1899,7 +1898,7 @@
     },
     "/api/files/orphaned": {
       "get": {
-        "operationId": "blog_api_list_orphaned_files",
+        "operationId": "listOrphanedFiles",
         "summary": "List Orphaned Files",
         "parameters": [],
         "responses": {
@@ -1914,7 +1913,6 @@
             }
           }
         },
-        "description": "Find files that exist in storage but not in the database.\nIf a file exists in both public and private storage, it will be considered public.\nReturns detailed metadata about each orphaned file.",
         "tags": [
           "files"
         ],
@@ -1927,7 +1925,7 @@
     },
     "/api/files/{id}": {
       "get": {
-        "operationId": "blog_api_get_file",
+        "operationId": "getFile",
         "summary": "Get File",
         "parameters": [
           {
@@ -1963,7 +1961,7 @@
         ]
       },
       "put": {
-        "operationId": "blog_api_update_file",
+        "operationId": "updateFile",
         "summary": "Update File",
         "parameters": [
           {
@@ -1988,7 +1986,6 @@
             }
           }
         },
-        "description": "Updates a file, namely the posts associated with the file. File properties are immutable.",
         "tags": [
           "files"
         ],
@@ -2009,7 +2006,7 @@
         ]
       },
       "delete": {
-        "operationId": "blog_api_delete_file",
+        "operationId": "deleteFile",
         "summary": "Delete File",
         "parameters": [
           {
@@ -2027,7 +2024,6 @@
             "description": "OK"
           }
         },
-        "description": "Deletes a file from the database and S3.",
         "tags": [
           "files"
         ],
@@ -2040,7 +2036,7 @@
     },
     "/api/comments/": {
       "get": {
-        "operationId": "blog_api_list_comments",
+        "operationId": "listComments",
         "summary": "List Comments",
         "parameters": [
           {
@@ -2115,7 +2111,7 @@
         ]
       },
       "post": {
-        "operationId": "blog_api_create_comment",
+        "operationId": "createComment",
         "summary": "Create Comment",
         "parameters": [],
         "responses": {
@@ -2153,7 +2149,7 @@
     },
     "/api/comments/moderation/queue": {
       "get": {
-        "operationId": "blog_api_mod_queue_list",
+        "operationId": "modQueueList",
         "summary": "Mod Queue List",
         "parameters": [
           {
@@ -2220,7 +2216,7 @@
     },
     "/api/comments/moderation/{id}": {
       "put": {
-        "operationId": "blog_api_mod_update_comment",
+        "operationId": "modUpdateComment",
         "summary": "Mod Update Comment",
         "parameters": [
           {
@@ -2265,7 +2261,7 @@
         ]
       },
       "get": {
-        "operationId": "blog_api_mod_get_comment",
+        "operationId": "modGetComment",
         "summary": "Mod Get Comment",
         "parameters": [
           {
@@ -2303,7 +2299,7 @@
     },
     "/api/comments/{id}": {
       "get": {
-        "operationId": "blog_api_get_comment",
+        "operationId": "getComment",
         "summary": "Get Comment",
         "parameters": [
           {
@@ -2339,7 +2335,7 @@
         ]
       },
       "put": {
-        "operationId": "blog_api_update_comment",
+        "operationId": "updateComment",
         "summary": "Update Comment",
         "parameters": [
           {
@@ -2384,7 +2380,7 @@
         ]
       },
       "delete": {
-        "operationId": "blog_api_delete_comment",
+        "operationId": "deleteComment",
         "summary": "Delete Comment",
         "parameters": [
           {
@@ -2414,7 +2410,7 @@
     },
     "/api/feed/": {
       "get": {
-        "operationId": "blog_api_feed",
+        "operationId": "getFeed",
         "summary": "Feed",
         "parameters": [
           {
@@ -4835,12 +4831,6 @@
         "type": "object"
       },
       "FeedItem": {
-        "example": {
-          "content_text": "Hello World!",
-          "date_published": "2023-04-20T14:22:00-07:00",
-          "id": "2347259",
-          "url": "https://example.org/2347259"
-        },
         "properties": {
           "id": {
             "description": "Unique for that item for that feed over time. If an item is ever updated, the id should be unchanged. New items should never use a previously-used id.",
@@ -4973,7 +4963,7 @@
             "anyOf": [
               {
                 "items": {
-                  "$ref": "#/components/schemas/AuthorSummary"
+                  "$ref": "#/components/schemas/FeedAuthorSchema"
                 },
                 "type": "array"
               },
@@ -5054,24 +5044,6 @@
         "type": "object"
       },
       "JSONFeed": {
-        "example": {
-          "feed_url": "https://example.org/feed.json",
-          "home_page_url": "https://example.org/",
-          "items": [
-            {
-              "content_text": "This is a second item.",
-              "id": "2",
-              "url": "https://example.org/second-item"
-            },
-            {
-              "content_html": "<p>Hello, world!</p>",
-              "id": "1",
-              "url": "https://example.org/initial-post"
-            }
-          ],
-          "title": "My Example Feed",
-          "version": "https://jsonfeed.org/version/1.1"
-        },
         "properties": {
           "version": {
             "default": "https://jsonfeed.org/version/1.1",

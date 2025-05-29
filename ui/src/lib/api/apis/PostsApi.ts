@@ -43,40 +43,40 @@ import {
     ValidationErrorResponseToJSON,
 } from '../models/index';
 
-export interface ApiCreatePostRequest {
+export interface CreatePostRequest {
     postCreate: PostCreate;
 }
 
-export interface ApiCreateSharecodeRequest {
+export interface CreateSharecodeRequest {
     postId: number;
     shareCodeCreate: ShareCodeCreate;
 }
 
-export interface ApiDeletePostRequest {
+export interface DeletePostRequest {
     postId: number;
 }
 
-export interface ApiDeleteSharecodeRequest {
+export interface DeleteSharecodeRequest {
     postId: number;
     code: string;
 }
 
-export interface ApiGetPostByIdRequest {
+export interface GetPostByIdRequest {
     postId: number;
 }
 
-export interface ApiGetPostBySlugAndYearRequest {
+export interface GetPostBySlugAndYearRequest {
     year: number;
     slug: string;
     draft?: boolean;
     sharecode?: string;
 }
 
-export interface ApiGetPostFilesByIdRequest {
+export interface GetPostFilesByIdRequest {
     postId: number;
 }
 
-export interface ApiListPostsRequest {
+export interface ListPostsRequest {
     seriesSlug?: string | null;
     authorId?: number | null;
     drafts?: boolean;
@@ -86,11 +86,11 @@ export interface ApiListPostsRequest {
     offset?: number;
 }
 
-export interface ApiListSharecodesRequest {
+export interface ListSharecodesRequest {
     postId: number;
 }
 
-export interface ApiUpdatePostRequest {
+export interface UpdatePostRequest {
     postId: number;
     postUpdate: PostUpdate;
 }
@@ -104,11 +104,11 @@ export class PostsApi extends runtime.BaseAPI {
      * Create a new blog post. If slug is not provided, it will be generated from the title. `series_id` can be provided to associate the post with a series.
      * Create Post
      */
-    async apiCreatePostRaw(requestParameters: ApiCreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
+    async createPostRaw(requestParameters: CreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
         if (requestParameters['postCreate'] == null) {
             throw new runtime.RequiredError(
                 'postCreate',
-                'Required parameter "postCreate" was null or undefined when calling apiCreatePost().'
+                'Required parameter "postCreate" was null or undefined when calling createPost().'
             );
         }
 
@@ -141,26 +141,26 @@ export class PostsApi extends runtime.BaseAPI {
      * Create a new blog post. If slug is not provided, it will be generated from the title. `series_id` can be provided to associate the post with a series.
      * Create Post
      */
-    async apiCreatePost(requestParameters: ApiCreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
-        const response = await this.apiCreatePostRaw(requestParameters, initOverrides);
+    async createPost(requestParameters: CreatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
+        const response = await this.createPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Create Sharecode
      */
-    async apiCreateSharecodeRaw(requestParameters: ApiCreateSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ShareCodeSchema>> {
+    async createSharecodeRaw(requestParameters: CreateSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ShareCodeSchema>> {
         if (requestParameters['postId'] == null) {
             throw new runtime.RequiredError(
                 'postId',
-                'Required parameter "postId" was null or undefined when calling apiCreateSharecode().'
+                'Required parameter "postId" was null or undefined when calling createSharecode().'
             );
         }
 
         if (requestParameters['shareCodeCreate'] == null) {
             throw new runtime.RequiredError(
                 'shareCodeCreate',
-                'Required parameter "shareCodeCreate" was null or undefined when calling apiCreateSharecode().'
+                'Required parameter "shareCodeCreate" was null or undefined when calling createSharecode().'
             );
         }
 
@@ -192,19 +192,19 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Create Sharecode
      */
-    async apiCreateSharecode(requestParameters: ApiCreateSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ShareCodeSchema> {
-        const response = await this.apiCreateSharecodeRaw(requestParameters, initOverrides);
+    async createSharecode(requestParameters: CreateSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ShareCodeSchema> {
+        const response = await this.createSharecodeRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Delete Post
      */
-    async apiDeletePostRaw(requestParameters: ApiDeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deletePostRaw(requestParameters: DeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['postId'] == null) {
             throw new runtime.RequiredError(
                 'postId',
-                'Required parameter "postId" was null or undefined when calling apiDeletePost().'
+                'Required parameter "postId" was null or undefined when calling deletePost().'
             );
         }
 
@@ -233,25 +233,25 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Delete Post
      */
-    async apiDeletePost(requestParameters: ApiDeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiDeletePostRaw(requestParameters, initOverrides);
+    async deletePost(requestParameters: DeletePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deletePostRaw(requestParameters, initOverrides);
     }
 
     /**
      * Delete Sharecode
      */
-    async apiDeleteSharecodeRaw(requestParameters: ApiDeleteSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteSharecodeRaw(requestParameters: DeleteSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['postId'] == null) {
             throw new runtime.RequiredError(
                 'postId',
-                'Required parameter "postId" was null or undefined when calling apiDeleteSharecode().'
+                'Required parameter "postId" was null or undefined when calling deleteSharecode().'
             );
         }
 
         if (requestParameters['code'] == null) {
             throw new runtime.RequiredError(
                 'code',
-                'Required parameter "code" was null or undefined when calling apiDeleteSharecode().'
+                'Required parameter "code" was null or undefined when calling deleteSharecode().'
             );
         }
 
@@ -280,18 +280,18 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Delete Sharecode
      */
-    async apiDeleteSharecode(requestParameters: ApiDeleteSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiDeleteSharecodeRaw(requestParameters, initOverrides);
+    async deleteSharecode(requestParameters: DeleteSharecodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteSharecodeRaw(requestParameters, initOverrides);
     }
 
     /**
      * Get Post By Id
      */
-    async apiGetPostByIdRaw(requestParameters: ApiGetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
+    async getPostByIdRaw(requestParameters: GetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
         if (requestParameters['postId'] == null) {
             throw new runtime.RequiredError(
                 'postId',
-                'Required parameter "postId" was null or undefined when calling apiGetPostById().'
+                'Required parameter "postId" was null or undefined when calling getPostById().'
             );
         }
 
@@ -320,26 +320,26 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Get Post By Id
      */
-    async apiGetPostById(requestParameters: ApiGetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
-        const response = await this.apiGetPostByIdRaw(requestParameters, initOverrides);
+    async getPostById(requestParameters: GetPostByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
+        const response = await this.getPostByIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Get Post By Slug And Year
      */
-    async apiGetPostBySlugAndYearRaw(requestParameters: ApiGetPostBySlugAndYearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
+    async getPostBySlugAndYearRaw(requestParameters: GetPostBySlugAndYearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
         if (requestParameters['year'] == null) {
             throw new runtime.RequiredError(
                 'year',
-                'Required parameter "year" was null or undefined when calling apiGetPostBySlugAndYear().'
+                'Required parameter "year" was null or undefined when calling getPostBySlugAndYear().'
             );
         }
 
         if (requestParameters['slug'] == null) {
             throw new runtime.RequiredError(
                 'slug',
-                'Required parameter "slug" was null or undefined when calling apiGetPostBySlugAndYear().'
+                'Required parameter "slug" was null or undefined when calling getPostBySlugAndYear().'
             );
         }
 
@@ -376,19 +376,19 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Get Post By Slug And Year
      */
-    async apiGetPostBySlugAndYear(requestParameters: ApiGetPostBySlugAndYearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
-        const response = await this.apiGetPostBySlugAndYearRaw(requestParameters, initOverrides);
+    async getPostBySlugAndYear(requestParameters: GetPostBySlugAndYearRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
+        const response = await this.getPostBySlugAndYearRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Get Post Files By Id
      */
-    async apiGetPostFilesByIdRaw(requestParameters: ApiGetPostFilesByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<FileDetails>>> {
+    async getPostFilesByIdRaw(requestParameters: GetPostFilesByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<FileDetails>>> {
         if (requestParameters['postId'] == null) {
             throw new runtime.RequiredError(
                 'postId',
-                'Required parameter "postId" was null or undefined when calling apiGetPostFilesById().'
+                'Required parameter "postId" was null or undefined when calling getPostFilesById().'
             );
         }
 
@@ -417,8 +417,8 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * Get Post Files By Id
      */
-    async apiGetPostFilesById(requestParameters: ApiGetPostFilesByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<FileDetails>> {
-        const response = await this.apiGetPostFilesByIdRaw(requestParameters, initOverrides);
+    async getPostFilesById(requestParameters: GetPostFilesByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<FileDetails>> {
+        const response = await this.getPostFilesByIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -426,7 +426,7 @@ export class PostsApi extends runtime.BaseAPI {
      * List posts, optionally filtered by series, author, or draft status. The \'order\' parameter controls the ordering of posts. Use \'-published_at\' (default) for descending, \'published_at\' for ascending.
      * List Posts
      */
-    async apiListPostsRaw(requestParameters: ApiListPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPostListPublic>> {
+    async listPostsRaw(requestParameters: ListPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedPostListPublic>> {
         const queryParameters: any = {};
 
         if (requestParameters['seriesSlug'] != null) {
@@ -481,19 +481,19 @@ export class PostsApi extends runtime.BaseAPI {
      * List posts, optionally filtered by series, author, or draft status. The \'order\' parameter controls the ordering of posts. Use \'-published_at\' (default) for descending, \'published_at\' for ascending.
      * List Posts
      */
-    async apiListPosts(requestParameters: ApiListPostsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPostListPublic> {
-        const response = await this.apiListPostsRaw(requestParameters, initOverrides);
+    async listPosts(requestParameters: ListPostsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedPostListPublic> {
+        const response = await this.listPostsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * List Sharecodes
      */
-    async apiListSharecodesRaw(requestParameters: ApiListSharecodesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ShareCodeSchema>>> {
+    async listSharecodesRaw(requestParameters: ListSharecodesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ShareCodeSchema>>> {
         if (requestParameters['postId'] == null) {
             throw new runtime.RequiredError(
                 'postId',
-                'Required parameter "postId" was null or undefined when calling apiListSharecodes().'
+                'Required parameter "postId" was null or undefined when calling listSharecodes().'
             );
         }
 
@@ -522,8 +522,8 @@ export class PostsApi extends runtime.BaseAPI {
     /**
      * List Sharecodes
      */
-    async apiListSharecodes(requestParameters: ApiListSharecodesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ShareCodeSchema>> {
-        const response = await this.apiListSharecodesRaw(requestParameters, initOverrides);
+    async listSharecodes(requestParameters: ListSharecodesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ShareCodeSchema>> {
+        const response = await this.listSharecodesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -531,18 +531,18 @@ export class PostsApi extends runtime.BaseAPI {
      * Update an existing blog post. All fields in payload are optional. `series_id` can be provided or set to `null` to disassociate from a series.
      * Update Post
      */
-    async apiUpdatePostRaw(requestParameters: ApiUpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
+    async updatePostRaw(requestParameters: UpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostPublic>> {
         if (requestParameters['postId'] == null) {
             throw new runtime.RequiredError(
                 'postId',
-                'Required parameter "postId" was null or undefined when calling apiUpdatePost().'
+                'Required parameter "postId" was null or undefined when calling updatePost().'
             );
         }
 
         if (requestParameters['postUpdate'] == null) {
             throw new runtime.RequiredError(
                 'postUpdate',
-                'Required parameter "postUpdate" was null or undefined when calling apiUpdatePost().'
+                'Required parameter "postUpdate" was null or undefined when calling updatePost().'
             );
         }
 
@@ -575,8 +575,8 @@ export class PostsApi extends runtime.BaseAPI {
      * Update an existing blog post. All fields in payload are optional. `series_id` can be provided or set to `null` to disassociate from a series.
      * Update Post
      */
-    async apiUpdatePost(requestParameters: ApiUpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
-        const response = await this.apiUpdatePostRaw(requestParameters, initOverrides);
+    async updatePost(requestParameters: UpdatePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostPublic> {
+        const response = await this.updatePostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

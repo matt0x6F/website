@@ -187,7 +187,7 @@ const loadComment = async () => {
   try {
     const commentId = parseInt(route.params.id as string);
     // Use the moderation API to get the comment with admin fields
-    const response = await moderationApi.apiModGetComment({ id: commentId });
+    const response = await moderationApi.modGetComment({ id: commentId });
     comment.value = response;
     console.log('Loaded admin comment:', comment.value);
   } catch (err) {
@@ -206,7 +206,7 @@ const approveComment = async (id: number) => {
       note: 'Approved by moderator'
     };
     
-    await moderationApi.apiModUpdateComment({
+    await moderationApi.modUpdateComment({
       id,
       adminCommentUpdate: update
     });
@@ -239,7 +239,7 @@ const rejectComment = async (id: number) => {
       note: 'Rejected by moderator'
     };
     
-    await moderationApi.apiModUpdateComment({
+    await moderationApi.modUpdateComment({
       id,
       adminCommentUpdate: update
     });
@@ -276,7 +276,7 @@ const confirmDelete = (comment: { id: number }) => {
 
 const deleteComment = async (id: number) => {
   try {
-    await commentsApi.apiDeleteComment({ id });
+    await commentsApi.deleteComment({ id });
     
     toast.add({
       severity: 'success',

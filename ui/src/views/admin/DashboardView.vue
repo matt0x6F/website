@@ -91,7 +91,7 @@ const fetchPublishedPostCount = async () => {
       }
     })
     const postsApi = new PostsApi(config)
-    const response = await postsApi.apiListPosts({ allPosts: false })
+    const response = await postsApi.listPosts({ allPosts: false })
     publishedPostCount.value = response.count || 0
   } catch (error) {
     console.error('Failed to fetch published post count:', error)
@@ -108,7 +108,7 @@ const fetchTotalPostCount = async () => {
       }
     })
     const postsApi = new PostsApi(config)
-    const response = await postsApi.apiListPosts({ allPosts: true })
+    const response = await postsApi.listPosts({ allPosts: true })
     totalPostCount.value = response.count || 0
   } catch (error) {
     console.error('Failed to fetch total post count:', error)
@@ -125,7 +125,7 @@ const fetchUserCount = async () => {
       }
     })
     const accountsApi = new AccountsApi(config)
-    const response = await accountsApi.apiListUsers()
+    const response = await accountsApi.listUsers()
     userCount.value = response.count || 0
   } catch (error) {
     console.error('Failed to fetch user count:', error)
@@ -147,7 +147,7 @@ const fetchPublishedPostsForHeatmap = async () => {
     let allPosts: any[] = []
     let total = 0
     do {
-      const response = await postsApi.apiListPosts({ allPosts: false, order: 'published_at', limit, offset })
+      const response = await postsApi.listPosts({ allPosts: false, order: 'published_at', limit, offset })
       const posts = response.items || []
       if (offset === 0) total = response.count || 0
       allPosts = allPosts.concat(posts)

@@ -31,7 +31,7 @@ vi.mock('@/lib/api', () => ({
     refresh: (...args: any[]) => mockTokenRefresh(...args)
   })),
   AccountsApi: vi.fn(() => ({
-    apiWhoami: (...args: any[]) => mockAccountsApiWhoami(...args)
+    whoami: (...args: any[]) => mockAccountsApiWhoami(...args)
   })),
   Configuration: vi.fn()
 }))

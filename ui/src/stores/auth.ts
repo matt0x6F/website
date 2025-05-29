@@ -55,7 +55,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
         const accountsApi = new AccountsApi(config)
-        const user = await accountsApi.apiWhoami()
+        const user = await accountsApi.whoami()
 
         userData.id = user.id
         userData.username = user.username
@@ -107,7 +107,7 @@ export const useAuthStore = defineStore('auth', () => {
         const authedConfig = new Configuration(authedParams)
         const accountsApi = new AccountsApi(authedConfig)
 
-        const user = await accountsApi.apiWhoami()
+        const user = await accountsApi.whoami()
         
         userData.id = user.id
         userData.username = user.username
@@ -261,7 +261,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       const accountsApi = new AccountsApi(config)
-      const response = await accountsApi.apiUpdateSelf({
+      const response = await accountsApi.updateSelf({
         updateAccount: data
       })
       
@@ -294,7 +294,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
     const config = new Configuration(params)
     const api = new AccountsApi(config);
-    const response = await api.apiSignUp({ newAccount });
+    const response = await api.signUp({ newAccount });
     return response;
   }
 

@@ -133,7 +133,7 @@ onMounted(async () => {
     const year = route.params.year as string
     
     // Load the post to get its ID and title
-    const postResult = await posts.apiGetPostBySlugAndYear({ slug: slug, year: +year })
+    const postResult = await posts.getPostBySlugAndYear({ slug: slug, year: +year })
     post.value = {
       id: postResult.id,
       title: postResult.title,
@@ -172,7 +172,7 @@ async function submitComment() {
   
   try {
     submitting.value = true
-    await commentsApi.apiCreateComment({ 
+    await commentsApi.createComment({ 
       commentCreate: form.value
     })
     submitted.value = true

@@ -125,7 +125,7 @@ onMounted(async () => {
     const year = route.params.year as string
     const sharecode = route.query.sharecode as string | undefined
     // First load the post
-    const postResult = await posts.apiGetPostBySlugAndYear({ slug: slug, year: +year, ...(sharecode ? { sharecode } : {}) })
+    const postResult = await posts.getPostBySlugAndYear({ slug: slug, year: +year, ...(sharecode ? { sharecode } : {}) })
     post.value = {
       id: postResult.id,
       title: postResult.title,
@@ -154,7 +154,7 @@ onMounted(async () => {
 // Function to reload comments
 async function loadComments() {
   if (post.value && post.value.id) {
-    const commentsResult = await commentsApi.apiListComments({ 
+    const commentsResult = await commentsApi.listComments({ 
       postId: post.value.id,
       topLevel: true 
     })
@@ -165,7 +165,7 @@ async function loadComments() {
 // Function to load all posts in the series
 async function loadSeriesPosts(seriesIdOrSlug: number | string) {
   try {
-    const result = await seriesApi.apiListPostsInSeries({ seriesIdOrSlug })
+    const result = await seriesApi.listPostsInSeries({ seriesIdOrSlug })
     let items = result.items || []
     if (post.value && !items.some(p => p.id === post.value!.id)) {
       items = [...items, {

@@ -1,6 +1,6 @@
 from typing import List
 
-from .schema import FeedAuthorSchema, FeedItem, Hub, JSONFeed
+from .schema.feed import FeedAuthorSchema, FeedItem, Hub, JSONFeed
 
 
 class FeedBuilder:
