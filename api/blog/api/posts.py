@@ -183,11 +183,11 @@ def list_posts(
     author_id: Optional[int] = None,
     drafts: bool = False,
     all_posts: bool = False,  # Combines drafts and published
-    order: str = "-published_at",  # New parameter
+    order: str = None,  # Will set default below
 ):
     """
     List posts, optionally filtered by series, author, or draft status.
-    The 'order' parameter controls the ordering of posts. Use '-published_at' (default) for descending, 'published_at' for ascending.
+    The 'order' parameter controls the ordering of posts. Use '-published_at' (default for published), '-updated_at' (default for drafts).
     """
     posts = Post.objects.select_related("author", "series").all()
     is_staff = request.user.is_authenticated and request.user.is_staff
@@ -209,8 +209,16 @@ def list_posts(
     if author_id:
         posts = posts.filter(author_id=author_id)
 
-    # Validate order param
-    allowed_orders = ["-published_at", "published_at"]
+    # Determine allowed orders and default order
+    if drafts:
+        allowed_orders = ["-updated_at", "updated_at"]
+        if not order:
+            order = "-updated_at"
+    else:
+        allowed_orders = ["-published_at", "published_at"]
+        if not order:
+            order = "-published_at"
+
     if order not in allowed_orders:
         raise HttpError(400, f"Invalid order parameter. Allowed: {allowed_orders}")
 

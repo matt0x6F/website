@@ -77,3 +77,104 @@ class TestPostsAPI:
         )
         assert response.status_code == 204 or response.status_code == 200
         assert not Post.objects.filter(id=post.id).exists()
+
+    @pytest.mark.parametrize("auth_token", ["superuser"], indirect=True)
+    def test_list_drafts_ordered_by_updated_at_desc(
+        self, client: Client, auth_token: str, superuser, series
+    ):
+        # Create three draft posts with different updated_at
+        import datetime
+
+        from django.utils import timezone
+
+        from blog.models import Post
+
+        now = timezone.now()
+        post1 = Post.objects.create(
+            title="Draft 1",
+            slug="draft-1",
+            author=superuser,
+            content="Draft 1 content",
+            published_at=None,
+            series=series,
+        )
+        post2 = Post.objects.create(
+            title="Draft 2",
+            slug="draft-2",
+            author=superuser,
+            content="Draft 2 content",
+            published_at=None,
+            series=series,
+        )
+        post3 = Post.objects.create(
+            title="Draft 3",
+            slug="draft-3",
+            author=superuser,
+            content="Draft 3 content",
+            published_at=None,
+            series=series,
+        )
+        # Manually set updated_at
+        Post.objects.filter(id=post1.id).update(updated_at=now - datetime.timedelta(days=2))
+        Post.objects.filter(id=post2.id).update(updated_at=now - datetime.timedelta(days=1))
+        Post.objects.filter(id=post3.id).update(updated_at=now)
+
+        response = client.get(
+            "/api/posts/?drafts=true",
+            HTTP_AUTHORIZATION=f"Bearer {auth_token}",
+        )
+        assert response.status_code == 200
+        data = response.json()
+        items = data["items"] if "items" in data else data
+        # Should be ordered by -updated_at (most recent first)
+        assert [item["title"] for item in items] == ["Draft 3", "Draft 2", "Draft 1"]
+
+    @pytest.mark.parametrize("auth_token", ["superuser"], indirect=True)
+    def test_list_drafts_ordered_by_updated_at_asc(
+        self, client: Client, auth_token: str, superuser, series
+    ):
+        import datetime
+
+        from django.utils import timezone
+
+        from blog.models import Post
+
+        now = timezone.now()
+        post1 = Post.objects.create(
+            title="Draft A",
+            slug="draft-a",
+            author=superuser,
+            content="Draft A content",
+            published_at=None,
+            series=series,
+        )
+        post2 = Post.objects.create(
+            title="Draft B",
+            slug="draft-b",
+            author=superuser,
+            content="Draft B content",
+            published_at=None,
+            series=series,
+        )
+        post3 = Post.objects.create(
+            title="Draft C",
+            slug="draft-c",
+            author=superuser,
+            content="Draft C content",
+            published_at=None,
+            series=series,
+        )
+        # Manually set updated_at
+        Post.objects.filter(id=post1.id).update(updated_at=now - datetime.timedelta(days=2))
+        Post.objects.filter(id=post2.id).update(updated_at=now - datetime.timedelta(days=1))
+        Post.objects.filter(id=post3.id).update(updated_at=now)
+
+        response = client.get(
+            "/api/posts/?drafts=true&order=updated_at",
+            HTTP_AUTHORIZATION=f"Bearer {auth_token}",
+        )
+        assert response.status_code == 200
+        data = response.json()
+        items = data["items"] if "items" in data else data
+        # Should be ordered by updated_at (oldest first)
+        assert [item["title"] for item in items] == ["Draft A", "Draft B", "Draft C"]
