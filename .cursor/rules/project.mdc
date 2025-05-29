@@ -1,0 +1,79 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Architecture & Development Rule
+
+## 1. Backend (`api/`)
+- **Language/Framework:** Python, Django (with Django Ninja, Django REST, and related plugins).
+- **Dependency Management:** Poetry (`poetry.lock`, `pyproject.toml`).
+- **Testing:** Pytest (with pytest-django).
+- **Environment:** Uses `.env` files for configuration (`.env`, `.env.ci`, `.env.docker`).
+- **Database:** PostgreSQL (see `docker-compose.yaml` for local dev).
+- **Code Style:** Follows standard Python/Django conventions; linting/formatting via Poetry dependencies.
+- **API:** OpenAPI v3 schema, auto-generated client in frontend (`ui/src/lib/api`).
+- **Tooling:**  
+  - **All Python/Django management commands and scripts must be run inside the running `django` Docker container** (e.g., `docker compose exec django poetry run python manage.py ...`).
+  - Use the `Taskfile.yml` for common workflows (migrations, superuser creation, schema export, SDK generation, fixture loading, etc.).
+
+## 2. Frontend (`ui/`)
+- **Language/Framework:** Vue 3 (Vite, TypeScript, Pinia, Vue Router, PrimeVue, TailwindCSS).
+- **Dependency Management:** npm (`package.json`).
+- **Testing:** 
+  - Unit: Vitest.
+  - E2E: Playwright.
+- **Linting/Formatting:** ESLint (with TypeScript, Vue, Playwright, Oxlint, Prettier).
+- **Type Checking:** `vue-tsc`.
+- **Component Auto-Import:** via `unplugin-vue-components`.
+- **Styling:** TailwindCSS (with custom config), PrimeVue themes, and PostCSS.
+- **EditorConfig:** Enforced via `.editorconfig` and Prettier.
+
+## 3. CI/CD (`.github/workflows/ci.yml`)
+- **Runs on:** Ubuntu-latest.
+- **Services:** PostgreSQL (for backend tests).
+- **Steps:**
+  - Checkout code.
+  - Set up Python and Node.js.
+  - Cache Poetry and npm dependencies.
+  - Install backend dependencies and run migrations/tests.
+  - Install frontend dependencies, run unit tests, build, and run E2E tests with Playwright.
+- **Environment:** Uses `.env.ci` for backend tests.
+
+## 4. Local Development (`docker-compose.yaml` & `Taskfile.yml`)
+- **Services:**
+  - `postgres`: PostgreSQL 16, with persistent volume.
+  - `django`: Runs backend in development mode, mounts `./api` for live reload.
+  - `ui`: Runs frontend dev server (`npm run dev`), mounts `./ui` for live reload.
+- **Ports:**
+  - Backend: `8000`
+  - Frontend: `3000`
+  - Database: `5432`
+- **Environment Variables:** Passed via `.env.docker` for Django, `VITE_API_URL` for UI.
+- **Usage:** `docker compose up` or `task up` brings up the full stack for local development.
+- **Task Automation:** Use `Taskfile.yml` for common tasks:
+  - `task up` / `task down` — start/stop dev environment
+  - `task migrate` — run migrations (inside container)
+  - `task create-super-user` — create Django superuser (inside container)
+  - `task export-schema` — export OpenAPI schema (inside container)
+  - `task generate-sdk` — generate TypeScript API client from schema
+  - `task build` — build frontend and collect static files
+  - `task load-fixtures` — load all fixtures (inside container)
+- **Note:** Any tooling or scripts that require the Python runtime (e.g., Django management commands, schema export) **must be run inside the running `django` Docker container**.
+
+## 5. General Conventions
+- **API Client:** Frontend uses auto-generated TypeScript client (`ui/src/lib/api`) from backend OpenAPI schema.
+- **Testing:** All new features should include unit and (where appropriate) E2E tests.
+- **Formatting:** All code should be formatted with Prettier and conform to EditorConfig.
+- **Component Usage:** Use PrimeVue and Tailwind for UI components and styling.
+- **Secrets:** Never commit secrets; use environment files and Docker secrets for local/dev/CI.
+
+---
+
+**How to use this rule:**
+- When generating code, always follow the conventions and tools described above.
+- For backend changes, ensure compatibility with Poetry, Django, and the OpenAPI schema, and run all Python tooling inside the Docker container.
+- For frontend changes, use Vue 3, TypeScript, and the auto-generated API client.
+- For CI/CD, ensure all steps pass as described in `.github/workflows/ci.yml`.
+- For local development, use `task up` or `docker compose up` and ensure all services are healthy.
+- Use `Taskfile.yml` for all common workflows and automation.
