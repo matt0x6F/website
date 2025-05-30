@@ -241,5 +241,12 @@ describe('MarkdownParser', () => {
         expect(result[0].content).toContain('5 &gt; 3 &amp; 2 &lt; 4')
       })
     })
+
+    it('should render single newlines as <br> in paragraphs', () => {
+      const result = parser.parse('Line one\nLine two\nLine three')
+      expect(result).toHaveLength(1)
+      expect(result[0].type).toBe('paragraph')
+      expect(result[0].content).toContain('Line one<br>\nLine two<br>\nLine three')
+    })
   })
 }) 

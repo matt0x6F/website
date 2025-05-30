@@ -76,5 +76,19 @@
       "slug": "standalone-markdown-post",
       "series": null
     }
+  },
+  {
+    "model": "blog.post",
+    "pk": 5,
+    "fields": {
+      "title": "Somewhere",
+      "content": "You might hear the wind make up stories.\nAcorns dream of growing tall.\nLeaves don't ask before they fall.\nLight finds its way between the trees.\n\nDew gathers without fuss.\nEven moss chooses where to rest.\nSome paths are made by wandering feet.\nEvery pebble has a place.\nRivers remember, but don't cling.\nVines reach, simply because they can.\nEach season brings its own kind of magic.\n\nButterflies don't rush decisions.\nEven the smallest roots run deep.\nTwilight knows how to keep a secret.\nTrails appear when the timing is right.\nEvery sky holds room for flight.\nRemember the way sunflowers turn.\n\nThistle and clover grow side by side.\nHollow logs foster many lives.\nAir hums louder in stillness.\nNests are built with scraps and hope.\n\nTrees don't worry about being chosen.\nHedges hide all kinds of wonders.\nIt's okay to outgrow your pot.\nSomewhere, a new field is blooming.",
+      "created_at": "2025-04-19T12:00:00Z",
+      "updated_at": "2025-04-19T12:00:00Z",
+      "published_at": "2025-04-19T12:00:00Z",
+      "author": 1,
+      "slug": "somewhere",
+      "series": null
+    }
   }
 ]
