@@ -10,7 +10,7 @@
         </template>
         <template #center>
           <div class="flex items-center gap-4">
-            <SelectButton v-model="filterStatus" optionLabel="label" :options="filterOptions" aria-label="Post Status" />
+            <SelectButton v-model="filterStatus" optionLabel="label" :options="filterOptions" aria-label="Post Status" :allowEmpty="false" />
           </div>
         </template>
         <template #end>
@@ -138,14 +138,15 @@ const loadPosts = async () => {
     loading.value = true
     error.value = null
 
-    console.log("Filter status: ", filterStatus.value)
-    
+    // Defensive: fallback to default if null
+    const status = filterStatus.value ?? { label: 'Published', value: 'published' }
+
     const queryParams: ListPostsRequest = {}
-    if (filterStatus.value.value === 'all') {
+    if (status.value === 'all') {
       queryParams.allPosts = true
       queryParams.drafts = true
     } else {
-      queryParams.drafts = filterStatus.value.value !== 'published'
+      queryParams.drafts = status.value !== 'published'
     }
     
     const response = await client.listPosts(queryParams)
