@@ -15,6 +15,15 @@ import router from './router'
 
 import 'primeicons/primeicons.css'
 
+// Inject Umami analytics script only in production and if the website ID is set
+if (import.meta.env.PROD && import.meta.env.VITE_UMAMI_WEBSITE_ID) {
+  const script = document.createElement('script');
+  script.defer = true;
+  script.src = 'https://cloud.umami.is/script.js';
+  script.setAttribute('data-website-id', import.meta.env.VITE_UMAMI_WEBSITE_ID);
+  document.head.appendChild(script);
+}
+
 const app = createApp(App)
 
 app.use(createPinia())
