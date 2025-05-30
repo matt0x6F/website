@@ -290,6 +290,24 @@
         "parameters": [
           {
             "in": "query",
+            "name": "is_staff",
+            "schema": {
+              "title": "Is Staff",
+              "type": "boolean"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "is_active",
+            "schema": {
+              "title": "Is Active",
+              "type": "boolean"
+            },
+            "required": false
+          },
+          {
+            "in": "query",
             "name": "limit",
             "schema": {
               "default": 100,
@@ -333,7 +351,7 @@
             }
           }
         },
-        "description": "Returns a list of all users",
+        "description": "Returns a list of all users, with optional filtering by staff and active status",
         "tags": [
           "accounts"
         ],
@@ -1373,7 +1391,6 @@
             "in": "query",
             "name": "order",
             "schema": {
-              "default": "-published_at",
               "title": "Order",
               "type": "string"
             },
@@ -1414,7 +1431,7 @@
             }
           }
         },
-        "description": "List posts, optionally filtered by series, author, or draft status.\nThe 'order' parameter controls the ordering of posts. Use '-published_at' (default) for descending, 'published_at' for ascending.",
+        "description": "List posts, optionally filtered by series, author, or draft status.\nThe 'order' parameter controls the ordering of posts. Use '-published_at' (default for published), '-updated_at' (default for drafts).",
         "tags": [
           "posts"
         ],

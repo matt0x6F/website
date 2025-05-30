@@ -49,6 +49,8 @@ export interface GetUserRequest {
 }
 
 export interface ListUsersRequest {
+    isStaff?: boolean;
+    isActive?: boolean;
     limit?: number;
     offset?: number;
 }
@@ -192,11 +194,19 @@ export class AccountsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns a list of all users
+     * Returns a list of all users, with optional filtering by staff and active status
      * List Users
      */
     async listUsersRaw(requestParameters: ListUsersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PagedAdminUserDetails>> {
         const queryParameters: any = {};
+
+        if (requestParameters['isStaff'] != null) {
+            queryParameters['is_staff'] = requestParameters['isStaff'];
+        }
+
+        if (requestParameters['isActive'] != null) {
+            queryParameters['is_active'] = requestParameters['isActive'];
+        }
 
         if (requestParameters['limit'] != null) {
             queryParameters['limit'] = requestParameters['limit'];
@@ -227,7 +237,7 @@ export class AccountsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns a list of all users
+     * Returns a list of all users, with optional filtering by staff and active status
      * List Users
      */
     async listUsers(requestParameters: ListUsersRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PagedAdminUserDetails> {

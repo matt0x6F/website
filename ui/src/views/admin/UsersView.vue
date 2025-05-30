@@ -2,6 +2,28 @@
   <div>
     <div class="">
       <div class="space-y-2">
+        <div class="flex flex-wrap gap-4 items-center mb-2">
+          <div>
+            <span class="text-gray-600 dark:text-gray-400 mr-2">User Type:</span>
+            <Dropdown
+              v-model="userTypeFilter"
+              :options="userTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="w-32"
+            />
+          </div>
+          <div>
+            <span class="text-gray-600 dark:text-gray-400 mr-2">Status:</span>
+            <Dropdown
+              v-model="statusFilter"
+              :options="statusOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="w-32"
+            />
+          </div>
+        </div>
         <div v-if="loading" class="text-gray-600">Loading users...</div>
         
         <div v-else-if="error" class="text-red-600">
@@ -107,10 +129,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApiClient } from '@/composables/useApiClient'
-import { AccountsApi } from '@/lib/api/apis/AccountsApi'
+import { AccountsApi, type ListUsersRequest } from '@/lib/api/apis/AccountsApi'
 import type { AdminUserDetails } from '@/lib/api/models'
 import Badge from 'primevue/badge'
 import Card from 'primevue/card'
@@ -135,11 +157,27 @@ const sortOptions = [
   { label: 'Join Date', value: 'dateJoined' }
 ]
 
+const userTypeOptions = [
+  { label: 'All', value: 'all' },
+  { label: 'Staff', value: true },
+  { label: 'Regular', value: false }
+]
+const statusOptions = [
+  { label: 'All', value: 'all' },
+  { label: 'Active', value: true },
+  { label: 'Inactive', value: false }
+]
+const userTypeFilter = ref<'all' | boolean>('all')
+const statusFilter = ref<'all' | boolean>(true)
+
 const loadUsers = async () => {
   const client = useApiClient(AccountsApi)
   try {
     loading.value = true
-    const response = await client.listUsers()
+    const params: ListUsersRequest = {}
+    if (userTypeFilter.value !== 'all') params.isStaff = userTypeFilter.value
+    if (statusFilter.value !== 'all') params.isActive = statusFilter.value
+    const response = await client.listUsers(params)
     users.value = response.items
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'An error occurred'
@@ -152,6 +190,8 @@ onMounted(() => {
   loadUsers()
   document.title = 'Admin: Users – ooo-yay.com'
 })
+
+watch([userTypeFilter, statusFilter], loadUsers)
 </script>
 
 <style>

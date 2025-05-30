@@ -147,12 +147,16 @@ def sign_up(request: HttpRequest, new_acct_details: NewAccount):
     operation_id="listUsers",
 )
 @paginate
-def list_users(request: HttpRequest):
+def list_users(request: HttpRequest, is_staff: bool = None, is_active: bool = None):
     """
-    Returns a list of all users
+    Returns a list of all users, with optional filtering by staff and active status
     """
     try:
         users = User.objects.all()
+        if is_staff is not None:
+            users = users.filter(is_staff=is_staff)
+        if is_active is not None:
+            users = users.filter(is_active=is_active)
     except Exception as e:
         raise ValidationError([e]) from e
 
