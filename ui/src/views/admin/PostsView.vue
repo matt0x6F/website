@@ -188,5 +188,6 @@ const confirmDeletePost = (post: PostListPublic) => {
 
 onMounted(() => {
   loadPosts()
+  document.title = 'Admin: Posts – ooo-yay.com'
 })
 </script> 

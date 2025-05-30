@@ -190,6 +190,8 @@ const loadComment = async () => {
     const response = await moderationApi.modGetComment({ id: commentId });
     comment.value = response;
     console.log('Loaded admin comment:', comment.value);
+    // Set document title
+    document.title = `Admin: Comment #${commentId} – ooo-yay.com`;
   } catch (err) {
     console.error('Error loading comment:', err);
     error.value = 'Failed to load comment details';

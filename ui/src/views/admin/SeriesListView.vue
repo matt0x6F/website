@@ -122,6 +122,7 @@ const confirmDeleteSeries = (series: SeriesDetailPublic) => {
 
 onMounted(() => {
   loadSeries()
+  document.title = 'Admin: Series – ooo-yay.com'
 })
 </script>
 

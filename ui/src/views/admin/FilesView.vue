@@ -227,9 +227,9 @@ function getOrphanedMenuItems(file: any) {
 }
 
 // Fetch files on component mount
-onMounted(async () => {
-  await fetchFiles()
-  await checkOrphanedFiles()
+onMounted(() => {
+  fetchFiles()
+  document.title = 'Admin: Files – ooo-yay.com'
 })
 
 async function fetchFiles() {

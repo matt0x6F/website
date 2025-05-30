@@ -157,6 +157,8 @@ onMounted(async () => {
       if (fetchedSeries.slug && fetchedSeries.slug !== generateSlug(fetchedSeries.title)) {
         slugManuallyEdited.value = true;
       }
+      // Set document title for editing
+      document.title = `Edit Series: ${series.value.title} – Admin – ooo-yay.com`
     } catch (error) {
       console.error('Error fetching series details:', error)
       toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load series details', life: 3000 })
@@ -164,6 +166,8 @@ onMounted(async () => {
     }
   } else {
     slugManuallyEdited.value = false;
+    // Set document title for new series
+    document.title = 'Create Series – Admin – ooo-yay.com'
   }
 })
 

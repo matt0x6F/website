@@ -17,6 +17,7 @@ const messages = [
 const randomMessage = ref(messages[0])
 
 onMounted(() => {
+  document.title = '404 – Page Not Found – ooo-yay.com'
   randomMessage.value = messages[Math.floor(Math.random() * messages.length)]
 })
 </script>

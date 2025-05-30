@@ -164,3 +164,53 @@ test.describe('Blog post sharecode access', () => {
     await expect(page.locator('article')).toContainText('Published content');
   });
 });
+
+test('Home page sets correct document title', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveTitle('ooo-yay.com – Home');
+});
+
+test('About page sets correct document title', async ({ page }) => {
+  await page.goto('/about');
+  await expect(page).toHaveTitle('About – ooo-yay.com');
+});
+
+test('Blog list page sets correct document title', async ({ page }) => {
+  await page.goto('/blog');
+  await expect(page).toHaveTitle('Blog – ooo-yay.com');
+});
+
+test('404 page sets correct document title', async ({ page }) => {
+  await page.goto('/this-page-does-not-exist');
+  await expect(page).toHaveTitle('404 – Page Not Found – ooo-yay.com');
+});
+
+test('Blog post page sets correct document title', async ({ page }) => {
+  // Mock API for blog post
+  await page.route('**/api/posts/slug/2025/test-post', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        id: 42,
+        title: 'Test Post',
+        content: 'Test content',
+        createdAt: '2025-05-18T02:53:01.410Z',
+        updatedAt: '2025-05-28T03:55:08.889Z',
+        publishedAt: '2025-05-28T03:55:08.889Z',
+        author: { id: 1, username: 'matt', email: 'm@ooo-yay.com', is_staff: true },
+        slug: 'test-post',
+        series: null,
+      })
+    });
+  });
+  await page.route('**/api/comments/**', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ items: [], count: 0 })
+    });
+  });
+  await page.goto('/blog/2025/test-post');
+  await expect(page).toHaveTitle('Test Post – Blog – ooo-yay.com');
+});

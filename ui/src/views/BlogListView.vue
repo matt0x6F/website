@@ -97,6 +97,7 @@ const loadPosts = async (newOffset: number) => {
 
 onMounted(() => {
   loadPosts(0)
+  document.title = 'Blog – ooo-yay.com'
 })
 </script>
 

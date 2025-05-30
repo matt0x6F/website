@@ -200,6 +200,8 @@ onMounted(async () => {
       groups: response.groups,
       userPermissions: response.userPermissions
     }
+    // Set document title for editing user
+    document.title = `Edit User: ${response.email} – Admin – ooo-yay.com`
   } catch (error) {
     console.error('Error fetching user:', error)
     toast.add({

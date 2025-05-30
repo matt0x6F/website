@@ -294,6 +294,7 @@ const onRowClick = (event: { data: { id: number } }) => {
 
 onMounted(() => {
   loadComments();
+  document.title = 'Admin: Comments – ooo-yay.com';
 });
 </script>
 

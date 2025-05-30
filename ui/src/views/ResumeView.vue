@@ -260,10 +260,15 @@
 
 <script setup lang="ts">
 import Card from 'primevue/card';
+import { onMounted } from 'vue'
 
 const downloadPDF = () => {
   window.print();
 };
+
+onMounted(() => {
+  document.title = 'Resume – ooo-yay.com'
+})
 </script>
 
 <style scoped>

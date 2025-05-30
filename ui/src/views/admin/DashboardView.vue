@@ -190,7 +190,7 @@ onMounted(() => {
     console.warn('Non-staff user accessed admin dashboard')
     return
   }
-  
+  document.title = 'Admin Dashboard – ooo-yay.com'
   fetchPublishedPostCount()
   fetchTotalPostCount()
   fetchUserCount()

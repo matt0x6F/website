@@ -409,6 +409,8 @@ onMounted(async () => {
         createdAt: response.createdAt ?? null,
         updatedAt: response.updatedAt ?? null
       }
+      // Set document title for editing
+      document.title = `Edit Post: ${post.value.title} – Admin – ooo-yay.com`
       // After post is loaded, if it has a seriesId, make sure selectedSeries is updated
       if (post.value.seriesId && availableSeries.value.length) {
          selectedSeries.value = availableSeries.value.find((s: SeriesSummaryWithCount) => s.id === post.value.seriesId);
@@ -426,6 +428,9 @@ onMounted(async () => {
       })
       router.push({ name: 'admin-posts' })
     }
+  } else {
+    // Set document title for new post
+    document.title = 'Create Post – Admin – ooo-yay.com'
   }
 })
 

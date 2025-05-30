@@ -148,6 +148,8 @@ onMounted(async () => {
     
     if (post.value && post.value.id) {
       form.value.postId = post.value.id
+      // Set document title
+      document.title = `Comment on: ${post.value.title} – ooo-yay.com`
     } else {
       throw new Error('Post not found')
     }

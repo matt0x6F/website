@@ -51,3 +51,11 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import TheWelcome from '../components/TheWelcome.vue'
+import { onMounted } from 'vue'
+onMounted(() => {
+  document.title = 'About – ooo-yay.com'
+})
+</script>

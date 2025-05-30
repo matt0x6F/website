@@ -38,4 +38,14 @@ app.use(ToastService)
 app.use(ConfirmationService)
 app.directive('tooltip', Tooltip)
 
+router.afterEach((to) => {
+  let title = typeof to.meta.title === 'function'
+    ? to.meta.title(to)
+    : to.meta.title
+  if (!title) {
+    title = 'ooo-yay.com'
+  }
+  document.title = title
+})
+
 app.mount('#app')

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '../stores/auth';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import { useToast } from 'primevue/usetoast';
@@ -150,6 +150,10 @@ const handleSave = async () => {
 const handleLogout = async () => {
     await authStore.logout();
 };
+
+onMounted(() => {
+  document.title = 'Profile – ooo-yay.com';
+});
 </script>
 
 <template>

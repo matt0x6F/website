@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import type { RouteLocation } from 'vue-router'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,42 +9,49 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: () => import('@/views/HomeView.vue'),
+      meta: { title: 'ooo-yay.com – Home' }
     },
     {
       path: '/about',
       name: 'about',
       component: () => import('@/views/AboutView.vue'),
+      meta: { title: 'About – ooo-yay.com' }
     },
     {
       path: '/resume',
       name: 'resume',
       component: () => import('@/views/ResumeView.vue'),
+      meta: { title: 'Resume – ooo-yay.com' }
     },
     {
       path: '/profile',
       name: 'profile',
       component: () => import('@/views/ProfileView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true, title: 'Profile – ooo-yay.com' }
     },
     {
       path: '/blog',
       name: 'blog-list',
       component: () => import('@/views/BlogListView.vue'),
+      meta: { title: 'Blog – ooo-yay.com' }
     },
     {
       path: '/blog/:year/:slug',
       name: 'blog-post',
       component: () => import('@/views/BlogPostView.vue'),
+      meta: { title: (route: RouteLocation) => `Blog Post – ooo-yay.com` }
     },
     {
       path: '/post/:year/:slug',
       name: 'BlogPost',
       component: () => import('@/views/BlogPostView.vue'),
+      meta: { title: (route: RouteLocation) => `Blog Post – ooo-yay.com` }
     },
     {
       path: '/post/:year/:slug/comment',
       name: 'AddComment',
       component: () => import('@/views/CommentFormView.vue'),
+      meta: { title: (route: RouteLocation) => `Add Comment – ooo-yay.com` }
     },
     {
       path: '/admin',
@@ -117,6 +125,7 @@ const router = createRouter({
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/views/PageNotFoundView.vue'),
+      meta: { title: '404 – Page Not Found – ooo-yay.com' }
     }
   ],
 })

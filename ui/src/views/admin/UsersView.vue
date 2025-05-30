@@ -150,6 +150,7 @@ const loadUsers = async () => {
 
 onMounted(() => {
   loadUsers()
+  document.title = 'Admin: Users – ooo-yay.com'
 })
 </script>
 

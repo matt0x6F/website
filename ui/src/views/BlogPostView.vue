@@ -137,6 +137,8 @@ onMounted(async () => {
       slug: postResult.slug,
       series: postResult.series ? { id: postResult.series.id, title: postResult.series.title } : undefined
     }
+    // Set document title
+    document.title = `${post.value.title} – Blog – ooo-yay.com`
     // If post is part of a series, load series posts using slug if available
     if (postResult.series?.slug) {
       await loadSeriesPosts(postResult.series.slug)
