@@ -14,6 +14,7 @@ import App from './App.vue'
 import router from './router'
 
 import 'primeicons/primeicons.css'
+import { createHead } from '@vueuse/head';
 
 // Inject Umami analytics script only in production and if the website ID is set
 if (import.meta.env.PROD && import.meta.env.VITE_UMAMI_WEBSITE_ID) {
@@ -27,6 +28,8 @@ if (import.meta.env.PROD && import.meta.env.VITE_UMAMI_WEBSITE_ID) {
 const app = createApp(App)
 
 app.use(createPinia())
+const head = createHead()
+app.use(head)
 app.use(router)
 app.use(PrimeVue, {
     theme: {

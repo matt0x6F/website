@@ -50,7 +50,11 @@
           </ol>
         </div>
         <!-- End Series box -->
-        <MarkdownPreview class="no-prose-padding" :content="post?.content || ''" />
+        <MarkdownPreview
+          class="no-prose-padding"
+          :content="post?.content || ''"
+          v-bind="blogPostSchema ? { jsonLd: blogPostSchema } : {}"
+        />
       </article>
       
       <!-- Comments section -->
@@ -90,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useApiClient } from '@/composables/useApiClient'
 import { PostsApi, CommentsApi, SeriesApi } from '@/lib/api'
@@ -100,6 +104,7 @@ import Comments from '@/components/Comments.vue'
 import LoginDialog from '@/components/LoginDialog.vue'
 import SignupDialog from '@/components/SignupDialog.vue'
 import MarkdownPreview from '@/components/MarkdownPreview.vue'
+import { MarkdownParser } from '@/services/MarkdownParser'
 
 const route = useRoute()
 const posts = useApiClient(PostsApi)
@@ -118,6 +123,40 @@ const isLoggedIn = computed(() => authStore.isLoggedIn)
 
 // Series state
 const seriesPosts = ref<PostSummaryForSeries[]>([])
+
+const parser = new MarkdownParser()
+
+const blogPostSchema = computed(() => {
+  if (!post.value) return null
+  const articleHtml = parser['md'].render(post.value.content)
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.value.title,
+    "datePublished": post.value.published,
+    "dateModified": post.value.updatedAt,
+    "author": {
+      "@type": "Person",
+      "name": "Matt Ouille",
+      "url": "https://ooo-yay.com",
+      "image": "https://ooo-yay.com/avatar_resized.png",
+      "description": "Distributed Systems Software and Systems Engineer in the PNW"
+    },
+    "articleBody": articleHtml,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": window.location.href
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "ooo-yay.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ooo-yay.com/logo.svg"
+      }
+    }
+  }
+})
 
 onMounted(async () => {
   try {

@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, defineExpose } from 'vue'
+import { ref, watch, defineExpose, getCurrentInstance } from 'vue'
 import hljs from 'highlight.js/lib/core'
 import markdown from 'highlight.js/lib/languages/markdown'
 import javascript from 'highlight.js/lib/languages/javascript'
@@ -38,8 +38,9 @@ import ParagraphBlock from '@/components/markdown/ParagraphBlock.vue'
 import ListBlock from '@/components/markdown/ListBlock.vue'
 import BlockquoteBlock from '@/components/markdown/BlockquoteBlock.vue'
 import { MarkdownParser } from '@/services/MarkdownParser'
+import { useHead } from '@vueuse/head'
 
-const props = defineProps<{ content: string }>()
+const props = defineProps<{ content: string, jsonLd?: string | object }>()
 const blocks = ref<any[]>([])
 const previewEl = ref<HTMLElement | null>(null)
 defineExpose({ previewEl })
@@ -70,6 +71,23 @@ const parser = new MarkdownParser((str: string, lang: string): string => {
 
 watch(() => props.content, (val) => {
   blocks.value = parser.parse(val || '')
+}, { immediate: true })
+
+// Inject JSON-LD if provided
+watch(() => props.jsonLd, (val) => {
+  const instance = getCurrentInstance()
+  console.log('[MarkdownPreview] jsonLd watcher triggered. getCurrentInstance():', instance)
+  console.log('[MarkdownPreview] jsonLd value:', val)
+  if (val) {
+    useHead({
+      script: [
+        {
+          type: 'application/ld+json',
+          children: typeof val === 'string' ? val : JSON.stringify(val)
+        }
+      ]
+    })
+  }
 }, { immediate: true })
 </script>
 
