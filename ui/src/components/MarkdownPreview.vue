@@ -39,8 +39,12 @@ import ListBlock from '@/components/markdown/ListBlock.vue'
 import BlockquoteBlock from '@/components/markdown/BlockquoteBlock.vue'
 import { MarkdownParser } from '@/services/MarkdownParser'
 import { useHead } from '@vueuse/head'
+import type { PostDetails } from '@/lib/api'
 
-const props = defineProps<{ content: string, jsonLd?: string | object }>()
+const props = defineProps<{
+  content: string,
+  meta?: PostDetails | null
+}>()
 const blocks = ref<any[]>([])
 const previewEl = ref<HTMLElement | null>(null)
 defineExpose({ previewEl })
@@ -73,21 +77,67 @@ watch(() => props.content, (val) => {
   blocks.value = parser.parse(val || '')
 }, { immediate: true })
 
-// Inject JSON-LD if provided
-watch(() => props.jsonLd, (val) => {
-  const instance = getCurrentInstance()
-  console.log('[MarkdownPreview] jsonLd watcher triggered. getCurrentInstance():', instance)
-  console.log('[MarkdownPreview] jsonLd value:', val)
-  if (val) {
-    useHead({
-      script: [
-        {
-          type: 'application/ld+json',
-          children: typeof val === 'string' ? val : JSON.stringify(val)
-        }
-      ]
-    })
-  }
+// Watch post prop and inject OpenGraph, Twitter, and JSON-LD meta tags
+watch(() => props.meta, (meta) => {
+  if (!meta) return
+  // OpenGraph/Twitter meta
+  const parser = new MarkdownParser()
+  const url = typeof window !== 'undefined' ? window.location.href : ''
+  const articleHtml = parser['md'].render(meta.content || '')
+  const description = (() => {
+    const tmp = document.createElement('div')
+    tmp.innerHTML = articleHtml
+    return (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 160)
+  })()
+  const publishedIso = meta.published ? new Date(meta.published).toISOString() : undefined
+  const image = 'https://ooo-yay.com/og-default.png'
+  useHead({
+    meta: [
+      { property: 'og:title', content: meta.title },
+      { property: 'og:description', content: description },
+      { property: 'og:type', content: 'article' },
+      { property: 'og:url', content: url },
+      { property: 'og:site_name', content: 'ooo-yay.com' },
+      { property: 'og:image', content: image },
+      ...(publishedIso ? [{ property: 'article:published_time', content: publishedIso }] : []),
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: meta.title },
+      { name: 'twitter:description', content: description },
+      { name: 'twitter:image', content: image },
+    ],
+    script: [
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "headline": meta.title,
+          "datePublished": meta.published,
+          "dateModified": meta.updatedAt,
+          "author": {
+            "@type": "Person",
+            "name": "Matt Ouille",
+            "url": "https://ooo-yay.com",
+            "image": "https://ooo-yay.com/avatar_resized.png",
+            "description": "Distributed Systems Software and Systems Engineer in the PNW"
+          },
+          "articleBody": articleHtml,
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": url
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "ooo-yay.com",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://ooo-yay.com/logo.svg"
+            }
+          }
+        })
+      }
+    ]
+  })
 }, { immediate: true })
 </script>
 
