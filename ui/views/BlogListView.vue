@@ -35,7 +35,7 @@
         <button 
           :disabled="offset === 0" 
           @click="loadPosts(offset - limit)"
-          class="px-4 py-2 border-primary/20 border rounded-md text-primary underline disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-4 py-2 border-emerald-300 border rounded-md text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition disabled:opacity-50 disabled:cursor-not-allowed dark:bg-emerald-900 dark:text-emerald-200 dark:border-emerald-700 dark:hover:bg-emerald-800"
         >
           Previous
         </button>
@@ -43,7 +43,7 @@
         <button 
           :disabled="offset + limit >= total" 
           @click="loadPosts(offset + limit)"
-          class="px-4 py-2 border-primary/20 border rounded-md text-primary underline disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-4 py-2 border-emerald-300 border rounded-md text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition disabled:opacity-50 disabled:cursor-not-allowed dark:bg-emerald-900 dark:text-emerald-200 dark:border-emerald-700 dark:hover:bg-emerald-800"
         >
           Next
         </button>

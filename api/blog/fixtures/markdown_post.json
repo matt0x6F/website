@@ -90,5 +90,103 @@
       "slug": "somewhere",
       "series": null
     }
+  },
+  {
+    "model": "blog.post",
+    "pk": 6,
+    "fields": {
+      "title": "Markdown Table Showcase",
+      "content": "# Table Showcase\n\n| Syntax | Description |\n|--------|-------------|\n| Header | Title       |\n| Cell   | Cell        |\n\n---\n\nA post to test table rendering.",
+      "created_at": "2025-04-20T12:00:00Z",
+      "updated_at": "2025-04-20T12:00:00Z",
+      "published_at": "2025-04-20T12:00:00Z",
+      "author": 1,
+      "slug": "markdown-table-showcase",
+      "series": 2
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 7,
+    "fields": {
+      "title": "Markdown Images",
+      "content": "# Images\n\n![Alt text](https://via.placeholder.com/150)\n\n---\n\nA post to test image rendering.",
+      "created_at": "2025-04-21T12:00:00Z",
+      "updated_at": "2025-04-21T12:00:00Z",
+      "published_at": "2025-04-21T12:00:00Z",
+      "author": 1,
+      "slug": "markdown-images",
+      "series": null
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 8,
+    "fields": {
+      "title": "Markdown Blockquotes",
+      "content": "> Blockquote test\n>\n> Another line.\n\n---\n\nA post to test blockquote rendering.",
+      "created_at": "2025-04-22T12:00:00Z",
+      "updated_at": "2025-04-22T12:00:00Z",
+      "published_at": "2025-04-22T12:00:00Z",
+      "author": 1,
+      "slug": "markdown-blockquotes",
+      "series": 1
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 9,
+    "fields": {
+      "title": "Markdown Inline Code",
+      "content": "# Inline Code\n\nUse `code` for inline code.\n\n---\n\nA post to test inline code rendering.",
+      "created_at": "2025-04-23T12:00:00Z",
+      "updated_at": "2025-04-23T12:00:00Z",
+      "published_at": "2025-04-23T12:00:00Z",
+      "author": 1,
+      "slug": "markdown-inline-code",
+      "series": null
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 10,
+    "fields": {
+      "title": "Markdown Headings",
+      "content": "# Heading 1\n## Heading 2\n### Heading 3\n\n---\n\nA post to test heading rendering.",
+      "created_at": "2025-04-24T12:00:00Z",
+      "updated_at": "2025-04-24T12:00:00Z",
+      "published_at": "2025-04-24T12:00:00Z",
+      "author": 1,
+      "slug": "markdown-headings",
+      "series": 2
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 11,
+    "fields": {
+      "title": "Markdown Horizontal Rule",
+      "content": "# Horizontal Rule\n\n---\n\nA post to test horizontal rule rendering.",
+      "created_at": "2025-04-25T12:00:00Z",
+      "updated_at": "2025-04-25T12:00:00Z",
+      "published_at": "2025-04-25T12:00:00Z",
+      "author": 1,
+      "slug": "markdown-horizontal-rule",
+      "series": null
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 12,
+    "fields": {
+      "title": "Markdown Emphasis",
+      "content": "# Emphasis\n\n*Italic* **Bold** ~~Strikethrough~~\n\n---\n\nA post to test emphasis rendering.",
+      "created_at": "2025-04-26T12:00:00Z",
+      "updated_at": "2025-04-26T12:00:00Z",
+      "published_at": "2025-04-26T12:00:00Z",
+      "author": 1,
+      "slug": "markdown-emphasis",
+      "series": 1
+    }
   }
 ]
