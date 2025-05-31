@@ -39,5 +39,10 @@ export default defineNuxtConfig({
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Inter:400,500,600,700&display=swap' }
       ]
     }
-  }
+  },
+  nitro: {
+    prerender: {
+      ignore: ['/api/feed/'],
+    },
+  },
 })
