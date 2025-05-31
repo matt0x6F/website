@@ -7,7 +7,9 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@nuxt/eslint": "^1.4.1",
@@ -39,6 +41,7 @@
     "@playwright/test": "^1.52.0",
     "@primevue/nuxt-module": "^4.3.4",
     "@tailwindcss/typography": "^0.5.16",
+    "@tsconfig/node22": "^22.0.2",
     "@types/markdown-it": "^14.1.2",
     "@vueuse/head": "^2.0.0",
     "happy-dom": "^17.5.6",
