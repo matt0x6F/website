@@ -15,7 +15,6 @@
     "@nuxt/icon": "^1.13.0",
     "@nuxt/image": "^1.10.0",
     "@nuxt/scripts": "^0.11.7",
-    "@nuxt/test-utils": "^3.19.1",
     "@nuxtjs/tailwindcss": "^7.0.0-beta.0",
     "@pinia/nuxt": "^0.11.0",
     "@primeuix/themes": "^1.1.1",
@@ -36,9 +35,13 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@nuxt/test-utils": "^3.19.1",
+    "@playwright/test": "^1.52.0",
     "@primevue/nuxt-module": "^4.3.4",
     "@tailwindcss/typography": "^0.5.16",
     "@types/markdown-it": "^14.1.2",
-    "@vueuse/head": "^2.0.0"
+    "@vueuse/head": "^2.0.0",
+    "happy-dom": "^17.5.6",
+    "vitest": "^3.1.4"
   }
 }
