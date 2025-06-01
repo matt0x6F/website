@@ -1,56 +1,65 @@
 <template>
   <div class="mt-8 space-y-8">
-    <div class="flex justify-between items-center">
-      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Comments</h2>
-      <button 
-        v-if="isLoggedIn"
-        @click="showNewCommentForm = !showNewCommentForm"
-        class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
-      >
-        {{ showNewCommentForm ? 'Cancel' : 'Add Comment' }}
-      </button>
-      <button 
-        v-else
-        @click="$emit('login-required')"
-        class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
-      >
-        Sign in to Comment
-      </button>
-    </div>
-    
-    <!-- New top-level comment form -->
-    <div v-if="showNewCommentForm" class="bg-gray-50 dark:bg-gray-800 p-4 rounded">
-      <textarea 
-        v-model="newCommentContent" 
-        class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
-        placeholder="Write your comment..."
-        rows="4"
-      ></textarea>
-      <div class="mt-2 flex justify-end">
+    <template v-if="isAuthInitialized">
+      <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Comments</h2>
         <button 
-          @click="submitNewComment" 
-          class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
-          :disabled="!newCommentContent.trim()"
+          v-if="isLoggedIn"
+          @click="showNewCommentForm = !showNewCommentForm"
+          class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
         >
-          Submit
+          {{ showNewCommentForm ? 'Cancel' : 'Add Comment' }}
+        </button>
+        <button 
+          v-else
+          @click="$emit('login-required')"
+          class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
+        >
+          Sign in to Comment
         </button>
       </div>
-    </div>
-    
-    <div v-if="comments.length === 0 && isLoggedIn" class="text-center py-6 text-gray-500">
-      No comments yet. Be the first to share your thoughts!
-    </div>
-    
-    <div v-else class="space-y-4">
-      <template v-for="comment in comments" :key="comment.id">
-        <CommentThread 
-          :comment="comment" 
-          :postId="postId"
-          @reply-added="$emit('refresh-comments')" 
-          @login-required="$emit('login-required')"
-        />
-      </template>
-    </div>
+      <!-- New top-level comment form -->
+      <div v-if="showNewCommentForm" class="bg-gray-50 dark:bg-gray-800 p-4 rounded">
+        <textarea 
+          v-model="newCommentContent" 
+          class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+          placeholder="Write your comment..."
+          rows="4"
+        ></textarea>
+        <div class="mt-2 flex justify-end">
+          <button 
+            @click="submitNewComment" 
+            class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
+            :disabled="!newCommentContent.trim()"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+      <div v-if="comments.length === 0">
+        <div v-if="isLoggedIn" class="text-center py-6 text-gray-500">
+          No comments yet. Be the first to share your thoughts!
+        </div>
+        <div v-else class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <p class="text-gray-600 dark:text-gray-300 mb-4">
+            Sign in to be the first to share your thoughts on this post!
+          </p>
+        </div>
+      </div>
+      <div v-else class="space-y-4">
+        <template v-for="comment in comments" :key="comment.id">
+          <CommentThread 
+            :comment="comment" 
+            :postId="postId"
+            @reply-added="$emit('refresh-comments')" 
+            @login-required="$emit('login-required')"
+          />
+        </template>
+      </div>
+    </template>
+    <template v-else>
+      <div class="text-center py-6 text-gray-500">Loading comments...</div>
+    </template>
   </div>
 </template>
 
@@ -74,6 +83,7 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore()
 const isLoggedIn = computed(() => authStore.isLoggedIn)
+const isAuthInitialized = computed(() => authStore.isInitialized)
 
 const showNewCommentForm = ref(false)
 const newCommentContent = ref('')

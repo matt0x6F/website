@@ -32,12 +32,17 @@ export function useApiClient<T extends Record<string, ApiConstructor<any>>>(apiC
 }
 export function useApiClient<T>(input: ApiConstructor<T> | Record<string, ApiConstructor<any>>) {
   const auth = useAuthStore()
-  
+  const isServer = typeof window === 'undefined'
+  const basePath = isServer
+    ? import.meta.env.VITE_API_URL_INTERNAL || import.meta.env.VITE_API_URL
+    : import.meta.env.VITE_API_URL
+
   const config = new Configuration({
-    basePath: import.meta.env.VITE_API_URL,
+    basePath,
     accessToken: () => auth.storedAccessToken
   })
   console.log('useApiClient: token at instantiation:', auth.storedAccessToken)
+  console.log('useApiClient: basePath at instantiation:', basePath)
 
   if (typeof input === 'function') {
     return new input(config)

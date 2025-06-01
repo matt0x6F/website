@@ -1,40 +1,40 @@
 <template>
   <div id="content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div v-if="loading" class="flex justify-center items-center min-h-[200px]">
+    <div v-if="props.loading" class="flex justify-center items-center min-h-[200px]">
       <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
     </div>
     
-    <div v-else-if="error" class="text-red-600">
-      {{ error }}
+    <div v-else-if="props.error" class="text-red-600">
+      {{ props.error }}
     </div>
     
-    <template v-else-if="post">
+    <template v-else-if="props.post">
       <article class="mb-8">
         <header class="mb-8">
-          <h1 class="text-4xl font-bold mb-2">{{ post.title }}</h1>
-          <div v-if="post.published" class="text-sm text-gray-500 italic">
-            Published {{ new Date(post.published).toLocaleDateString() }}
+          <h1 class="text-4xl font-bold mb-2">{{ props.post.title }}</h1>
+          <div v-if="props.post.published" class="text-sm text-gray-500 italic">
+            Published {{ new Date(props.post.published).toLocaleDateString() }}
           </div>
         </header>
         <!-- Series box below the title -->
         <div
-          v-if="post.series && seriesPosts.length > 1"
+          v-if="props.post.series && seriesPosts.length > 1"
           class="mb-6 p-4 border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 rounded"
         >
           <div class="font-semibold text-emerald-700 dark:text-emerald-300 mb-2">
-            Part of the series: <span class="underline">{{ post.series.title }}</span>
+            Part of the series: <span class="underline">{{ props.post.series.title }}</span>
           </div>
           <ol class="list-decimal list-inside space-y-1">
             <li
               v-for="sp in seriesPosts"
               :key="sp.id"
               :class="{
-                'font-bold text-emerald-800 dark:text-emerald-200': sp.id === post.id,
-                'text-gray-700 dark:text-gray-300': sp.id !== post.id
+                'font-bold text-emerald-800 dark:text-emerald-200': sp.id === props.post.id,
+                'text-gray-700 dark:text-gray-300': sp.id !== props.post.id
               }"
             >
               <NuxtLink
-                v-if="sp.id !== post.id"
+                v-if="sp.id !== props.post.id"
                 :to="{
                   name: 'blog-post',
                   params: { slug: sp.slug, year: sp.year || (sp.publishedAt ? new Date(sp.publishedAt).getFullYear() : undefined) }
@@ -52,38 +52,43 @@
         <!-- End Series box -->
         <MarkdownPreview
           class="no-prose-padding"
-          :content="post?.content || ''"
-          :meta="post"
+          :content="props.post?.content || ''"
+          :meta="props.post"
         />
       </article>
       
       <!-- Comments section -->
       <div class="mt-8">
-        <div v-if="!isLoggedIn && comments.length === 0" class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <p class="text-gray-600 dark:text-gray-300 mb-4">
-            Sign in to be the first to share your thoughts on this post!
-          </p>
-          <div class="flex justify-center space-x-4">
-            <button 
-              @click="showLoginDialog = true" 
-              class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-            >
-              Sign In
-            </button>
-            <button 
-              @click="showSignupDialog = true" 
-              class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-            >
-              Sign Up
-            </button>
+        <template v-if="isAuthInitialized">
+          <div v-if="!isLoggedIn && comments.length === 0" class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <p class="text-gray-600 dark:text-gray-300 mb-4">
+              Sign in to be the first to share your thoughts on this post!
+            </p>
+            <div class="flex justify-center space-x-4">
+              <button 
+                @click="showLoginDialog = true" 
+                class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+              >
+                Sign In
+              </button>
+              <button 
+                @click="showSignupDialog = true" 
+                class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+              >
+                Sign Up
+              </button>
+            </div>
           </div>
-        </div>
-        
-        <Comments 
-          :comments="comments" 
-          :postId="post.id" 
-          @refresh-comments="loadComments" 
-        />
+          
+          <Comments 
+            :comments="comments" 
+            :postId="props.post.id" 
+            @refresh-comments="loadComments" 
+          />
+        </template>
+        <template v-else>
+          <div class="text-center py-6 text-gray-500">Loading comments...</div>
+        </template>
       </div>
     </template>
     
@@ -94,10 +99,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, watch } from 'vue'
 import { useApiClient } from '@/composables/useApiClient'
-import { PostsApi, CommentsApi, SeriesApi } from '@/lib/api'
+import { CommentsApi, SeriesApi } from '@/lib/api'
 import type { PostDetails, CommentList, PostSummaryForSeries } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth'
 import Comments from '@/components/Comments.vue'
@@ -105,82 +109,59 @@ import LoginDialog from '@/components/LoginDialog.vue'
 import SignupDialog from '@/components/SignupDialog.vue'
 import MarkdownPreview from '@/components/MarkdownPreview.vue'
 
+const props = defineProps<{
+  post: PostDetails | null
+  loading: boolean
+  error: any
+}>()
 
-const route = useRoute()
-const posts = useApiClient(PostsApi)
 const commentsApi = useApiClient(CommentsApi)
 const seriesApi = useApiClient(SeriesApi)
 const authStore = useAuthStore()
 
-const post = ref<PostDetails | null>(null)
 const comments = ref<CommentList[]>([])
-const loading = ref(true)
-const error = ref<string | null>(null)
 const showLoginDialog = ref(false)
 const showSignupDialog = ref(false)
-
 const isLoggedIn = computed(() => authStore.isLoggedIn)
-
-// Series state
+const isAuthInitialized = computed(() => authStore.isInitialized)
 const seriesPosts = ref<PostSummaryForSeries[]>([])
 
-onMounted(async () => {
-  try {
-    const slug = route.params.slug as string
-    const year = route.params.year as string
-    const sharecode = route.query.sharecode as string | undefined
-    // First load the post
-    const postResult = await posts.getPostBySlugAndYear({ slug: slug, year: +year, ...(sharecode ? { sharecode } : {}) })
-    post.value = {
-      id: postResult.id,
-      title: postResult.title,
-      content: postResult.content,
-      createdAt: postResult.createdAt,
-      updatedAt: postResult.updatedAt,
-      published: postResult.publishedAt,
-      authorId: postResult.author?.id ?? 0,
-      slug: postResult.slug,
-      series: postResult.series ? { id: postResult.series.id, title: postResult.series.title } : undefined
+watch(
+  () => props.post,
+  async (newPost) => {
+    if (newPost) {
+      if (newPost.series?.id || newPost.series?.title) {
+        await loadSeriesPosts(newPost.series.id || newPost.series.title)
+      } else {
+        seriesPosts.value = []
+      }
+      await loadComments()
     }
-    // Set document title
-    document.title = `${post.value.title} – Blog – ooo-yay.com`
-    // If post is part of a series, load series posts using slug if available
-    if (postResult.series?.slug) {
-      await loadSeriesPosts(postResult.series.slug)
-    }
-    // Then load comments using the post's ID
-    await loadComments()
-  } catch (e) {
-    error.value = 'Failed to load blog post'
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
-})
+  },
+  { immediate: true }
+)
 
-// Function to reload comments
 async function loadComments() {
-  if (post.value && post.value.id) {
-    const commentsResult = await commentsApi.listComments({ 
-      postId: post.value.id,
-      topLevel: true 
+  if (props.post && props.post.id) {
+    const commentsResult = await commentsApi.listComments({
+      postId: props.post.id,
+      topLevel: true
     })
     comments.value = commentsResult.items || []
   }
 }
 
-// Function to load all posts in the series
 async function loadSeriesPosts(seriesIdOrSlug: number | string) {
   try {
     const result = await seriesApi.listPostsInSeries({ seriesIdOrSlug })
     let items = result.items || []
-    if (post.value && !items.some(p => p.id === post.value!.id)) {
+    if (props.post && !items.some(p => p.id === props.post!.id)) {
       items = [...items, {
-        id: post.value.id,
-        title: post.value.title,
-        slug: post.value.slug,
-        year: post.value.published ? new Date(post.value.published).getFullYear() : undefined,
-        publishedAt: post.value.published ? new Date(post.value.published) : undefined
+        id: props.post.id,
+        title: props.post.title,
+        slug: props.post.slug,
+        year: props.post.published ? new Date(props.post.published).getFullYear() : undefined,
+        publishedAt: props.post.published ? new Date(props.post.published) : undefined
       }]
       items.sort((a, b) => {
         if (!a.publishedAt || !b.publishedAt) return 0
@@ -188,8 +169,13 @@ async function loadSeriesPosts(seriesIdOrSlug: number | string) {
       })
     }
     seriesPosts.value = items
-  } catch (e) {
-    // Log the error, but do not block the page
+  } catch (e: any) {
+    const status = e?.status || e?.response?.status
+    if (status === 404) {
+      seriesPosts.value = []
+      return
+    }
+    // Log other errors
     console.warn('Failed to load series posts:', e)
     seriesPosts.value = []
   }

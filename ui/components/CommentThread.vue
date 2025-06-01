@@ -9,40 +9,45 @@
       </div>
       <div class="mt-2 prose-sm">{{ comment.content }}</div>
       
-      <!-- Reply link - only show if depth is less than 5 -->
-      <div v-if="depth < 5" class="mt-2 text-sm">
-        <button 
-          @click="isLoggedIn ? (showReplyForm = !showReplyForm) : $emit('login-required')" 
-          class="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
-        >
-          {{ isLoggedIn ? (showReplyForm ? 'Cancel' : 'Reply') : 'Sign in to Reply' }}
-        </button>
-      </div>
-      
-      <!-- Reply form -->
-      <div v-if="showReplyForm" class="mt-3">
-        <textarea 
-          v-model="replyContent" 
-          class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
-          placeholder="Write your reply..."
-          rows="3"
-        ></textarea>
-        <div class="mt-2 flex justify-end space-x-2">
+      <template v-if="isAuthInitialized">
+        <!-- Reply link - only show if depth is less than 5 -->
+        <div v-if="depth < 5" class="mt-2 text-sm">
           <button 
-            @click="showReplyForm = false" 
-            class="px-3 py-1 text-sm border rounded hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-600"
+            @click="isLoggedIn ? (showReplyForm = !showReplyForm) : $emit('login-required')" 
+            class="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
           >
-            Cancel
-          </button>
-          <button 
-            @click="submitReply" 
-            class="px-3 py-1 text-sm bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
-            :disabled="!replyContent.trim()"
-          >
-            Submit
+            {{ isLoggedIn ? (showReplyForm ? 'Cancel' : 'Reply') : 'Sign in to Reply' }}
           </button>
         </div>
-      </div>
+        
+        <!-- Reply form -->
+        <div v-if="showReplyForm" class="mt-3">
+          <textarea 
+            v-model="replyContent" 
+            class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+            placeholder="Write your reply..."
+            rows="3"
+          ></textarea>
+          <div class="mt-2 flex justify-end space-x-2">
+            <button 
+              @click="showReplyForm = false" 
+              class="px-3 py-1 text-sm border rounded hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-600"
+            >
+              Cancel
+            </button>
+            <button 
+              @click="submitReply" 
+              class="px-3 py-1 text-sm bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
+              :disabled="!replyContent.trim()"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      </template>
+      <template v-else>
+        <div class="text-center py-2 text-gray-500">Loading...</div>
+      </template>
     </div>
     
     <!-- Nested replies -->
@@ -78,6 +83,7 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore()
 const isLoggedIn = computed(() => authStore.isLoggedIn)
+const isAuthInitialized = computed(() => authStore.isInitialized)
 
 // Default depth to 0 if not provided
 const depth = props.depth ?? 0
