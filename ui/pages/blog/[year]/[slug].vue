@@ -1,5 +1,9 @@
 <template>
-  <BlogPostView :post="mappedPost" :loading="pending" :error="error" />
+  <div v-if="post === null">
+    <h1>Failed to load blog post</h1>
+    <p>The blog post could not be found or an error occurred.</p>
+  </div>
+  <BlogPostView v-else :post="mappedPost" :loading="pending" :error="error" />
   <div v-if="error" style="color: red; font-weight: bold;">
     SSR error: {{ error }}
   </div>
@@ -9,7 +13,7 @@
 import { useRoute } from 'vue-router'
 import { useAsyncData } from '#app'
 import { useHead } from '@vueuse/head'
-import { computed } from 'vue'
+import { computed, onMounted, watchEffect } from 'vue'
 import BlogPostView from '~/views/BlogPostView.vue'
 import { useApiClient } from '@/composables/useApiClient'
 import { PostsApi } from '@/lib/api'
@@ -22,7 +26,8 @@ const { data: post, pending, error } = await useAsyncData('post', async () => {
   try {
     return await postsApi.getPostBySlugAndYear({
       slug: route.params.slug as string,
-      year: Number(route.params.year)
+      year: Number(route.params.year),
+      sharecode: route.query.sharecode as string | undefined
     })
   } catch (e: any) {
     // Log everything we can
@@ -57,7 +62,13 @@ const mappedPost = computed(() => {
   }
 })
 
-if (post.value) {
+const getCanonicalUrl = () => {
+  const base = import.meta.env.VITE_PUBLIC_SITE_URL || ''
+  return `${base}/blog/${route.params.year}/${route.params.slug}`
+}
+
+watchEffect(() => {
+  if (!post.value) return
   const description = post.value.content
     ? post.value.content.replace(/[#_*>\-\n]/g, '').slice(0, 160)
     : ''
@@ -71,7 +82,7 @@ if (post.value) {
       { property: 'og:title', content: post.value.title },
       { property: 'og:description', content: description },
       { property: 'og:type', content: 'article' },
-      { property: 'og:url', content: typeof window !== 'undefined' ? window.location.href : '' },
+      { property: 'og:url', content: getCanonicalUrl() },
       { property: 'og:site_name', content: 'ooo-yay.com' },
       { property: 'og:image', content: image },
       ...(publishedIso ? [{ property: 'article:published_time', content: publishedIso }] : []),
@@ -99,7 +110,7 @@ if (post.value) {
           "articleBody": post.value.content,
           "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": typeof window !== 'undefined' ? window.location.href : ''
+            "@id": getCanonicalUrl()
           },
           "publisher": {
             "@type": "Organization",
@@ -113,5 +124,5 @@ if (post.value) {
       }
     ]
   })
-}
+})
 </script> 

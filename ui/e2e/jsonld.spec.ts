@@ -1,45 +1,47 @@
-import { test, expect, Page, Route } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import { mockServer } from './mockServer.js'
+import { URL } from 'url'
 
 const postYear = 2025
 const postSlug = 'test-post-jsonld'
 const postTitle = 'JSON-LD Test Post'
 const postContent = 'This is a test post for JSON-LD.'
 
-// Mock API response for the blog post
-const mockPostApi = async (page: Page) => {
-  await page.route(`**/api/posts/slug/${postYear}/${postSlug}`, async (route: Route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        id: 100,
-        title: postTitle,
-        content: postContent,
-        createdAt: '2025-05-18T02:53:01.410Z',
-        updatedAt: '2025-05-28T03:55:08.889Z',
-        publishedAt: '2025-05-28T03:55:08.889Z',
-        author: { id: 1, username: 'matt', email: 'm@ooo-yay.com', is_staff: true },
-        slug: postSlug,
-        series: null,
-      })
-    })
-  })
-  await page.route('**/api/comments/**', async (route: Route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ items: [], count: 0 })
-    })
-  })
-}
+test.beforeAll(async () => {
+  await mockServer.start(4100);
+  // Register the post mock
+  const path = `/api/posts/slug/${postYear}/${postSlug}`;
+  await mockServer.forGet(path)
+    .asPriority(1)
+    .thenCallback(req => {
+      return {
+        status: 200,
+        json: {
+          id: 102,
+          title: postTitle,
+          content: postContent,
+          created_at: '2025-05-18T02:53:01.410Z',
+          updated_at: '2025-05-28T03:55:08.889Z',
+          published_at: '2025-05-28T03:55:08.889Z',
+          author: { id: 1, username: 'matt', email: 'm@ooo-yay.com', is_staff: true },
+          slug: postSlug,
+          series: null,
+        }
+      }
+    });
+  // Register comments mock
+  await mockServer.forGet(/\/api\/comments\/.*/).thenJson(200, { items: [], count: 0 });
+});
+
+test.afterAll(async () => {
+  await mockServer.stop()
+})
 
 test('Blog post page injects correct JSON-LD', async ({ page }) => {
-  await mockPostApi(page)
   await page.goto(`/blog/${postYear}/${postSlug}`)
-  // Wait for the headline to appear
   await expect(page.locator('h1')).toHaveText(postTitle)
-  // Evaluate the JSON-LD in the head
   const jsonld = await page.evaluate(() => {
+    // @ts-expect-error: 'document' is available in browser context
     const script = document.head.querySelector('script[type="application/ld+json"]')
     if (!script || !script.textContent) return null
     return JSON.parse(script.textContent)

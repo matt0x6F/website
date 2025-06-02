@@ -41,6 +41,7 @@ services:
     environment:
       - VITE_API_URL=http://localhost:8000
       - VITE_API_URL_INTERNAL=http://django:8000
+      - VITE_PUBLIC_SITE_URL=http://localhost:3000
     volumes:
       - ./ui:/app
     ports:
