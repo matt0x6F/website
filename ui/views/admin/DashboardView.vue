@@ -188,15 +188,15 @@ function onHeatmapSelect(day: { date: string, count: number }) {
 onMounted(() => {
   if (typeof window === 'undefined') return; // Only run on client
   watch(
-    () => [authStore.isInitialized, authStore.userData.isStaff],
-    ([initialized, isStaff]) => {
-      if (initialized && isStaff) {
+    () => authStore.userData.isStaff,
+    (isStaff) => {
+      if (isStaff) {
         document.title = 'Admin Dashboard – ooo-yay.com'
         fetchPublishedPostCount()
         fetchTotalPostCount()
         fetchUserCount()
         fetchPublishedPostsForHeatmap()
-      } else if (initialized && !isStaff) {
+      } else {
         console.warn('Non-staff user accessed admin dashboard')
       }
     },

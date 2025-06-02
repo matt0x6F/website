@@ -155,16 +155,6 @@ const loadComments = async () => {
   loading.value = true;
   error.value = null;
   try {
-    if (!auth.isInitialized) {
-      await new Promise(resolve => {
-        const stop = watch(() => auth.isInitialized, (val) => {
-          if (val) {
-            stop()
-            resolve(true)
-          }
-        })
-      })
-    }
     const moderationApi = useApiClient(ModerationApi);
     let allComments: any[] = [];
     if (reviewFilterOption.value.value === null) {
