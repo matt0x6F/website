@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AccountsApi';
+export * from './AuthApi';
 export * from './CommentsApi';
 export * from './DefaultApi';
 export * from './FeedApi';

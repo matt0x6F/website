@@ -64,6 +64,7 @@ export interface UpdateFileRequest {
 export class FilesApi extends runtime.BaseAPI {
 
     /**
+     * Creates a file with or without post associations.
      * Create File
      */
     async createFileRaw(requestParameters: CreateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FileDetails>> {
@@ -129,6 +130,7 @@ export class FilesApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates a file with or without post associations.
      * Create File
      */
     async createFile(requestParameters: CreateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FileDetails> {
@@ -137,6 +139,7 @@ export class FilesApi extends runtime.BaseAPI {
     }
 
     /**
+     * Deletes a file from the database and S3.
      * Delete File
      */
     async deleteFileRaw(requestParameters: DeleteFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
@@ -170,6 +173,7 @@ export class FilesApi extends runtime.BaseAPI {
     }
 
     /**
+     * Deletes a file from the database and S3.
      * Delete File
      */
     async deleteFile(requestParameters: DeleteFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
@@ -268,6 +272,7 @@ export class FilesApi extends runtime.BaseAPI {
     }
 
     /**
+     * Find files that exist in storage but not in the database. If a file exists in both public and private storage, it will be considered public. Returns detailed metadata about each orphaned file.
      * List Orphaned Files
      */
     async listOrphanedFilesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OrphanedFiles>> {
@@ -294,6 +299,7 @@ export class FilesApi extends runtime.BaseAPI {
     }
 
     /**
+     * Find files that exist in storage but not in the database. If a file exists in both public and private storage, it will be considered public. Returns detailed metadata about each orphaned file.
      * List Orphaned Files
      */
     async listOrphanedFiles(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OrphanedFiles> {
@@ -302,6 +308,7 @@ export class FilesApi extends runtime.BaseAPI {
     }
 
     /**
+     * Updates a file, namely the posts associated with the file. File properties are immutable.
      * Update File
      */
     async updateFileRaw(requestParameters: UpdateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FileDetails>> {
@@ -345,6 +352,7 @@ export class FilesApi extends runtime.BaseAPI {
     }
 
     /**
+     * Updates a file, namely the posts associated with the file. File properties are immutable.
      * Update File
      */
     async updateFile(requestParameters: UpdateFileRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FileDetails> {

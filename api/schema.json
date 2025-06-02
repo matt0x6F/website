@@ -6,6 +6,55 @@
     "description": "Resource-based API for ooo-yay.com."
   },
   "paths": {
+    "/api/auth/login": {
+      "post": {
+        "operationId": "login",
+        "summary": "Login",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "username",
+            "schema": {
+              "title": "Username",
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "password",
+            "schema": {
+              "title": "Password",
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "summary": "Logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/health": {
       "get": {
         "operationId": "core_api_healthcheck",
@@ -982,11 +1031,6 @@
         "description": "Retrieve a single series by its ID.\nIncludes a list of associated posts (summaries) by default.\nUse `include_posts=false` to omit posts.\nUse `posts_limit` to control the number of posts returned.",
         "tags": [
           "series"
-        ],
-        "security": [
-          {
-            "JWTAuth": []
-          }
         ]
       },
       "put": {
@@ -1125,11 +1169,6 @@
         "description": "List all series. Use `include_posts_count=true` to get the number of posts in each series.",
         "tags": [
           "series"
-        ],
-        "security": [
-          {
-            "JWTAuth": []
-          }
         ]
       }
     },
@@ -1183,11 +1222,6 @@
         "description": "Retrieve a single series by its slug.\nIncludes a list of associated posts (summaries) by default.\nUse `include_posts=false` to omit posts.\nUse `posts_limit` to control the number of posts returned.",
         "tags": [
           "series"
-        ],
-        "security": [
-          {
-            "JWTAuth": []
-          }
         ]
       }
     },
@@ -1276,11 +1310,6 @@
         "description": "List all published posts belonging to a specific series.\nOptionally exclude a specific post by its ID (e.g., the current post being viewed).\nThe 'order' parameter controls the ordering of posts. Use '-published_at' (default) for descending, 'published_at' for ascending.",
         "tags": [
           "series"
-        ],
-        "security": [
-          {
-            "JWTAuth": []
-          }
         ]
       }
     },
@@ -1878,6 +1907,7 @@
             }
           }
         },
+        "description": "Creates a file with or without post associations.",
         "tags": [
           "files"
         ],
@@ -1930,6 +1960,7 @@
             }
           }
         },
+        "description": "Find files that exist in storage but not in the database.\nIf a file exists in both public and private storage, it will be considered public.\nReturns detailed metadata about each orphaned file.",
         "tags": [
           "files"
         ],
@@ -2003,6 +2034,7 @@
             }
           }
         },
+        "description": "Updates a file, namely the posts associated with the file. File properties are immutable.",
         "tags": [
           "files"
         ],
@@ -2041,6 +2073,7 @@
             "description": "OK"
           }
         },
+        "description": "Deletes a file from the database and S3.",
         "tags": [
           "files"
         ],

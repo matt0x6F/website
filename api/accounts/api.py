@@ -21,7 +21,7 @@ from accounts.schemas import (
 from auth.middleware import AnonymousOnly, AuthenticatedOnly, JWTAuth, StaffOnly
 
 logger: structlog.stdlib.BoundLogger = structlog.get_logger(__name__)  # noqa: F821
-accounts_router = Router()
+accounts_router = Router(auth=JWTAuth())
 
 
 @accounts_router.get(

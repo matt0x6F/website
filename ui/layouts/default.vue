@@ -6,7 +6,6 @@ import MainNav from '~/components/MainNav.vue';
 import MainFooter from '~/components/MainFooter.vue';
 // PrimeVue MenuBar, Button, Toast, etc. should be auto-imported or imported as needed
 
-const userStore = useAuthStore();
 const showLoginDialog = ref(false);
 const isDarkMode = ref(false);
 

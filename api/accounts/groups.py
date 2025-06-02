@@ -14,8 +14,8 @@ from accounts.schemas import Permission as PermissionSchema
 from auth.middleware import JWTAuth, StaffOnly
 
 logger: structlog.stdlib.BoundLogger = structlog.get_logger(__name__)
-groups_router = Router()
-permissions_router = Router()
+groups_router = Router(auth=JWTAuth(permissions=StaffOnly))
+permissions_router = Router(auth=JWTAuth(permissions=StaffOnly))
 
 
 # Groups API endpoints

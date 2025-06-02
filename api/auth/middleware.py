@@ -1,7 +1,6 @@
 from typing import Any, Type
 
 import structlog
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser, AnonymousUser
 from django.http import HttpRequest
 from ninja.errors import HttpError
@@ -81,16 +80,15 @@ class JWTAuth(JWTAuth):
     def __call__(self, request: HttpRequest) -> Any | None:
         headers = request.headers
         auth_value = headers.get(self.header)
+        token = None
+
         if auth_value is not None:
             parts = auth_value.split(" ")
-
-            if parts[0].lower() != self.openapi_scheme:
-                if settings.DEBUG:
-                    logger.error(f"Unexpected auth - '{auth_value}'")
-                return None
-            token = " ".join(parts[1:])
-        else:
-            token = TOKEN_UNSET
+            if parts[0].lower() == self.openapi_scheme:
+                token = " ".join(parts[1:])
+        # If not in header, try cookie
+        if not token or token == TOKEN_UNSET:
+            token = request.COOKIES.get("access_token", TOKEN_UNSET)
 
         user: AbstractUser = AnonymousUser()
 
@@ -110,18 +108,14 @@ class JWTAuth(JWTAuth):
 
         if token == TOKEN_UNSET:
             logger.debug("Token is not set; defaulting to AnonymousUser")
-
             return user
 
         try:
             logger.debug("Authenticating user with token", token=token)
-
             user = super().jwt_authenticate(request, token)
-
             logger.info("Successfully authenticated user", user=user)
         except InvalidToken:
             logger.error("Token is invalid; defaulting to AnonymousUser")
-
         except Exception:
             logger.error("Failed to authenticate user; defaulting to AnonymousUser")
 

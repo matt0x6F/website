@@ -26,12 +26,11 @@ type ApiConstructor<T> = new (config: Configuration) => T
  * const api = useApiClient(MyApi)
  * ```
  */
-export function useApiClient<T>(ApiClass: ApiConstructor<T>): T
-export function useApiClient<T extends Record<string, ApiConstructor<any>>>(apiClasses: T): {
+export function useApiClient<T>(ApiClass: ApiConstructor<T>, cookie?: string): T
+export function useApiClient<T extends Record<string, ApiConstructor<any>>>(apiClasses: T, cookie?: string): {
   [K in keyof T]: InstanceType<T[K]>
 }
-export function useApiClient<T>(input: ApiConstructor<T> | Record<string, ApiConstructor<any>>) {
-  const auth = useAuthStore()
+export function useApiClient<T>(input: ApiConstructor<T> | Record<string, ApiConstructor<any>>, cookie?: string) {
   const isServer = typeof window === 'undefined'
   const basePath = isServer
     ? import.meta.env.VITE_API_URL_INTERNAL || import.meta.env.VITE_API_URL
@@ -39,10 +38,18 @@ export function useApiClient<T>(input: ApiConstructor<T> | Record<string, ApiCon
 
   const config = new Configuration({
     basePath,
-    accessToken: () => auth.storedAccessToken
+    fetchApi: (url, options = {}) => {
+      let baseHeaders: Record<string, string> = {};
+      if (options.headers && typeof options.headers === 'object' && !Array.isArray(options.headers)) {
+        baseHeaders = options.headers as Record<string, string>;
+      }
+      const headers: Record<string, string> = { ...baseHeaders };
+      if (cookie && isServer) {
+        headers['cookie'] = cookie;
+      }
+      return fetch(url, { ...options, headers, credentials: 'include' })
+    }
   })
-  console.log('useApiClient: token at instantiation:', auth.storedAccessToken)
-  console.log('useApiClient: basePath at instantiation:', basePath)
 
   if (typeof input === 'function') {
     return new input(config)

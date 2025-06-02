@@ -58,7 +58,7 @@ tasks:
   generate-sdk:
     desc: "Generate SDK"
     cmds:
-      - npx openapi-generator-cli generate -g typescript-fetch -i api/schema.json -o ui/src/lib/api --remove-operation-id-prefix
+      - npx openapi-generator-cli generate -g typescript-fetch -i api/schema.json -o ui/lib/api --remove-operation-id-prefix
     generates:
       - ui/src/lib/api
     sources:

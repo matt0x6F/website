@@ -59,36 +59,30 @@
       
       <!-- Comments section -->
       <div class="mt-8">
-        <template v-if="isAuthInitialized">
-          <div v-if="!isLoggedIn && comments.length === 0" class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <p class="text-gray-600 dark:text-gray-300 mb-4">
-              Sign in to be the first to share your thoughts on this post!
-            </p>
-            <div class="flex justify-center space-x-4">
-              <button 
-                @click="showLoginDialog = true" 
-                class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-              >
-                Sign In
-              </button>
-              <button 
-                @click="showSignupDialog = true" 
-                class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-              >
-                Sign Up
-              </button>
-            </div>
+        <div v-if="!isLoggedIn && comments.length === 0" class="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <p class="text-gray-600 dark:text-gray-300 mb-4">
+            Sign in to be the first to share your thoughts on this post!
+          </p>
+          <div class="flex justify-center space-x-4">
+            <button 
+              @click="showLoginDialog = true" 
+              class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+            >
+              Sign In
+            </button>
+            <button 
+              @click="showSignupDialog = true" 
+              class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+            >
+              Sign Up
+            </button>
           </div>
-          
-          <Comments 
-            :comments="comments" 
-            :postId="props.post.id" 
-            @refresh-comments="loadComments" 
-          />
-        </template>
-        <template v-else>
-          <div class="text-center py-6 text-gray-500">Loading comments...</div>
-        </template>
+        </div>
+        <Comments 
+          :comments="comments" 
+          :postId="props.post.id" 
+          @refresh-comments="loadComments" 
+        />
       </div>
     </template>
     

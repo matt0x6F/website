@@ -1,13 +1,11 @@
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, toRaw } from 'vue'
 import { defineStore } from 'pinia'
-import { AccountsApi, Configuration, TokenApi, type ConfigurationParameters, type UserSelf, type UpdateAccount, type NewAccount } from '@/lib/api'
+import { AccountsApi, AuthApi, type UserSelf, type UpdateAccount, type NewAccount } from '@/lib/api'
 import { useRouter } from 'vue-router'
+import { useApiClient } from '@/composables/useApiClient'
 
 export const useAuthStore = defineStore('auth', () => {
-  const storedAccessToken = ref<string>(typeof window !== 'undefined' ? localStorage.getItem("accessToken") || "" : "")
-  const storedRefreshToken = ref<string>(typeof window !== 'undefined' ? localStorage.getItem("refreshToken") || "" : "")
-  const refreshTokenTimeout = ref<number>(0)
-  const userData = reactive<UserSelf>({
+  const userData = ref<UserSelf>({
     id: -1,
     username: "",
     email: "",
@@ -17,281 +15,69 @@ export const useAuthStore = defineStore('auth', () => {
     isActive: false,
     dateJoined: new Date(),
   })
-  // refresh token is not undefined or blank
-  const isLoggedIn = computed(() => storedRefreshToken.value !== "")
   const router = useRouter()
   const redirectUrl = ref<string | null>(null)
   const isInitialized = ref(false)
 
-  async function init() {
-    console.log('Auth init: refreshToken', storedRefreshToken.value)
+  const isLoggedIn = computed(() => userData.value.id !== -1)
+
+  async function init(cookie?: string) {
     isInitialized.value = false
-    if (storedRefreshToken.value) {
-      try {
-        await refreshToken()
-        await getUserData()
-        startRefreshTokenTimer()
-      } catch (error) {
-        logout()
-        throw error
-      }
+    try {
+      await getUserData(cookie)
+    } catch (error) {
+      resetUserData()
     }
     isInitialized.value = true
-    console.log('Auth init complete. userData:', JSON.parse(JSON.stringify(userData)))
   }
 
-  async function getUserData() {
-    console.log('Calling getUserData with accessToken', storedAccessToken.value)
-    if (!storedAccessToken.value) {
-        throw new Error('No access token available')
-    }
-
-    const params: ConfigurationParameters = {
-        basePath: import.meta.env.VITE_API_URL,
-        accessToken: storedAccessToken.value,
-        headers: {
-            'Authorization': `Bearer ${storedAccessToken.value}`
-        }
-    }
-
-    const config = new Configuration(params)
-
-    try {
-        const accountsApi = new AccountsApi(config)
-        const user = await accountsApi.whoami()
-
-        userData.id = user.id
-        userData.username = user.username
-        userData.email = user.email
-        userData.firstName = user.firstName
-        userData.lastName = user.lastName
-        userData.isStaff = user.isStaff
-        userData.isActive = user.isActive
-        userData.dateJoined = user.dateJoined
-        console.log('getUserData success. userData:', JSON.parse(JSON.stringify(userData)))
-    } catch (error) {
-        if (error instanceof Error && 
-            'status' in error && 
-            error.status === 401 && 
-            storedRefreshToken.value) {
-            await refreshToken()
-            // Try again with the new token
-            return await getUserData()
-        }
-        throw error
-    }
+  async function getUserData(cookie?: string) {
+    const accountsApi = useApiClient(AccountsApi, cookie)
+    const user = await accountsApi.whoami()
+    if (!user) throw new Error('No user returned from whoami')
+    userData.value = { ...user, dateJoined: new Date(user.dateJoined) }
   }
 
   async function login(username: string, password: string) {
-    const params: ConfigurationParameters = {
-        basePath: import.meta.env.VITE_API_URL,
+    const authApi = useApiClient(AuthApi)
+    await authApi.login({ username, password })
+    await getUserData()
+    // After successful login, check for redirect
+    if (redirectUrl.value) {
+      const redirect = redirectUrl.value
+      redirectUrl.value = null // Clear the redirect URL
+      router.push(redirect)
     }
-
-    const anonConfig = new Configuration(params)
-    const tokenApi = new TokenApi(anonConfig)
-
-    try {
-        const tokens = await tokenApi.obtainPair({ 
-          tokenObtainPairInputSchema: { email: username, password: password } 
-        })
-        
-        storedAccessToken.value = tokens.access
-        storedRefreshToken.value = tokens.refresh
-        
-        if (typeof window !== 'undefined') {
-          localStorage.setItem("accessToken", storedAccessToken.value)
-          localStorage.setItem("refreshToken", storedRefreshToken.value)
-        }
-
-        const authedParams: ConfigurationParameters = {
-            basePath: import.meta.env.VITE_API_URL,
-            accessToken: storedAccessToken.value,
-            headers: {
-                'Authorization': `Bearer ${storedAccessToken.value}`
-            }
-        }
-        const authedConfig = new Configuration(authedParams)
-        const accountsApi = new AccountsApi(authedConfig)
-
-        const user = await accountsApi.whoami()
-        
-        userData.id = user.id
-        userData.username = user.username
-        userData.email = user.email
-        userData.firstName = user.firstName
-        userData.lastName = user.lastName
-        userData.isStaff = user.isStaff
-        userData.isActive = user.isActive
-        userData.dateJoined = user.dateJoined
-
-        startRefreshTokenTimer();
-
-        // After successful login, check for redirect
-        if (redirectUrl.value) {
-          const redirect = redirectUrl.value
-          redirectUrl.value = null // Clear the redirect URL
-          router.push(redirect)
-        }
-    } catch (error) {
-        // If anything fails, clear everything
-        clearTokens()
-        throw error
-    }
-  }
-
-  function clearTokens() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem("accessToken")
-      localStorage.removeItem("refreshToken")
-    }
-    storedAccessToken.value = ""
-    storedRefreshToken.value = ""
   }
 
   async function logout() {
-    clearTokens()
-    // Reset user data
-    userData.id = -1
-    userData.username = ""
-    userData.email = ""
-    userData.firstName = ""
-    userData.lastName = ""
-    userData.isStaff = false
-    userData.isActive = false
-    userData.dateJoined = new Date()
-
-    stopRefreshTokenTimer()
+    const authApi = useApiClient(AuthApi)
+    await authApi.logout()
+    resetUserData()
     router.push('/')
   }
 
-  async function refreshToken() {
-    console.log('Attempting to refresh token...')
-    const params: ConfigurationParameters = {
-      basePath: import.meta.env.VITE_API_URL,
-    }
-
-    const config = new Configuration(params)
-    const tokenApi = new TokenApi(config)
-    
-    try {
-      const tokens = await tokenApi.refresh({ 
-        tokenRefreshInputSchema: { refresh: storedRefreshToken.value } 
-      })
-
-      storedAccessToken.value = tokens.access !== null ? tokens.access : storedAccessToken.value
-      storedRefreshToken.value = tokens.refresh
-
-      if (typeof window !== 'undefined') {
-        localStorage.setItem("accessToken", storedAccessToken.value)
-        localStorage.setItem("refreshToken", storedRefreshToken.value)
-      }
-
-      console.log('Token refresh successful - new access token received (', storedAccessToken.value.length, ')')
-      startRefreshTokenTimer()
-    } catch (error) {
-      console.error('Token refresh failed:', error)
-      clearTokens()
-      throw error
-    }
-  }
-
-  function startRefreshTokenTimer() {
-    // Clear any existing timeout first
-    stopRefreshTokenTimer()
-    
-    try {
-      // Parse the access token
-      const jwtBase64 = storedAccessToken.value.split('.')[1];
-      const jwtToken = JSON.parse(atob(jwtBase64));
-
-      // Set a timeout to refresh the token when it's at 75% of its lifetime
-      // This ensures we refresh well before expiration
-      const expires = new Date(jwtToken.exp * 1000);
-      const issued = new Date(jwtToken.iat * 1000);
-      const tokenLifetime = expires.getTime() - issued.getTime();
-      const refreshAt = issued.getTime() + (tokenLifetime * 0.75);
-      const timeout = refreshAt - Date.now();
-      
-      // Only set the timer if the timeout is positive and reasonable
-      if (timeout > 0 && timeout < tokenLifetime) {
-        refreshTokenTimeout.value = window.setTimeout(async () => {
-          try {
-            await refreshToken()
-            // After successful refresh, start the timer again
-            startRefreshTokenTimer()
-          } catch (error) {
-            console.error('Token refresh failed:', error)
-            // If refresh fails, attempt one more time after a short delay
-            const retryTimeout = window.setTimeout(async () => {
-              try {
-                await refreshToken()
-                startRefreshTokenTimer()
-              } catch (retryError) {
-                console.error('Token refresh retry failed:', retryError)
-                await logout()
-              }
-              clearTimeout(retryTimeout)
-            }, 5000) // Wait 5 seconds before retry
-          }
-        }, timeout);
-      } else if (storedRefreshToken.value) {
-        // If we're already past the refresh time but have a refresh token, try to refresh immediately
-        refreshToken().catch(async (error) => {
-          console.error('Immediate token refresh failed:', error)
-          await logout()
-        })
-      }
-    } catch (error) {
-      console.error('Error starting refresh timer:', error)
-      stopRefreshTokenTimer()
-    }
-  }
-
-  function stopRefreshTokenTimer() {
-    if (refreshTokenTimeout.value) {
-      clearTimeout(refreshTokenTimeout.value)
-      refreshTokenTimeout.value = 0
+  function resetUserData() {
+    userData.value = {
+      id: -1,
+      username: "",
+      email: "",
+      firstName: "",
+      lastName: "",
+      isStaff: false,
+      isActive: false,
+      dateJoined: new Date(),
     }
   }
 
   async function updateProfile(data: UpdateAccount) {
-    if (!storedAccessToken.value) {
-      throw new Error('No access token available')
-    }
-
-    const params: ConfigurationParameters = {
-      basePath: import.meta.env.VITE_API_URL,
-      accessToken: storedAccessToken.value,
-      headers: {
-        'Authorization': `Bearer ${storedAccessToken.value}`
-      }
-    }
-
-    const config = new Configuration(params)
-
-    try {
-      const accountsApi = new AccountsApi(config)
-      const response = await accountsApi.updateSelf({
-        updateAccount: data
-      })
-      
-      // Update all user data fields from response
-      userData.username = response.username
-      userData.email = response.email
-      userData.firstName = response.firstName
-      userData.lastName = response.lastName
-      return response
-    } catch (error) {
-      if (error instanceof Error && 
-          'status' in error && 
-          error.status === 401 && 
-          storedRefreshToken.value) {
-        await refreshToken()
-        // Try again with the new token
-        return await updateProfile(data)
-      }
-      throw error
-    }
+    const accountsApi = useApiClient(AccountsApi)
+    const response = await accountsApi.updateSelf({ updateAccount: data })
+    userData.value.username = response.username
+    userData.value.email = response.email
+    userData.value.firstName = response.firstName
+    userData.value.lastName = response.lastName
+    return response
   }
 
   function setRedirectUrl(url: string) {
@@ -299,35 +85,33 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signup(newAccount: NewAccount) {
-    const params: ConfigurationParameters = {
-      basePath: import.meta.env.VITE_API_URL,
-    }
-    const config = new Configuration(params)
-    const api = new AccountsApi(config);
-    const response = await api.signUp({ newAccount });
-    return response;
+    const accountsApi = useApiClient(AccountsApi)
+    const response = await accountsApi.signUp({ newAccount })
+    return response
   }
 
-  // Initialize the store when created
-  init()
+  // Pinia SSR helpers
+  function dehydrate() {
+    return { userData: toRaw(userData.value), isInitialized: isInitialized.value }
+  }
+  function hydrate(state: any) {
+    if (state?.userData) userData.value = { ...state.userData, dateJoined: new Date(state.userData.dateJoined) }
+    if (typeof state?.isInitialized === 'boolean') isInitialized.value = state.isInitialized
+  }
 
-  // Export all methods that might be needed externally
-  return { 
-    storedAccessToken, 
-    storedRefreshToken,
-    userData, 
-    isLoggedIn, 
-    login, 
+  return {
+    userData,
+    isLoggedIn,
+    login,
     logout,
     init,
-    refreshToken,
     getUserData,
     updateProfile,
     redirectUrl,
     setRedirectUrl,
     signup,
-    startRefreshTokenTimer,
-    stopRefreshTokenTimer,
     isInitialized,
+    dehydrate,
+    hydrate,
   }
 })

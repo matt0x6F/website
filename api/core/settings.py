@@ -186,6 +186,9 @@ ALLOWED_HOSTS = config.allowed_hosts
 
 CORS_ALLOWED_ORIGINS = config.cors.allowed_origins
 CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+CORS_ALLOW_CREDENTIALS = True  # Allow cookies to be sent cross-origin
+# If you use cookies for auth, you may need to enable CSRF protection for POST/PUT/DELETE requests.
+# Django Ninja supports CSRF (see https://django-ninja.dev/guides/authentication/)
 
 DATABASES = {
     "default": {
