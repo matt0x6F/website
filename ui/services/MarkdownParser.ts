@@ -42,6 +42,12 @@ export class MarkdownParser {
 
   private parseCodeBlock(token: any): Block {
     const lang = token.info ? this.md.utils.unescapeAll(token.info).trim().split(/\s+/g)[0] : ''
+    if (lang === 'mermaid') {
+      return {
+        type: 'mermaid',
+        content: token.content
+      }
+    }
     return {
       type: 'code',
       lang,

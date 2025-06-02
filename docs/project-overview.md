@@ -44,7 +44,7 @@ flowchart TD
 - **Posts:** Create, edit, publish, and manage blog posts
 - **Series:** Group posts into series for multi-part content
 - **Sharecodes:** Generate and use shareable codes for content access or collaboration
-- **Markdown Editor:** Rich markdown editing experience with preview and formatting tools
+- **Markdown Editor:** Rich markdown editing experience with preview and formatting tools. **Supports Mermaid diagrams in markdown code blocks.**
 - **Media Management:** Upload and manage images/files for posts
 - **Commenting:** User comments on posts (if enabled)
 - **User Profiles:** Manage account details and profile information

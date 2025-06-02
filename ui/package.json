@@ -28,6 +28,7 @@
     "eslint": "^9.28.0",
     "highlight.js": "^11.11.1",
     "markdown-it": "^14.1.0",
+    "mermaid": "^11.6.0",
     "nuxt": "^3.17.4",
     "postcss": "^8.5.4",
     "primeicons": "^7.0.0",

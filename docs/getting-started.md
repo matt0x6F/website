@@ -68,4 +68,6 @@ docker compose up --build
    task load-fixtures
    ```
 
-You are now ready to start developing! See other docs for more details on workflows and conventions. 
+You are now ready to start developing! See other docs for more details on workflows and conventions.
+
+> **Tip:** You can use Mermaid diagrams in markdown by writing code blocks with `mermaid` as the language. 

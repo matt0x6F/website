@@ -6,6 +6,7 @@
       <ListBlock v-else-if="block.type === 'list'" :ordered="block.ordered" :start="block.start" :items="block.items" />
       <BlockquoteBlock v-else-if="block.type === 'blockquote'" :blocks="block.content" />
       <CodeBlock v-else-if="block.type === 'code'" :lang="block.lang" :code="block.content" />
+      <MermaidBlock v-else-if="block.type === 'mermaid'" :code="block.content" />
       <MarkdownTable v-else-if="block.type === 'table'" :columns="block.columns" :rows="block.rows" />
       <TaskListItem v-else-if="block.type === 'task'" :modelValue="block.modelValue" :label="block.label" />
       <OrderedList v-else-if="block.type === 'ordered_list'" :items="block.items" :start="block.start" />
@@ -37,6 +38,7 @@ import HeadingBlock from '@/components/markdown/HeadingBlock.vue'
 import ParagraphBlock from '@/components/markdown/ParagraphBlock.vue'
 import ListBlock from '@/components/markdown/ListBlock.vue'
 import BlockquoteBlock from '@/components/markdown/BlockquoteBlock.vue'
+import MermaidBlock from '@/components/markdown/MermaidBlock.vue'
 import { MarkdownParser } from '@/services/MarkdownParser'
 import type { PostDetails } from '@/lib/api'
 

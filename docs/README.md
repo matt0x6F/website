@@ -6,7 +6,7 @@ Welcome to the documentation for this project! This guide is designed to help de
 
 ## About This Project
 
-This project is a modern, full-stack web application built with Django (Python) on the backend and Vue 3 (TypeScript) on the frontend. It features robust authentication, a RESTful API, and a rich admin/user interface. The codebase is designed for maintainability, scalability, and ease of collaboration.
+This project is a modern, full-stack web application built with Django (Python) on the backend and Vue 3 (TypeScript) on the frontend. It features robust authentication, a RESTful API, and a rich admin/user interface. The codebase is designed for maintainability, scalability, and ease of collaboration. It **supports Mermaid diagrams in markdown** (just use ```mermaid code blocks).
 
 ---
 

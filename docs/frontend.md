@@ -78,12 +78,26 @@ The app features a powerful, custom-built Markdown editing and rendering experie
 - **Rich Toolbar:** Bold, italic, code, headings, links, images, code blocks, lists (ordered, unordered, checklists), and more.
 - **Live Preview:** Side-by-side split view with real-time markdown rendering.
 - **Syntax Highlighting:** Code blocks are highlighted using Highlight.js.
+- **Mermaid Diagrams:** Code blocks with `mermaid` as the language (```mermaid) are rendered as diagrams using [Mermaid](https://mermaid-js.github.io/). See `MermaidBlock.vue`.
 - **Drag-and-Drop Uploads:** Drag files/images into the editor to upload and insert markdown links automatically.
 - **Paste Support:** Paste URLs or images directly; smart link formatting.
 - **Task Lists:** Support for GitHub-style checklists (`- [ ] Task`, `- [x] Done`).
 - **Responsive & Expandable:** Editor can be expanded to fullscreen for distraction-free writing.
 - **Custom Parsing:** `MarkdownParser.ts` provides block-level parsing for advanced features (tables, blockquotes, lists, etc.).
 - **Extensible:** Easily add new toolbar actions or parsing rules.
+
+#### Mermaid Example
+
+You can include diagrams in markdown like this:
+
+```mermaid
+graph TD
+  A[Start] --> B{Is it working?}
+  B -- Yes --> C[Great!]
+  B -- No  --> D[Fix it]
+```
+
+This will render as a diagram in the preview and published post.
 
 ### Markdown Rendering Components
 
