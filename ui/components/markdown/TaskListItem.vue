@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, defineEmits } from 'vue'
+import { computed } from 'vue'
 import Checkbox from 'primevue/checkbox'
 
 const props = defineProps({
@@ -18,6 +18,7 @@ const props = defineProps({
   inputId: { type: String, default: () => `task-checkbox-${Math.random().toString(36).slice(2, 10)}` },
   unordered: { type: Boolean, default: false }
 })
+
 const emit = defineEmits(['update:modelValue'])
 
 const modelValueProxy = computed({

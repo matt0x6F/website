@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps } from 'vue'
+import { computed } from 'vue'
 import Checkbox from 'primevue/checkbox'
 import TaskListItem from './TaskListItem.vue'
 import MarkdownListRenderer from './MarkdownListRenderer.vue'

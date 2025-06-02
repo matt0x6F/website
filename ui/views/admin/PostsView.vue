@@ -4,7 +4,7 @@
       <h1 class="text-2xl font-bold">Blog Posts</h1>
       <Toolbar class="mb-6">
         <template #start>
-          <NuxtLink :to="{ name: 'admin-posts' }">
+          <NuxtLink :to="{ path: '/admin/posts/edit/new' }">
             <Button v-tooltip.bottom="{ value: 'Create New Post', showDelay: 1000 }" icon="pi pi-plus" aria-label="Create New Post" class="mr-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600" text />
           </NuxtLink>
         </template>

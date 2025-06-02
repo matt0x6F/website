@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineAsyncComponent, watchEffect } from 'vue'
+import { defineAsyncComponent, watchEffect } from 'vue'
 
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'

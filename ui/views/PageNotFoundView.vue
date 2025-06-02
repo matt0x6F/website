@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useHead } from '@unhead/vue'
+import { useHead } from '#imports'
 
 const messages = [
   "Looks like this page took a wrong turn at Albuquerque...",

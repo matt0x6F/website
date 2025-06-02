@@ -97,7 +97,7 @@
                             label="Edit"
                             severity="secondary"
                             size="small"
-                            @click="router.push({ name: 'admin-users-edit', params: { id: item.id }})"
+                            @click="router.push(`/admin/users/${item.id}`)"
                           />
                         </div>
                       </template>
