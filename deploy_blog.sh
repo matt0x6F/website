@@ -38,7 +38,7 @@ nvm install
 nvm use
 
 # 8. Set build environment variables and build
-export VITE_API_URL="https://ooo-yay.com/api"
+export VITE_API_URL="https://ooo-yay.com"
 export VITE_API_URL_INTERNAL="http://127.0.0.1:8000"
 export VITE_PUBLIC_SITE_URL="https://ooo-yay.com"
 
