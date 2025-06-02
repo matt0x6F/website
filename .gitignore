@@ -1,3 +1,5 @@
+frontend/
+
 .venv/
 node_modules/
 .task/

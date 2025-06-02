@@ -44,6 +44,12 @@ export VITE_PUBLIC_SITE_URL="https://ooo-yay.com"
 
 npm install
 npm run build
+
+# Copy .output to ../frontend
+target_dir="/var/lib/blog/ui/.output"
+dest_dir="/var/lib/blog/frontend"
+rm -rf "$dest_dir"
+cp -r "$target_dir" "$dest_dir"
 EOF
 
 # 9. Back to 'matt' user, restart services
