@@ -106,6 +106,10 @@ jobs:
           cd ui
           npm ci
       - name: Build frontend for preview
+        env:
+          VITE_API_URL: http://localhost:4100
+          VITE_API_URL_INTERNAL: http://localhost:4100
+          VITE_PUBLIC_SITE_URL: http://localhost:3100
         run: |
           cd ui
           npm run build
