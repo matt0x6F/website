@@ -6,7 +6,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     await auth.init()
   }
   // Only run this check on the client
-  if (process.client && to.path.startsWith('/admin') && !auth.isLoggedIn) {
+  if (import.meta.client && to.path.startsWith('/admin') && !auth.isLoggedIn) {
     return navigateTo('/')
   }
   // No redirect needed; just ensure auth is ready
