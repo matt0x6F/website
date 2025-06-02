@@ -38,6 +38,13 @@ export default defineNuxtConfig({
     head: {
       link: [
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Inter:400,500,600,700&display=swap' }
+      ],
+      script: [
+        {
+          src: 'https://cloud.umami.is/script.js',
+          defer: true,
+          'data-website-id': '02cf5648-2104-40e1-b356-c1a537882489'
+        }
       ]
     }
   },
