@@ -144,16 +144,16 @@ jobs:
         run: |
           cd ui
           ls -l .output
+      - name: Install Playwright browsers
+        run: |
+          cd ui
+          npx playwright install --with-deps
       - name: Try running Nuxt preview server (debug)
         run: |
           cd ui
           npm run preview &
           sleep 10
           curl -I http://localhost:3100 || true
-      - name: Install Playwright browsers
-        run: |
-          cd ui
-          npx playwright install --with-deps
       - name: Run frontend e2e tests
         run: |
           cd ui
