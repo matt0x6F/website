@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  backend-test:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -22,20 +22,12 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: Cache Poetry virtualenv
         uses: actions/cache@v4
         with:
@@ -46,13 +38,11 @@ jobs:
           key: ${{ runner.os }}-poetry-${{ hashFiles('api/poetry.lock') }}
           restore-keys: |
             ${{ runner.os }}-poetry-
-
       - name: Install backend dependencies
         run: |
           cd api
           pip install poetry
           poetry install
-
       - name: Write .env.ci for backend
         run: |
           cat <<EOF > api/.env.ci
@@ -66,33 +56,104 @@ jobs:
           allowed_hosts=["*"]
           cors__allowed_origins=["*"]
           EOF
-
       - name: Run backend tests
         run: |
           cd api
           ENV_FILE=.env.ci poetry run python manage.py migrate
           ENV_FILE=.env.ci poetry run pytest
 
+  frontend-unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('ui/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
       - name: Install frontend dependencies
         run: |
           cd ui
           npm ci
-
-      - name: Install Playwright browsers
-        run: |
-          cd ui
-          npx playwright install --with-deps
-
       - name: Run frontend unit tests
         run: |
           cd ui
           npm run test:unit
 
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('ui/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+      - name: Install frontend dependencies
+        run: |
+          cd ui
+          npm ci
       - name: Build frontend for preview
         run: |
           cd ui
           npm run build
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuxt-build
+          path: ui/.output
 
+  frontend-e2e-test:
+    runs-on: ubuntu-latest
+    needs: frontend-build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('ui/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+      - name: Install frontend dependencies
+        run: |
+          cd ui
+          npm ci
+      - name: Download frontend build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nuxt-build
+          path: ui/.output
+      - name: List .output contents
+        run: |
+          cd ui
+          ls -l .output
+      - name: Try running Nuxt preview server (debug)
+        run: |
+          cd ui
+          npm run preview &
+          sleep 10
+          curl -I http://localhost:3100 || true
+      - name: Install Playwright browsers
+        run: |
+          cd ui
+          npx playwright install --with-deps
       - name: Run frontend e2e tests
         run: |
           cd ui
