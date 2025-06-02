@@ -103,8 +103,8 @@ export default defineConfig({
      * Use the preview server on CI for more realistic testing.
      * Playwright will re-use the local server if there is already a dev-server running.
      */
-    command: process.env.CI ? 'npm run preview' : 'npm run dev -- --port 3100',
-    port: 3100,
+    command: process.env.CI ? 'npm run preview' : 'npm run dev',
+    port: 3000,
     reuseExistingServer: false,
     env: {
       VITE_API_URL: 'http://localhost:4100',
