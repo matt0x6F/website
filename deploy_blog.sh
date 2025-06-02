@@ -11,8 +11,13 @@ fi
 cd /var/lib/blog
 
 # 3. Change to 'blog' user and run deployment steps
-sudo -u blog bash <<'EOF'
+sudo -i -u blog bash <<'EOF'
 set -euo pipefail
+
+cd /var/lib/blog
+
+# Ensure poetry is in PATH (adjust if your poetry is elsewhere)
+export PATH="$PATH:/home/blog/.local/bin"
 
 # 4. Pull latest code
 git pull
@@ -26,7 +31,13 @@ poetry run python manage.py collectstatic --noinput
 # 6. Change to frontend directory
 cd /var/lib/blog/ui
 
-# 7. Set build environment variables and build
+# 7. Ensure nvm and npm are available, and use the correct Node version from .nvmrc
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm install
+nvm use
+
+# 8. Set build environment variables and build
 export VITE_API_URL="https://ooo-yay.com/api"
 export VITE_API_URL_INTERNAL="http://127.0.0.1:8000"
 export VITE_PUBLIC_SITE_URL="https://ooo-yay.com"
@@ -35,7 +46,7 @@ npm install
 npm run build
 EOF
 
-# 8. Back to 'matt' user, restart services
+# 9. Back to 'matt' user, restart services
 sudo systemctl restart nuxt
 sudo systemctl restart blog
 
