@@ -237,14 +237,16 @@ const saveResume = async () => {
 onMounted(async () => {
   try {
     const data = await api.apiGetResume()
-    // Format dates for input fields
+    // Format dates for input fields and sort experiences
     resume.value = {
       ...data,
-      experiences: data.experiences.map(exp => ({
-        ...exp,
-        startDate: formatDateForInput(exp.startDate) as unknown as Date,
-        endDate: formatDateForInput(exp.endDate) as unknown as Date
-      })),
+      experiences: data.experiences
+        .map(exp => ({
+          ...exp,
+          startDate: formatDateForInput(exp.startDate) as unknown as Date,
+          endDate: formatDateForInput(exp.endDate) as unknown as Date
+        }))
+        .sort((a, b) => b.startDate.getTime() - a.startDate.getTime()),
       proficiencies: data.proficiencies.map(prof => ({
         category: prof.category,
         items: prof.items
