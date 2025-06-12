@@ -78,6 +78,7 @@ tasks:
   load-fixtures:
     desc: "Load all fixtures"
     cmds:
-      - docker compose exec django sh -c 'poetry run python manage.py loaddata blog/fixtures/*'
+      - docker compose exec django sh -c 'poetry run python manage.py flush --no-input'
+      - docker compose exec django sh -c 'poetry run python manage.py loaddata accounts/fixtures/initial_users.json resume/fixtures/initial_resume.json blog/fixtures/*'
     env:
       DATABASE__HOST: "localhost"

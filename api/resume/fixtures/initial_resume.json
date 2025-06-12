@@ -1,0 +1,81 @@
+[
+  {
+    "model": "resume.proficiency",
+    "pk": 1,
+    "fields": {
+      "category": "Cloud & Containers",
+      "items": ["AWS", "GCP", "Azure", "Kubernetes", "Docker", "Podman"]
+    }
+  },
+  {
+    "model": "resume.proficiency",
+    "pk": 2,
+    "fields": {
+      "category": "Programming Languages",
+      "items": ["Python", "Go", "Java", "Bash", "Typescript", "Javascript", "Node.js", "Ruby"]
+    }
+  },
+  {
+    "model": "resume.proficiency",
+    "pk": 3,
+    "fields": {
+      "category": "Databases",
+      "items": ["MySQL", "Postgres", "Redis", "OpenSearch", "Elasticsearch", "MongoDB"]
+    }
+  },
+  {
+    "model": "resume.proficiency",
+    "pk": 4,
+    "fields": {
+      "category": "Frameworks",
+      "items": ["Django", "FastAPI", "React", "Vue", "Svelte", "Spring"]
+    }
+  },
+  {
+    "model": "resume.experience",
+    "pk": 1,
+    "fields": {
+      "title": "Senior Software Engineer, Reliability Engineering",
+      "company": "Slack",
+      "start_date": "2022-08-01",
+      "is_current": true,
+      "achievements": "- Multi-cloud user and group synchronization system integrated with cloud provider SCIM\n- GovSlack Directly Responsible Individual (DRI)\n- Developed cross-partition artifact verification and copying service\n- Maintainer of Service Owner Catalog @ Slack\n- Drove internal production ownership through personas, user stories, and roadmapping\n- Championed OpenAPIv3 end-to-end generation as a service development pattern\n- Developed team project intake process, streamlining and increasing external contributions\n- Drove adoption of Athens Proxy greatly increasing developer productivity and reliability of Go artifacts\n- Developed automated service level objective (SLO) program\n- Over 1,000 yearly contributions (reviews, commits, pull requests, issues) on GitHub"
+    }
+  },
+  {
+    "model": "resume.experience",
+    "pk": 2,
+    "fields": {
+      "title": "Staff Software Engineer (Lead Engineer, IDPS)",
+      "company": "Intuit",
+      "start_date": "2020-04-01",
+      "end_date": "2022-08-15",
+      "is_current": false,
+      "achievements": "- Implemented a new authentication method for appliance management APIs based on non-static credentials\n- Led the development and maintenance of six products (Java, Go, Node, Python SDKs + developer platform + CLI) with 2-3 engineers\n- Served as escalation support for bugs and incidents\n- Designed and led rewrite of secrets & key management CLI\n- Replatformed all microservices onto a custom Kubernetes implementation (EKS-based)\n- Designed and led production of a CLI workflow management utility for Kubernetes users\n- Implemented agile rituals (retrospectives, action items) leading to demonstrated backlog reduction\n- Designed next-gen capability negotiation between backend services and client SDKs\n- Oversaw acquisition and retrofit of an init-container based secrets fetching solution"
+    }
+  },
+  {
+    "model": "resume.experience",
+    "pk": 3,
+    "fields": {
+      "title": "Staff Site Reliability Engineer (API Gateway & Kubernetes Service)",
+      "company": "Intuit",
+      "start_date": "2019-03-01",
+      "end_date": "2020-04-01",
+      "is_current": false,
+      "achievements": "- Led the company in on-boarding to SELinux and Amazon Linux 2 simultaneously for Intuit API Gateway\n- Helped design patterns and training docs for other teams to onboard to SELinux quickly\n- Led successful audits for CCPA, PCI, and Indiana Department of Revenue\n- Led a POC around reinventing our internal secrets solution to be Kubernetes native\n- As an SRE: average concurrent RPS >600k for Intuit API Gateway and Intuit Kubernetes Service\n- Maintained Intuit API Gateway's systems infrastructure with Chef, Python\n- Developed, as a team member, on Intuit Kubernetes Service v1/v2 (Python/GoLang)\n- Advised on implementation for DR strategies and wrote the systems feature that enabled full restoral from nothing on Intuit API Gateway\n- Built out POC Golden signals dashboards that was used during peak season\n- Provided mentorship for colleagues as part of a mentorship program\n- Provided community support for GoLang and mentored new Go developers\n- Forked and developed an internal version of GoDoc.org for use within Intuit\n- Contributed features back to kubernetes/kops (Kubernetes Operations) and other FOSS projects\n- Wrote a POC self-service application syncing VMWare Wavefront dashboards and alerts from a Git repo\n- Led a project to improve the secrets delivery experience inside containers\n  - Designed and benchmarked a new secrets delivery system\n  - Improved security posture by reducing attack surface\n  - Reduced latency by 50% through optimized caching\n- Designed and wrote a GitOps based orchestration utility to synchronize Kubernetes clusters and their configuration"
+    }
+  },
+  {
+    "model": "resume.resume",
+    "pk": 1,
+    "fields": {
+      "name": "Matt",
+      "github_url": "https://github.com/matt0x6f",
+      "website_url": "https://ooo-yay.com",
+      "bio": "My name is Matt. I'm a software engineer that has made a career building software that eases service ownership, reliability, and security burdens. I enjoy working with curious, hard working, and ambitious teams.",
+      "proficiencies": [1, 2, 3, 4],
+      "experiences": [1, 2, 3]
+    }
+  }
+] 

@@ -36,5 +36,6 @@ const navLinks = [
     { to: '/admin/users', text: 'Users', icon: 'pi pi-users' },
     { to: '/admin/comments', text: 'Comments', icon: 'pi pi-comments' },
     { to: '/admin/files', text: 'Files', icon: 'pi pi-folder' },
+    { to: '/admin/resume', text: 'Resume', icon: 'pi pi-file-edit' },
 ];
 </script> 

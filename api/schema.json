@@ -2505,6 +2505,65 @@
           }
         ]
       }
+    },
+    "/api/resume/": {
+      "get": {
+        "operationId": "resume_api_get_resume",
+        "summary": "Get Resume",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get the resume data",
+        "tags": [
+          "resume"
+        ]
+      },
+      "put": {
+        "operationId": "resume_api_update_resume",
+        "summary": "Update Resume",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeSchema"
+                }
+              }
+            }
+          }
+        },
+        "description": "Update the resume data. Only staff members can update the resume.",
+        "tags": [
+          "resume"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResumeSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -5258,6 +5317,117 @@
           "items"
         ],
         "title": "JSONFeed",
+        "type": "object"
+      },
+      "ExperienceSchema": {
+        "properties": {
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "company": {
+            "title": "Company",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "is_current": {
+            "default": false,
+            "title": "Is Current",
+            "type": "boolean"
+          },
+          "achievements": {
+            "title": "Achievements",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "company",
+          "start_date",
+          "achievements"
+        ],
+        "title": "ExperienceSchema",
+        "type": "object"
+      },
+      "ProficiencySchema": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "category",
+          "items"
+        ],
+        "title": "ProficiencySchema",
+        "type": "object"
+      },
+      "ResumeSchema": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "github_url": {
+            "title": "Github Url",
+            "type": "string"
+          },
+          "website_url": {
+            "title": "Website Url",
+            "type": "string"
+          },
+          "bio": {
+            "title": "Bio",
+            "type": "string"
+          },
+          "proficiencies": {
+            "items": {
+              "$ref": "#/components/schemas/ProficiencySchema"
+            },
+            "title": "Proficiencies",
+            "type": "array"
+          },
+          "experiences": {
+            "items": {
+              "$ref": "#/components/schemas/ExperienceSchema"
+            },
+            "title": "Experiences",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "github_url",
+          "website_url",
+          "bio",
+          "proficiencies",
+          "experiences"
+        ],
+        "title": "ResumeSchema",
         "type": "object"
       }
     },

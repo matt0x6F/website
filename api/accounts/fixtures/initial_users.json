@@ -1,0 +1,23 @@
+[
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$QRaWAIje5Kz4hm9dG0I6YL$C45WMT7446mT38FiMAkrHsKjlFpnphvhoKY9zuYNK2w=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "matt",
+      "first_name": "Matt",
+      "last_name": "",
+      "email": "m@ooo-yay.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "avatar_link": null,
+      "website_url": "https://ooo-yay.com",
+      "notes": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+] 

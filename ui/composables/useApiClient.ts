@@ -1,5 +1,4 @@
 import { Configuration } from '@/lib/api'
-import { useAuthStore } from '@/stores/auth'
 
 type ApiConstructor<T> = new (config: Configuration) => T
 

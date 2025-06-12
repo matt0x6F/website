@@ -19,6 +19,7 @@ from blog.api.feed import feed_router
 from blog.api.files import files_router
 from blog.api.posts import posts_router
 from blog.api.series import series_router
+from resume.api import router as resume_router
 
 api = NinjaExtraAPI(
     title="ooo-yay.com API",
@@ -95,6 +96,7 @@ api.add_router("/posts/", posts_router)
 api.add_router("/files/", files_router)
 api.add_router("/comments/", comments_router)
 api.add_router("/feed/", feed_router)
+api.add_router("/resume/", resume_router)
 
 urlpatterns = [
     path("api/", api.urls),
