@@ -1,8 +1,7 @@
 import pytest
-from django.test import Client
+from django.test.client import Client
 
 from accounts.models import User
-from resume.models import Experience, Proficiency, Resume
 
 
 @pytest.mark.django_db
@@ -67,36 +66,16 @@ class TestResumeAPI:
         """Test getting resume when none exists"""
         response = client.get("/api/resume/")
         assert response.status_code == 200
-        assert response.json() is None
+        data = response.json()
+        assert data["name"] == ""
+        assert data["github_url"] == ""
+        assert data["website_url"] == ""
+        assert data["bio"] == ""
+        assert data["proficiencies"] == []
+        assert data["experiences"] == []
 
-    def test_get_resume_with_data(self, client: Client, resume_data):
+    def test_get_resume_with_data(self, client: Client, resume, resume_data):
         """Test getting resume with existing data"""
-        # Create resume with data
-        resume = Resume.objects.create(
-            name=resume_data["name"],
-            github_url=resume_data["github_url"],
-            website_url=resume_data["website_url"],
-            bio=resume_data["bio"],
-        )
-
-        # Create proficiencies
-        for prof in resume_data["proficiencies"]:
-            proficiency = Proficiency.objects.create(category=prof["category"], items=prof["items"])
-            resume.proficiencies.add(proficiency)
-
-        # Create experiences
-        for exp in resume_data["experiences"]:
-            experience = Experience.objects.create(
-                title=exp["title"],
-                company=exp["company"],
-                start_date=exp["start_date"],
-                end_date=exp.get("end_date"),
-                is_current=exp["is_current"],
-                achievements=exp["achievements"],
-            )
-            resume.experiences.add(experience)
-
-        # Test getting the resume
         response = client.get("/api/resume/")
         assert response.status_code == 200
         data = response.json()
@@ -126,7 +105,8 @@ class TestResumeAPI:
             if "end_date" in matching_exp:
                 assert exp["end_date"] == matching_exp["end_date"]
 
-    def test_update_resume_staff(self, client: Client, resume_data, staff_token):
+    @pytest.mark.parametrize("auth_token", ["superuser"], indirect=True)
+    def test_update_resume_staff(self, client: Client, auth_token: str, resume_data):
         """Test updating resume data as staff"""
         # First create initial resume
         initial_data = {
@@ -142,7 +122,7 @@ class TestResumeAPI:
             "/api/resume/",
             initial_data,
             content_type="application/json",
-            HTTP_AUTHORIZATION=f"Bearer {staff_token}",
+            HTTP_AUTHORIZATION=f"Bearer {auth_token}",
         )
         assert response.status_code == 200
 
@@ -151,7 +131,7 @@ class TestResumeAPI:
             "/api/resume/",
             resume_data,
             content_type="application/json",
-            HTTP_AUTHORIZATION=f"Bearer {staff_token}",
+            HTTP_AUTHORIZATION=f"Bearer {auth_token}",
         )
         assert response.status_code == 200
         data = response.json()
@@ -164,22 +144,24 @@ class TestResumeAPI:
         assert len(data["proficiencies"]) == len(resume_data["proficiencies"])
         assert len(data["experiences"]) == len(resume_data["experiences"])
 
-    def test_update_resume_non_staff_forbidden(self, client: Client, resume_data, regular_token):
+    @pytest.mark.parametrize("auth_token", ["regular_user"], indirect=True)
+    def test_update_resume_non_staff_forbidden(self, client: Client, auth_token: str, resume_data):
         """Test that non-staff users cannot update resume"""
         response = client.put(
             "/api/resume/",
             resume_data,
             content_type="application/json",
-            HTTP_AUTHORIZATION=f"Bearer {regular_token}",
+            HTTP_AUTHORIZATION=f"Bearer {auth_token}",
         )
         assert response.status_code == 403
 
     def test_update_resume_unauthenticated_forbidden(self, client: Client, resume_data):
         """Test that unauthenticated users cannot update resume"""
         response = client.put("/api/resume/", resume_data, content_type="application/json")
-        assert response.status_code == 403  # Forbidden due to missing authentication
+        assert response.status_code == 403
 
-    def test_update_resume_validation(self, client: Client, staff_token):
+    @pytest.mark.parametrize("auth_token", ["superuser"], indirect=True)
+    def test_update_resume_validation(self, client: Client, auth_token: str):
         """Test resume update validation"""
         invalid_data = {
             "name": "Test User",
@@ -194,11 +176,12 @@ class TestResumeAPI:
             "/api/resume/",
             invalid_data,
             content_type="application/json",
-            HTTP_AUTHORIZATION=f"Bearer {staff_token}",
+            HTTP_AUTHORIZATION=f"Bearer {auth_token}",
         )
-        assert response.status_code == 400  # Bad Request
+        assert response.status_code == 400
 
-    def test_update_resume_experience_validation(self, client: Client, staff_token):
+    @pytest.mark.parametrize("auth_token", ["superuser"], indirect=True)
+    def test_update_resume_experience_validation(self, client: Client, auth_token: str):
         """Test resume experience validation"""
         invalid_data = {
             "name": "Test User",
@@ -222,6 +205,6 @@ class TestResumeAPI:
             "/api/resume/",
             invalid_data,
             content_type="application/json",
-            HTTP_AUTHORIZATION=f"Bearer {staff_token}",
+            HTTP_AUTHORIZATION=f"Bearer {auth_token}",
         )
-        assert response.status_code == 400  # Bad Request
+        assert response.status_code == 400

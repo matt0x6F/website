@@ -160,7 +160,14 @@ interface ProficiencyForm {
 }
 
 const api = useApiClient(ResumeApi)
-const resume = ref<(ResumeSchema & { proficiencies: ProficiencyForm[] }) | null>(null)
+const resume = ref<(ResumeSchema & { proficiencies: ProficiencyForm[] })>({
+  name: '',
+  githubUrl: '',
+  websiteUrl: '',
+  bio: '',
+  proficiencies: [],
+  experiences: []
+})
 const toast = useToast()
 
 const formatDateForInput = (date: Date | null | undefined) => {
@@ -197,9 +204,12 @@ const saveResume = async () => {
     const resumeToSave: ResumeSchema = {
       ...resume.value,
       experiences: resume.value.experiences.map(exp => ({
-        ...exp,
+        title: exp.title,
+        company: exp.company,
         startDate: parseDate(exp.startDate) || new Date(),
-        endDate: exp.isCurrent ? null : parseDate(exp.endDate)
+        endDate: exp.isCurrent ? null : parseDate(exp.endDate),
+        isCurrent: exp.isCurrent,
+        achievements: exp.achievements
       })),
       proficiencies: resume.value.proficiencies.map(prof => ({
         category: prof.category,
@@ -242,6 +252,12 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('Failed to fetch resume:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load resume data',
+      life: 3000
+    })
   }
 })
 </script>

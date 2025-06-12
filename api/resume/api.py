@@ -2,7 +2,6 @@ import re
 
 from ninja import Router
 from ninja.errors import HttpError
-from ninja.responses import Response
 
 from auth.middleware import JWTAuth, StaffOnly
 
@@ -32,7 +31,14 @@ def get_resume(request):
     """Get the resume data"""
     resume = Resume.objects.first()  # We'll only have one resume
     if not resume:
-        return Response(None, status=200)
+        return {
+            "name": "",
+            "github_url": "",
+            "website_url": "",
+            "bio": "",
+            "proficiencies": [],
+            "experiences": [],
+        }
 
     return {
         "name": resume.name,
